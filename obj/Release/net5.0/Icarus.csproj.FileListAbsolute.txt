@@ -1,0 +1,17 @@
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.exe
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.deps.json
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.runtimeconfig.json
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.runtimeconfig.dev.json
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.dll
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\ref\Icarus.dll
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.pdb
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.AssemblyInfoInputs.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.AssemblyInfo.cs
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CoreCompileInputs.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.dll
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\ref\Icarus.dll
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.pdb
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.Fody.CopyLocal.cache
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\GreyCrammedContainer.xml

@@ -1,0 +1,5 @@
+C:\Users\thewa\source\repos\C#\Icarus\obj\Debug\net5.0\Icarus.csproj.AssemblyReference.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Debug\net5.0\Icarus.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\thewa\source\repos\C#\Icarus\obj\Debug\net5.0\Icarus.AssemblyInfoInputs.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Debug\net5.0\Icarus.AssemblyInfo.cs
+C:\Users\thewa\source\repos\C#\Icarus\obj\Debug\net5.0\Icarus.csproj.CoreCompileInputs.cache

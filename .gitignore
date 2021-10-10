@@ -27,6 +27,7 @@
 *.so
 *.so.*
 *.dylib
+./C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Config.gcc
 
 # Executables
 *.exe
@@ -50,3 +51,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+bin/Release/net5.0/Config.gcc
