@@ -3,6 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon>light-tourelles.ico</ApplicationIcon>
+    <Authors>Mikayel Kananov</Authors>
+    <Company>CardinalSoft</Company>
+    <Description>Icarus is a strictly moderation based discord bot with aim to be on level with human moderators if not better.</Description>
+    <Copyright>Copyright ©Michael Kananov 2021</Copyright>
+    <PackageIcon>light-tourelles.png</PackageIcon>
+    <PackageIconUrl />
+    <NeutralLanguage>en-150</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\" />
     <Folder Include="lib\" />
   </ItemGroup>
 
@@ -24,6 +31,13 @@
     <Reference Include="GreyCrammedContainer">
       <HintPath>lib\GreyCrammedContainer.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\OneDrive\Рабочий стол\Art\Icons\light-tourelles.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

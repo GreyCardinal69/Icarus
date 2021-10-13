@@ -15,3 +15,4 @@ C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.pdb
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.Fody.CopyLocal.cache
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\GreyCrammedContainer.xml
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.AssemblyReference.cache
