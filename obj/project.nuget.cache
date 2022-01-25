@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Zr1SbCxUgx5bU5p4ZxUpRuseEPoJTKqHUiCwtzjM0aqZIFrQE42Y/5I43lH85FQJIdce1X47EtO2aKSvWApvbw==",
+  "dgSpecHash": "YWjh4hsT+oO7SEVYXNWlMdpTKSP8UEtU5Srh+QsnvDOIiLTRhsnClK8aTdSokXx8T/y8sQo1f0U26jYUR00zuQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
   "expectedPackageFiles": [
@@ -101,7 +101,8 @@
     "C:\\Users\\thewa\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
-    "C:\\Users\\thewa\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512"
+    "C:\\Users\\thewa\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.12\\microsoft.netcore.app.host.win-x64.5.0.12.nupkg.sha512"
   ],
   "logs": []
 }

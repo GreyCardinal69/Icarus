@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
@@ -237,17 +236,5 @@ namespace Icarus.Modules.Logs
             await ctx.RespondAsync( $"Disabled the following log events: {string.Join( ", ", Events.Where( X => EventTypes.Contains( X ) ) )}" );
             GccConverter.Serialize( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.gcc", Profile );
         }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

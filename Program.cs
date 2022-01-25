@@ -2,6 +2,9 @@
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using System.Timers;
 
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -9,15 +12,15 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Logging;
 using GreyCrammedContainer;
 
 using Icarus.Modules.Other;
 using Icarus.Modules.Profiles;
 using Icarus.Modules.Logs;
-using DSharpPlus.Entities;
-using System.Linq;
-using System.IO;
+using Icarus.Modules.Isolation;
 
 namespace Icarus
 {
@@ -26,7 +29,8 @@ namespace Icarus
         public static string Token;
         public static ulong OwnerID;
         public static Program Core;
-        
+        private static Timer EntryCheckTimer;
+
         public DiscordClient Client { get; private set; }
         public CommandsNextConfiguration CommandsNextConfig { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
@@ -42,6 +46,8 @@ namespace Icarus
         static void Main ( string[] args )
         {
             Core = new Program();
+            Core.ServerProfiles = new List<ServerProfile>();
+            SetTimer();
 
             if (GetOperatingSystem() == OSPlatform.Windows)
             {
@@ -50,6 +56,53 @@ namespace Icarus
             }
             Core.BotStartUpStamp = DateTimeOffset.Now;
             Core.RunBotAsync().GetAwaiter().GetResult();
+        }
+
+        private static void SetTimer ()
+        {
+            // Create a timer with a two second interval.
+            EntryCheckTimer = new System.Timers.Timer( 600 );
+            // Hook up the Elapsed event for the timer. 
+         //   EntryCheckTimer.Elapsed += OnEntryUpdate;
+            EntryCheckTimer.AutoReset = true;
+            EntryCheckTimer.Enabled = true;
+        }
+
+        private static void OnEntryUpdate ( Object source, ElapsedEventArgs e )
+        {
+            int Index = 0;
+            foreach (var profile in Core.ServerProfiles)
+            {
+                if (profile.Entries.Count > 0)
+                {
+                    foreach (var entry in profile.Entries)
+                    {
+                        if (entry.ReleaseDate < DateTimeOffset.UtcNow)
+                        {
+                            Core.ServerProfiles[Index].Entries.Remove( entry );
+                            var User = Core.Client.GetUserAsync( 893223668174438421 ).Result;
+                            var Channel = Core.Client.GetGuildAsync( profile.ID ).Result.GetChannel( entry.BackUpChannelID );
+                            var Command = Core.Commands.FindCommand( "releaseuser", out _ );
+                            if (User != null && Channel != null && Command != null)
+                            {
+                                Console.WriteLine( "here" );
+                                var ctx = Core.Commands.CreateFakeContext(
+                                       Core.Client.GetUserAsync( 893223668174438421 ).Result,
+                                       Core.Client.GetGuildAsync( profile.ID ).Result.GetChannel( entry.BackUpChannelID ),
+                                       $"%releaseuser {entry.IsolationChannel} {entry.IsolatedUserID}",
+                                       "%",
+                                       Core.Commands.FindCommand( "releaseuser", out _ ),
+                                       $"{entry.IsolationChannel} {entry.IsolatedUserID}"
+                                );
+                                Core.Commands.ExecuteCommandAsync( ctx );
+                            }
+                            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+                            GccConverter.Serialize( $"{ProfilesPath}{profile.ID}.gcc", profile );
+                        }
+                    }
+                }
+                Index++;
+            }
         }
 
         public static OSPlatform GetOperatingSystem ()
@@ -75,10 +128,14 @@ namespace Icarus
         public async Task RunBotAsync ()
         {
             Config Info = GccConverter.Deserialize<Config>( AppDomain.CurrentDomain.BaseDirectory + @"Config.gcc" );
-            List<string> Profiles = HelperFuncs.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
+            List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
 
             foreach (var prof in Profiles)
             {
+                if (!prof.EndsWith(".gcc"))
+                {
+                    continue;
+                }
                 ServerProfile Profile = GccConverter.Deserialize<ServerProfile>( prof );
                 ServerProfiles.Add( Profile );
                 RegisteredServerIds.Add( Profile.ID );
@@ -91,7 +148,9 @@ namespace Icarus
             {
                 Intents = DiscordIntents.AllUnprivileged
                     .AddIntent(DiscordIntents.GuildInvites)
-                    .AddIntent(DiscordIntents.GuildMembers),
+                    .AddIntent(DiscordIntents.GuildMembers)
+                    .AddIntent(DiscordIntents.AllUnprivileged)
+                    .AddIntent(DiscordIntents.All),
                 Token = Info.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
@@ -120,7 +179,8 @@ namespace Icarus
 
 
             // Profiles
-            Commands.RegisterCommands<ServProgManagement>();
+            Commands.RegisterCommands<ServerManagement>();
+            Commands.RegisterCommands<IsolationManagement>();
 
             // Logging
             Commands.RegisterCommands<LogManagement>();
@@ -149,6 +209,7 @@ namespace Icarus
             Client.ChannelCreated += Event_ChannelCreated;
             Client.ChannelDeleted += Event_ChannelDeleted;
 
+            Core.Client = this.Client;
             await this.Client.ConnectAsync();
             await Task.Delay( -1 );
         }

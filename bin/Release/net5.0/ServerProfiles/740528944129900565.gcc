@@ -1,28 +1,30 @@
 |
-	Name: "Grey Cardinal Games"
+	Name: "Member"
 	ID: 740528944129900565
 	LogConfig|
-		LoggingEnabled: 1
-		GuildMemberRemoved: 1
-		GuildMemberAdded: 1
-		GuildBanRemoved: 0
-		GuildBanAdded: 0
-		GuildRoleCreated: 1
-		GuildRoleUpdated: 1
-		GuildRoleDeleted: 1
-		MessageReactionsCleared: 1
-		MessageReactionRemoved: 1
-		MessageReactionAdded: 1
-		MessagesBulkDeleted: 1
-		MessageDeleted: 1
-		MessageUpdated: 1
-		MessageCreated: 0
-		InviteDeleted: 1
-		InviteCreated: 1
-		ChannelUpdated: 1
-		ChannelDeleted: 1
-		ChannelCreated: 1
+		LoggingEnabled: false
+		GuildMemberRemoved: false
+		GuildMemberAdded: false
+		GuildBanRemoved: false
+		GuildBanAdded: false
+		GuildRoleCreated: false
+		GuildRoleUpdated: false
+		GuildRoleDeleted: false
+		MessageReactionsCleared: false
+		MessageReactionRemoved: false
+		MessageReactionAdded: false
+		MessagesBulkDeleted: false
+		MessageDeleted: false
+		MessageUpdated: false
+		MessageCreated: false
+		InviteDeleted: false
+		InviteCreated: false
+		ChannelUpdated: false
+		ChannelDeleted: false
+		ChannelCreated: false
 		LogChannel: 801168435119783998
 		SecondaryLogChannel: 0
 	|
+	Entries>
+		<
 |

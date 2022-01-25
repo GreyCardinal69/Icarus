@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Icarus.Modules.Other
 {
-    public class HelperFuncs
+    public class Helpers
     {
         public static int LevenshteinDistance ( string s, string t )
         {
@@ -36,8 +33,8 @@ namespace Icarus.Modules.Other
 
         public static List<string> GetAllFilesFromFolder ( string root, bool searchSubfolders )
         {
-            Queue<string> folders = new Queue<string>();
-            List<string> files = new List<string>();
+            Queue<string> folders = new();
+            List<string> files = new();
             folders.Enqueue( root );
             while (folders.Count != 0)
             {

@@ -16,7 +16,7 @@ namespace Icarus.Modules.Other
         {
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync( 
-                $""
+                $"helpr\nping\nIsolate\n"
             );
         }
 

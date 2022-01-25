@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Icarus.Modules.Isolation;
 using Icarus.Modules.Logs;
 
 namespace Icarus.Modules.Profiles
@@ -14,6 +16,10 @@ namespace Icarus.Modules.Profiles
         public string Name { get; set; }
         public ulong ID { get; set; }
         public LogConfig LogConfig { get; set; }
+        public List<IsolationEntry> Entries { get; set; }
+
+
+
 
         public static ServerProfile ProfileFromId( ulong ID )
         {
@@ -27,7 +33,5 @@ namespace Icarus.Modules.Profiles
             }
             return null;
         }
-
-
     }
 }

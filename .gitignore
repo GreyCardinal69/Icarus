@@ -30,6 +30,7 @@
 *.so.*
 *.dylib
 ./C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Config.gcc
+*.gcc
 
 # Executables
 *.exe

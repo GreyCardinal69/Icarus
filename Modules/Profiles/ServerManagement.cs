@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Icarus.Modules.Profiles
 {
-    public class ServProgManagement : BaseCommandModule
+    public class ServerManagement : BaseCommandModule
     {
         [Command( "RegisterServer" )]
         [Description( "Creates a server profile for the server where executed." )]
@@ -25,7 +25,7 @@ namespace Icarus.Modules.Profiles
                 await ctx.RespondAsync($"A server profile for this server already exists, do you want to reset it ? If yes type `%registerserver true`");
                 return;
             }
-
+            
             ServerProfile Profile = new()
             {
                 Name = ctx.Guild.Name,
