@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Icarus.Modules.Other
 {
-    public class Helpers
+    public sealed class Helpers
     {
         public static int LevenshteinDistance ( string s, string t )
         {
