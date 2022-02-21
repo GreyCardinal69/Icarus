@@ -12,7 +12,7 @@ namespace Icarus.Modules.Other
     public class Help : BaseCommandModule
     {
         [Command( "help" )]
-        [Description( "Responds with information on available commands." )]
+        [Description( "Responds with information on available command categories." )]
         public async Task HelpBasic ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();

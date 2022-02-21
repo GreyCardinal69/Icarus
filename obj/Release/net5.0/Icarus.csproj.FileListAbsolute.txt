@@ -18,8 +18,8 @@ C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.GeneratedMSBuild
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.AssemblyInfoInputs.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.AssemblyInfo.cs
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CoreCompileInputs.cache
-C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CopyComplete
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.dll
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\ref\Icarus.dll
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.pdb
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.AssemblyReference.cache
