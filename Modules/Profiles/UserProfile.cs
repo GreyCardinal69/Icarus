@@ -13,8 +13,6 @@ namespace Icarus.Modules.Profiles
         public string LastUsername { get; set; }
         public List<string> OldUsernames { get; set; }
 
-        public List<Tuple<int, string>> Strikes;
-
         public List<Tuple<DateTime, string>> PunishmentEntries { get; set; }
         public List<Tuple<DateTime, string>> BanEntries { get; set; }
         public List<Tuple<DateTime, string>> KickEntries { get; set; }
@@ -26,7 +24,6 @@ namespace Icarus.Modules.Profiles
 
         public UserProfile ( ulong id, string usernameLast )
         {
-            Strikes = new();
             OldUsernames = new();
             PunishmentEntries = new();
             BanEntries = new();

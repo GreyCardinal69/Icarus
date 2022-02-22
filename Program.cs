@@ -20,6 +20,7 @@ using Icarus.Modules.Other;
 using Icarus.Modules;
 using Icarus.Modules.Logs;
 using Icarus.Modules.Servers;
+using Icarus.Modules.Isolation;
 
 namespace Icarus
 {
@@ -38,7 +39,7 @@ namespace Icarus
         public List<ServerProfile> ServerProfiles = new();
 
         private string _token;
-        private Timer _entryCheckTimer;
+        private System.Timers.Timer _entryCheckTimer;
         private readonly EventId BotEventId = new( 1488, "Bot-Ex1488" );
 
         static void Main ( string[] args )
@@ -47,12 +48,35 @@ namespace Icarus
 
             if (GetOperatingSystem() == OSPlatform.Windows)
             {
+                #pragma warning disable CA1416
                 Console.WindowWidth = 140;
                 Console.WindowHeight = 30;
+                #pragma warning restore CA1416
             }
 
+            Core._entryCheckTimer = new(10000);
+            Core._entryCheckTimer.Elapsed += async ( sender, e ) => await HandleTimer();
+            Core._entryCheckTimer.Start();
+            Core._entryCheckTimer.AutoReset = true;
+            Core._entryCheckTimer.Enabled = true;
             Core.BotStartUpStamp = DateTimeOffset.Now;
             Core.RunBotAsync().GetAwaiter().GetResult();
+        }
+
+        private static async Task<Task> HandleTimer ()
+        {
+            for (int i = 0; i < Core.ServerProfiles.Count; i++)
+            {
+                for (int w = 0; w < Core.ServerProfiles[i].Entries.Count; w++)
+                {
+                    if (DateTime.UtcNow > Core.ServerProfiles[i].Entries[w].ReleaseDate)
+                    {
+                        await IsolationManagement.ReleaseEntry( Core.ServerProfiles[i], Core.ServerProfiles[i].Entries[w] );
+                    }
+                }
+            }
+            Console.WriteLine( $"Completed 10 minute server entries check [{DateTime.UtcNow}]." );
+            return Task.CompletedTask;
         }
 
         private static OSPlatform GetOperatingSystem ()
@@ -148,6 +172,7 @@ namespace Icarus
 
             Commands.RegisterCommands<LogManagement>();
             Commands.RegisterCommands<ServerManagement>();
+            Commands.RegisterCommands<IsolationManagement>();
 
             Core.Client = this.Client;
             await this.Client.ConnectAsync();
@@ -670,6 +695,10 @@ namespace Icarus
 
         private async Task Event_GuildMemberAdded ( DiscordClient sender, GuildMemberAddEventArgs e )
         {
+            if (e.Guild.Id == 740528944129900565)
+            {
+                await e.Member.GrantRoleAsync(e.Guild.GetRole( 740557101843087441 ) );
+            }
             for (int i = 0; i < ServerProfiles.Count; i++)
             {
                 if (e.Guild.Id == ServerProfiles[i].ID)

@@ -27,8 +27,8 @@ namespace Icarus.Modules
 
         public string Name;
         public ulong ID;
-        public LogProfile LogConfig = new LogProfile();
-        public List<IsolationEntry> Entries = new List<IsolationEntry>();
+        public LogProfile LogConfig = new();
+        public List<IsolationEntry> Entries = new();
         public DateTime ProfileCreationDate { get; init; }
     }
 }

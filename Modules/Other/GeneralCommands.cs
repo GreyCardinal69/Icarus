@@ -1,5 +1,7 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +65,26 @@ namespace Icarus.Modules.Other
         {
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync( $"Watching { string.Join( ",\n  \t\t\t\t ", ctx.Client.Guilds.Values.ToList() ) }" );
+        }
+
+        [Command( "setStatus" )]
+        [Description( "Responds with information on serving servers." )]
+        [RequireOwner]
+        private async Task SetActivity ( CommandContext ctx )
+        {
+            if (ctx.User.Id == Program.Core.OwnerId)
+            {
+                DiscordActivity activity = new DiscordActivity();
+                DiscordClient discord = ctx.Client;
+                string input = Console.ReadLine();
+                activity.Name = input;
+                await discord.UpdateStatusAsync( activity );
+                return;
+            }
+            else
+            {
+                await ctx.RespondAsync("No way this part of code will ever be executed.");
+            }
         }
     }
 }
