@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext;
 
-using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System.IO;
 using DSharpPlus.Interactivity.Extensions;
+using DSharpPlus.Entities;
+using System.Text;
 
 namespace Icarus.Modules.Servers
 {
@@ -67,6 +66,84 @@ namespace Icarus.Modules.Servers
             {
                 await ctx.RespondAsync( "Confirmation time ran out, aborting." );
             }
+        }
+
+        [Command( "profile" )]
+        [Description( "Responds with information on the current server profile." )]
+        public async Task HelpBasic ( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not provide information." );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            StringBuilder enabledEvents = new StringBuilder();
+
+            if (profile.LogConfig.GuildMemberRemoved)
+                enabledEvents.Append( "GuildMemberRemoved, " );
+            if (profile.LogConfig.GuildMemberAdded)
+                enabledEvents.Append( "GuildMemberAdded, " );
+            if (profile.LogConfig.GuildBanRemoved)
+                enabledEvents.Append( "GuildBanRemoved, " );
+            if (profile.LogConfig.GuildBanAdded)
+                enabledEvents.Append( "GuildBanAdded, " );
+            if (profile.LogConfig.GuildRoleCreated)
+                enabledEvents.Append( "GuildRoleCreated, " );
+            if (profile.LogConfig.GuildRoleUpdated)
+                enabledEvents.Append( "GuildRoleUpdated, " );
+            if (profile.LogConfig.GuildRoleDeleted)
+                enabledEvents.Append( "GuildRoleDeleted, " );
+            if (profile.LogConfig.MessageReactionsCleared)
+                enabledEvents.Append( "MessageReactionsCleared, " );
+            if (profile.LogConfig.MessageReactionRemoved)
+                enabledEvents.Append( "MessageReactionRemoved, " );
+            if (profile.LogConfig.MessageReactionAdded)
+                enabledEvents.Append( "MessageReactionAdded, " );
+            if (profile.LogConfig.MessagesBulkDeleted)
+                enabledEvents.Append( "MessagesBulkDeleted, " );
+            if (profile.LogConfig.MessageCreated)
+                enabledEvents.Append( "MessageCreated, " );
+            if (profile.LogConfig.MessageDeleted)
+                enabledEvents.Append( "MessageDeleted, " );
+            if (profile.LogConfig.MessageUpdated)
+                enabledEvents.Append( "MessageUpdated, " );
+            if (profile.LogConfig.InviteCreated)
+                enabledEvents.Append( "InviteCreated, " );
+            if (profile.LogConfig.InviteDeleted)
+                enabledEvents.Append( "InviteDeleted, " );
+            if (profile.LogConfig.ChannelCreated)
+                enabledEvents.Append( "ChannelCreated, " );
+            if (profile.LogConfig.ChannelDeleted)
+                enabledEvents.Append( "ChannelDeleted, " );
+            if (profile.LogConfig.ChannelUpdated)
+                enabledEvents.Append( "ChannelUpdated." );
+
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = $"Server Profile for {ctx.Guild.Name}",
+                Color = DiscordColor.SpringGreen,
+                Description =
+                    $"Logging Enabled?: {profile.LogConfig.LoggingEnabled}.\n\n" +
+                    $"Logging enabled for following events: {enabledEvents}\n\n" +
+                    $"Default notifications are sent to: {ctx.Guild.GetChannel(profile.LogConfig.LogChannel).Mention}.\n\n" +
+                    $"Major notifications are sent to: {ctx.Guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ).Mention}.\n\n" +
+                    $"The default containment channel is: {ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}.\n\n" +
+                    $"The default containment role is: {ctx.Guild.GetRole(profile.LogConfig.DefaultContainmentRoleId).Mention}.\n\n" +
+                    $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
+                    $"Server profile created at: {profile.ProfileCreationDate}.",
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    IconUrl = ctx.Client.CurrentUser.AvatarUrl,
+                },
+                Timestamp = DateTime.Now
+            };
+
+            await ctx.RespondAsync( embed );
         }
     }
 }

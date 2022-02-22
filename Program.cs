@@ -32,14 +32,13 @@ namespace Icarus
         public CommandsNextConfiguration CommandsNextConfig { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
         public InteractivityExtension Interactivity { get; private set; }
-        public DateTimeOffset BotStartUpStamp { get; private set; }
+        public DateTime BotStartUpStamp { get; private set; }
         public ulong OwnerId { get; private set; }
 
         public List<ulong> RegisteredServerIds = new();
         public List<ServerProfile> ServerProfiles = new();
 
-        private string _token;
-        private System.Timers.Timer _entryCheckTimer;
+        private Timer _entryCheckTimer;
         private readonly EventId BotEventId = new( 1488, "Bot-Ex1488" );
 
         private static void Main ( string[] args )
@@ -59,7 +58,7 @@ namespace Icarus
             Core._entryCheckTimer.Start();
             Core._entryCheckTimer.AutoReset = true;
             Core._entryCheckTimer.Enabled = true;
-            Core.BotStartUpStamp = DateTimeOffset.Now;
+            Core.BotStartUpStamp = DateTime.Now;
             Core.RunBotAsync().GetAwaiter().GetResult();
         }
 
@@ -90,16 +89,10 @@ namespace Icarus
             return OSPlatform.Windows;
         }
 
-        private void SetToken ( string token )
-        {
-            this._token = token;
-        }
-
         private async Task RunBotAsync ()
         {
             Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
 
-            Core.SetToken( Info.Token );
             Core.OwnerId = Info.OwnerId;
 
             List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
@@ -182,7 +175,7 @@ namespace Icarus
 
         private async Task Event_MessageCreated ( DiscordClient sender, MessageCreateEventArgs e )
         {
-            if (e.Author.Id == Core.Client.CurrentUser.Id)
+            if (e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId)
             {
                 return;
             }

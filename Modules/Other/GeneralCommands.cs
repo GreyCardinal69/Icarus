@@ -70,7 +70,7 @@ namespace Icarus.Modules.Other
         [Command( "setStatus" )]
         [Description( "Responds with information on serving servers." )]
         [RequireOwner]
-        private async Task SetActivity ( CommandContext ctx, int type, [RemainingText] string status )
+        public async Task SetActivity ( CommandContext ctx, int type, [RemainingText] string status )
         {
             if (ctx.User.Id == Program.Core.OwnerId)
             {
