@@ -70,15 +70,19 @@ namespace Icarus.Modules.Other
         [Command( "setStatus" )]
         [Description( "Responds with information on serving servers." )]
         [RequireOwner]
-        private async Task SetActivity ( CommandContext ctx )
+        private async Task SetActivity ( CommandContext ctx, int type, [RemainingText] string status )
         {
             if (ctx.User.Id == Program.Core.OwnerId)
             {
                 DiscordActivity activity = new DiscordActivity();
                 DiscordClient discord = ctx.Client;
-                string input = Console.ReadLine();
-                activity.Name = input;
-                await discord.UpdateStatusAsync( activity );
+                activity.Name = status;
+                // Offline = 0,
+                // Online = 1,
+                // Idle = 2,
+                // DoNotDisturb = 4,
+                // Invisible = 5
+                await discord.UpdateStatusAsync( activity, (UserStatus)type, DateTimeOffset.UtcNow );
                 return;
             }
             else

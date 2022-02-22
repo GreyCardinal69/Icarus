@@ -12,6 +12,12 @@ namespace Icarus.Modules
     {
         public ServerProfile () { }
 
+        public string Name;
+        public ulong ID;
+        public LogProfile LogConfig = new();
+        public List<IsolationEntry> Entries = new();
+        public DateTime ProfileCreationDate { get; init; }
+
         public static ServerProfile ProfileFromId ( ulong ID )
         {
             var ProfileList = Program.Core.ServerProfiles;
@@ -24,11 +30,5 @@ namespace Icarus.Modules
             }
             return null;
         }
-
-        public string Name;
-        public ulong ID;
-        public LogProfile LogConfig = new();
-        public List<IsolationEntry> Entries = new();
-        public DateTime ProfileCreationDate { get; init; }
     }
 }

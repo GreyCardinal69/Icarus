@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "akSiykQjR5mpOVAzV+kO5DEjmfoe1R6vBxkA6xQfVY3Wwtc5EN87jCcsTREJbZnwqlsHkgBgTL7f9lptJu/w/Q==",
+  "dgSpecHash": "FAe59W5ni+fhYaMPx/lpG/3l6IOM1YKeJGPCSHhkDlrXbuZxQKsj8zoPfgH6ff2GavEnfSvNFlvgArS9y07KeQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
   "expectedPackageFiles": [
@@ -14,6 +14,7 @@
     "C:\\Users\\thewa\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\5.0.0\\microsoft.extensions.logging.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.1\\microsoft.netcore.platforms.1.1.1.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.visualstudio.vsixcolorcompiler\\16.0.0\\microsoft.visualstudio.vsixcolorcompiler.16.0.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\microsoft.win32.primitives\\4.3.0\\microsoft.win32.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",

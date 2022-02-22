@@ -42,7 +42,7 @@ namespace Icarus
         private System.Timers.Timer _entryCheckTimer;
         private readonly EventId BotEventId = new( 1488, "Bot-Ex1488" );
 
-        static void Main ( string[] args )
+        private static void Main ( string[] args )
         {
             Core = new Program();
 
@@ -54,7 +54,7 @@ namespace Icarus
                 #pragma warning restore CA1416
             }
 
-            Core._entryCheckTimer = new(10000);
+            Core._entryCheckTimer = new(600000);
             Core._entryCheckTimer.Elapsed += async ( sender, e ) => await HandleTimer();
             Core._entryCheckTimer.Start();
             Core._entryCheckTimer.AutoReset = true;
@@ -95,7 +95,7 @@ namespace Icarus
             this._token = token;
         }
 
-        public async Task RunBotAsync ()
+        private async Task RunBotAsync ()
         {
             Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ));
 
@@ -125,6 +125,7 @@ namespace Icarus
             };
 
             this.Client = new DiscordClient( cfg );
+            Core.Client = this.Client;
 
             this.Client.Ready += this.Client_Ready;
             this.Client.GuildAvailable += this.Client_GuildAvailable;
@@ -142,6 +143,7 @@ namespace Icarus
             Client.MessagesBulkDeleted += Event_MessagesBulkDeleted;
             Client.MessageDeleted += Event_MessageDeleted;
             Client.MessageUpdated += Event_MessageUpdated;
+            Client.MessageCreated += Event_MessageCreated;
             Client.InviteDeleted += Event_InviteDeleted;
             Client.InviteCreated += Event_InviteCreated;
             Client.ChannelUpdated += Event_ChannelUpdated;
@@ -174,9 +176,33 @@ namespace Icarus
             Commands.RegisterCommands<ServerManagement>();
             Commands.RegisterCommands<IsolationManagement>();
 
-            Core.Client = this.Client;
             await this.Client.ConnectAsync();
             await Task.Delay( -1 );
+        }
+
+        private async Task Event_MessageCreated ( DiscordClient sender, MessageCreateEventArgs e )
+        {
+            foreach (var link in Database.ScamLinks)
+            {
+                if (e.Message.Content.Contains(link))
+                {
+                    var cmds = Program.Core.Client.GetCommandsNext();
+                    var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                    customArgs = "[]help. Hunting For Pulsars.";
+                    var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                    var user = guild.GetMemberAsync( e.Author.Id ).Result;
+                    var fakeContext = cmds.CreateFakeContext
+                        (
+                            user,
+                            Program.Core.Client.GetChannelAsync( e.Channel.Id ).Result,
+                            "isolate", ">",
+                            cmd,
+                            customArgs
+                        );
+                    await fakeContext.RespondAsync("found link");
+                }
+            }
+            return;
         }
 
         private async Task Event_InviteDeleted ( DiscordClient sender, InviteDeleteEventArgs e )
@@ -808,6 +834,7 @@ namespace Icarus
 
         private Task Client_Ready ( DiscordClient sender, ReadyEventArgs e )
         {
+            Core.Client.UpdateStatusAsync( new DiscordActivity( "You", ActivityType.Watching ), UserStatus.DoNotDisturb, DateTimeOffset.UtcNow );
             sender.Logger.LogInformation( BotEventId, "Client is ready to process events." );
             return Task.CompletedTask;
         }

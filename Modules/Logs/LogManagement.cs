@@ -36,7 +36,34 @@ namespace Icarus.Modules.Logs
 
             Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).LogConfig.LogChannel = channelId;
             Profile.LogConfig.ToggleLogging( true );
-            await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId )}" );
+            await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId ).Mention}" );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
+        [Command( "setMajorLogChannel" )]
+        [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
+        public async Task SetMajorNotificationsChannel ( CommandContext ctx, ulong channelId )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            if (!ctx.Guild.Channels.ContainsKey( channelId ))
+            {
+                await ctx.RespondAsync( $"Invalid channel Id: {channelId}" );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).LogConfig.MajorNotificationsChannelId = channelId;
+            await ctx.RespondAsync( $"Set channel for important notifications of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}" );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }

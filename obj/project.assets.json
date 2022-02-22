@@ -119,6 +119,12 @@
           "lib/netstandard1.0/_._": {}
         }
       },
+      "Microsoft.VisualStudio.VsixColorCompiler/16.0.0": {
+        "type": "package",
+        "build": {
+          "build/Microsoft.VisualStudio.VsixColorCompiler.targets": {}
+        }
+      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -1401,6 +1407,21 @@
         "microsoft.netcore.targets.1.1.0.nupkg.sha512",
         "microsoft.netcore.targets.nuspec",
         "runtime.json"
+      ]
+    },
+    "Microsoft.VisualStudio.VsixColorCompiler/16.0.0": {
+      "sha512": "lN7Rrf2U6takufBrbySIzcHbWtHuT0HiUuwIsB0/6HCQ5JDML03Y9mcxke04TH3SJSspaegaRbwOgR6ljkqq2Q==",
+      "type": "package",
+      "path": "microsoft.visualstudio.vsixcolorcompiler/16.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Microsoft.VisualStudio.Pkgdef.dll",
+        "VsixColorCompiler.exe",
+        "VsixColorCompiler.exe.config",
+        "build/Microsoft.VisualStudio.VsixColorCompiler.targets",
+        "microsoft.visualstudio.vsixcolorcompiler.16.0.0.nupkg.sha512",
+        "microsoft.visualstudio.vsixcolorcompiler.nuspec"
       ]
     },
     "Microsoft.Win32.Primitives/4.3.0": {
@@ -4256,6 +4277,7 @@
       "DSharpPlus >= 4.1.0",
       "DSharpPlus.CommandsNext >= 4.1.0",
       "DSharpPlus.Interactivity >= 4.1.0",
+      "Microsoft.VisualStudio.VsixColorCompiler >= 16.0.0",
       "Newtonsoft.Json >= 13.0.1"
     ]
   },
@@ -4317,6 +4339,10 @@
           "DSharpPlus.Interactivity": {
             "target": "Package",
             "version": "[4.1.0, )"
+          },
+          "Microsoft.VisualStudio.VsixColorCompiler": {
+            "target": "Package",
+            "version": "[16.0.0, )"
           },
           "Newtonsoft.Json": {
             "target": "Package",
