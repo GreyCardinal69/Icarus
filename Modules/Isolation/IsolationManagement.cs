@@ -56,7 +56,8 @@ namespace Icarus.Modules.Isolation
                         ? DateTime.UtcNow.AddDays( Convert.ToDouble( timeLen[..^1]) )
                         : DateTime.UtcNow.AddMonths( Convert.ToInt32( timeLen[..^1] ) ),
                 RemovedRoles = user.Roles.ToList(),
-                ReturnRoles = returnRoles
+                ReturnRoles = returnRoles,
+                Reason = reason
             };
 
             foreach (var item in user.Roles.ToList())
@@ -139,7 +140,7 @@ namespace Icarus.Modules.Isolation
             var fakeContext = cmds.CreateFakeContext
                 (
                     user,
-                    Program.Core.Client.GetChannelAsync( entry.IsolationChannelId ).Result,
+                    guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ),
                     "isolate", ">",
                     cmd,
                     customArgs

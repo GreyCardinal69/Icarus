@@ -87,7 +87,7 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            if (!ctx.Guild.Roles.ContainsKey(roleId))
+            if (!ctx.Guild.Roles.ContainsKey( roleId ))
             {
                 await ctx.RespondAsync( $"Invalid role Id: {roleId}" );
                 return;
@@ -224,7 +224,7 @@ namespace Icarus.Modules.Logs
 
             if (!Profile.LogConfig.LoggingEnabled)
             {
-                await ctx.RespondAsync(" Logging is disabled for this server, did you forget to enable it?");
+                await ctx.RespondAsync( " Logging is disabled for this server, did you forget to enable it?" );
             }
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );

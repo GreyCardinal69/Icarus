@@ -14,7 +14,7 @@ namespace Icarus.Modules.Servers
 {
     public class ServerManagement : BaseCommandModule
     {
-        [Command( "registerServer" )]
+        [Command( "registerProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterServer ( CommandContext ctx, bool OverWrite = false )
@@ -39,7 +39,7 @@ namespace Icarus.Modules.Servers
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
         }
 
-        [Command( "deleteServer" )]
+        [Command( "deleteProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterServer ( CommandContext ctx )
@@ -69,7 +69,8 @@ namespace Icarus.Modules.Servers
         }
 
         [Command( "profile" )]
-        [Description( "Responds with information on the current server profile." )]
+        [Description( "Responds with information on the server profile." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
         public async Task HelpBasic ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
@@ -82,7 +83,7 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            StringBuilder enabledEvents = new StringBuilder();
+            StringBuilder enabledEvents = new();
 
             if (profile.LogConfig.GuildMemberRemoved)
                 enabledEvents.Append( "GuildMemberRemoved, " );
