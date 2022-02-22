@@ -18,6 +18,12 @@ namespace Icarus.Modules
         public List<IsolationEntry> Entries = new();
         public DateTime ProfileCreationDate { get; init; }
 
+        public void SetContainmentDefaults( ulong channelId, ulong roleId )
+        {
+            LogConfig.DefaultContainmentChannelId = channelId;
+            LogConfig.DefaultContainmentRoleId = roleId;
+        }
+
         public static ServerProfile ProfileFromId ( ulong ID )
         {
             var ProfileList = Program.Core.ServerProfiles;

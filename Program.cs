@@ -48,13 +48,13 @@ namespace Icarus
 
             if (GetOperatingSystem() == OSPlatform.Windows)
             {
-                #pragma warning disable CA1416
+#pragma warning disable CA1416
                 Console.WindowWidth = 140;
                 Console.WindowHeight = 30;
-                #pragma warning restore CA1416
+#pragma warning restore CA1416
             }
 
-            Core._entryCheckTimer = new(600000);
+            Core._entryCheckTimer = new( 600000 );
             Core._entryCheckTimer.Elapsed += async ( sender, e ) => await HandleTimer();
             Core._entryCheckTimer.Start();
             Core._entryCheckTimer.AutoReset = true;
@@ -97,7 +97,7 @@ namespace Icarus
 
         private async Task RunBotAsync ()
         {
-            Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ));
+            Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
 
             Core.SetToken( Info.Token );
             Core.OwnerId = Info.OwnerId;
@@ -113,7 +113,7 @@ namespace Icarus
 
             var cfg = new DiscordConfiguration
             {
-                Intents =       DiscordIntents.AllUnprivileged
+                Intents = DiscordIntents.AllUnprivileged
                     .AddIntent( DiscordIntents.GuildInvites )
                     .AddIntent( DiscordIntents.GuildMembers )
                     .AddIntent( DiscordIntents.AllUnprivileged )
@@ -154,7 +154,7 @@ namespace Icarus
             {
                 PaginationBehaviour = PaginationBehaviour.Ignore,
                 Timeout = TimeSpan.FromMinutes( 2 )
-            });
+            } );
 
             CommandsNextConfig = new CommandsNextConfiguration
             {
@@ -182,6 +182,27 @@ namespace Icarus
 
         private async Task Event_MessageCreated ( DiscordClient sender, MessageCreateEventArgs e )
         {
+            if (e.Author.Id == Core.Client.CurrentUser.Id)
+            {
+                return;
+            }
+
+            var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
+            var perms = user.Permissions;
+
+            if ( perms.HasPermission(Permissions.Administrator)  ||
+                 perms.HasPermission(Permissions.BanMembers)     ||
+                 perms.HasPermission(Permissions.KickMembers)    ||
+                 perms.HasPermission(Permissions.ManageChannels) ||
+                 perms.HasPermission(Permissions.ManageGuild)    ||
+                 perms.HasPermission(Permissions.ManageMessages) ||
+                 perms.HasPermission(Permissions.ManageRoles)    ||
+                 perms.HasPermission(Permissions.ManageEmojis)
+                 )
+            {
+                return;
+            }
+
             foreach (var link in Database.ScamLinks)
             {
                 if (e.Message.Content.Contains(link))
@@ -190,16 +211,30 @@ namespace Icarus
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
                     customArgs = "[]help. Hunting For Pulsars.";
                     var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
-                    var user = guild.GetMemberAsync( e.Author.Id ).Result;
+                    var profile = ServerProfile.ProfileFromId( guild.Id );
+
                     var fakeContext = cmds.CreateFakeContext
                         (
                             user,
-                            Program.Core.Client.GetChannelAsync( e.Channel.Id ).Result,
+                            guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ),
                             "isolate", ">",
                             cmd,
                             customArgs
                         );
-                    await fakeContext.RespondAsync("found link");
+
+                    await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
+                    await fakeContext.RespondAsync(
+                        $"Isolated user {user.Mention} at {guild.GetChannel(profile.LogConfig.DefaultContainmentChannelId).Mention}. " +
+                        $"The user's message contained a discord scam link, the link was: `{link}`. " +
+                        $"Revoked the following roles from the user: {string.Join(", ", user.Roles.Select( x => x.Mention ).ToArray())}."
+                    );
+
+                    foreach (var role in user.Roles)
+                    {
+                        await user.RevokeRoleAsync( role );
+                    }
+
+                    await e.Message.DeleteAsync();
                 }
             }
             return;

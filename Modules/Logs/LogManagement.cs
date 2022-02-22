@@ -42,7 +42,7 @@ namespace Icarus.Modules.Logs
         }
 
         [Command( "setMajorLogChannel" )]
-        [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
+        [Description( "Sets the channel for major notifications." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task SetMajorNotificationsChannel ( CommandContext ctx, ulong channelId )
         {
@@ -64,6 +64,42 @@ namespace Icarus.Modules.Logs
 
             Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).LogConfig.MajorNotificationsChannelId = channelId;
             await ctx.RespondAsync( $"Set channel for important notifications of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}" );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
+        [Command( "setContainmentDefaults" )]
+        [Description( "Sets default containment channel and role id-s." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
+        public async Task SetDefaultContainmentIds ( CommandContext ctx, ulong channelId, ulong roleId )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            if (!ctx.Guild.Channels.ContainsKey( channelId ))
+            {
+                await ctx.RespondAsync( $"Invalid channel Id: {channelId}" );
+                return;
+            }
+
+            if (!ctx.Guild.Roles.ContainsKey(roleId))
+            {
+                await ctx.RespondAsync( $"Invalid role Id: {roleId}" );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).SetContainmentDefaults( channelId, roleId );
+            await ctx.RespondAsync(
+                $"Set channel for default containment of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}.\n" +
+                $"Default role for containment is set as {ctx.Guild.Roles[roleId].Mention}"
+            );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }

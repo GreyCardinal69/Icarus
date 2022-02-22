@@ -57,6 +57,8 @@ namespace Icarus.Modules.Profiles
         public bool ChannelCreated { get; set; }
         public ulong LogChannel { get; set; }
         public ulong MajorNotificationsChannelId { get; set; }
+        public ulong DefaultContainmentChannelId { get; set; }
+        public ulong DefaultContainmentRoleId { get; set; }
         public ulong SecondaryLogChannel { get; set; }
     }
 }
