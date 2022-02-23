@@ -71,6 +71,38 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
+        [Command( "antiSpamIgnore" )]
+        [Description( "Tells the anti spam module to ignore said channels." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task EnableLogging ( CommandContext ctx, params ulong[] channels )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            DiscordChannel[] mentions = new DiscordChannel[channels.Length];
+
+            int i = 0;
+            foreach (var item in channels)
+            {
+                mentions[i] = ctx.Guild.GetChannel( item );
+                Profile.AntiSpamIgnored.Add( item );
+                i++;
+            }
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored = Profile.AntiSpamIgnored;
+
+            await ctx.RespondAsync(
+                $"Configured anti spam module to ignore the following channels: {string.Join(", ", mentions.Select( x => x.Mention ) ) }."
+            );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
         [Command( "deleteProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]

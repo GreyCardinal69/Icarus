@@ -14,6 +14,7 @@ namespace Icarus.Modules
         public LogProfile LogConfig = new();
         public AntiSpamProfile AntiSpam = new() { CacheResetInterval = 20, FirstWarning = 5, LastWarning = 9, Limit = 12, SecondWarning = 7 };
         public List<IsolationEntry> Entries = new();
+        public List<ulong> AntiSpamIgnored = new();
         public DateTime ProfileCreationDate { get; init; }
 
         public void SetContainmentDefaults( ulong channelId, ulong roleId )

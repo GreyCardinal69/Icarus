@@ -214,75 +214,79 @@ namespace Icarus
                 return;
             }
 
-            if (_temporaryMessageCounter.Count <= 0 )
-            {
-                _temporaryMessageCounter.Add( (e.Author.Id, 1) );
-            }
+            var profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
-            bool found = false;
-            for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+            if (!profile.AntiSpamIgnored.Contains(e.Channel.Id))
             {
-                if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                if (_temporaryMessageCounter.Count <= 0)
                 {
-                    found = true;
+                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
                 }
-            }
 
-            if (!found)
-            {
-                _temporaryMessageCounter.Add( (e.Author.Id, 1) );
-            }
-
-            for (int i = 0; i < _temporaryMessageCounter.Count; i++)
-            {
-                if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                bool found = false;
+                for (int i = 0; i < _temporaryMessageCounter.Count; i++)
                 {
-                    _temporaryMessageCounter[i] = ( e.Author.Id, _temporaryMessageCounter[i].Item2+1);
-                    var profile = ServerProfile.ProfileFromId( e.Guild.Id );
-                    if (_temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning)
+                    if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
                     {
-                        var cmds = Program.Core.Client.GetCommandsNext();
-                        var cmd = cmds.FindCommand( "isolate", out var customArgs );
-                        customArgs = "[]help. Hunting For Pulsars.";
-                        var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
-                        var fakeContext = cmds.CreateFakeContext(
-                                user,
-                                guild.GetChannel( e.Channel.Id ),
-                                "isolate", ">",
-                                cmd,
-                                customArgs
-                        );
-                        if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning)
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                {
+                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
+                }
+
+                for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+                {
+                    if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                    {
+                        _temporaryMessageCounter[i] = (e.Author.Id, _temporaryMessageCounter[i].Item2 + 1);
+                        if (_temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning)
                         {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
-                        }
-                        else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning)
-                        {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
-                        }
-                        else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning)
-                        {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
-                        }
-                        else if (_temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit)
-                        {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
-                            var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
-                            await fakeContext.Channel.DeleteMessagesAsync( messages );
-                            await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
-                            await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs)
-                                .RespondAsync(
-                                $"Isolated user {user.Mention} at {guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
-                                $"The user's actions were considered spam. " +
-                                $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
+                            var cmds = Program.Core.Client.GetCommandsNext();
+                            var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                            customArgs = "[]help. Hunting For Pulsars.";
+                            var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                            var fakeContext = cmds.CreateFakeContext(
+                                    user,
+                                    guild.GetChannel( e.Channel.Id ),
+                                    "isolate", ">",
+                                    cmd,
+                                    customArgs
                             );
-                            foreach (var role in user.Roles)
+                            if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning)
                             {
-                                await user.RevokeRoleAsync( role );
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
+                            }
+                            else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning)
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
+                            }
+                            else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning)
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
+                            }
+                            else if (_temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit)
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
+                                var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
+                                await fakeContext.Channel.DeleteMessagesAsync( messages );
+                                await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
+                                await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs )
+                                    .RespondAsync(
+                                    $"Isolated user {user.Mention} at {guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
+                                    $"The user's actions were considered spam. " +
+                                    $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
+                                );
+                                foreach (var role in user.Roles)
+                                {
+                                    await user.RevokeRoleAsync( role );
+                                }
                             }
                         }
+                        break;
                     }
-                    break;
                 }
             }
 
@@ -294,8 +298,6 @@ namespace Icarus
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
                     customArgs = "[]help. Hunting For Pulsars.";
                     var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
-                    var profile = ServerProfile.ProfileFromId( guild.Id );
-
                     var fakeContext = cmds.CreateFakeContext(
                             user,
                             guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ),
