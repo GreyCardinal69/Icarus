@@ -520,17 +520,17 @@ namespace Icarus
                                 IconUrl = e.Guild.IconUrl
                             },
                             Description = $"\n {e.Messages.Count} messages were purged.\n\n" +
-                            "The messages were deleted at: " + e.Channel.Mention + "\n\n" +
-                            "Providing a file with all the deleted messages below.",
+                            "The messages were deleted at: " + e.Channel.Mention + "\n\n", //+
+                            //"Providing a file with all the deleted messages below.",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
-                        using (var fs = new FileStream( TempPath, FileMode.Open, FileAccess.Read ))
-                        {
-                            await new DiscordMessageBuilder()
-                                      .WithFile( "Purged_Messages.txt", fs )
-                                           .SendAsync( e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ) );
-                        }
+                        //using (var fs = new FileStream( TempPath, FileMode.Open, FileAccess.Read ))
+                       // {
+                          //  await new DiscordMessageBuilder()
+                          //            .WithFile( "Purged_Messages.txt", fs )
+                          //                 .SendAsync( e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ) );
+                        //}
                     }
                     else
                     {
