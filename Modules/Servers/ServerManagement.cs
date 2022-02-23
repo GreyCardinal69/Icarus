@@ -84,23 +84,44 @@ namespace Icarus.Modules.Servers
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             DiscordChannel[] mentions = new DiscordChannel[channels.Length];
 
             int i = 0;
             foreach (var item in channels)
             {
                 mentions[i] = ctx.Guild.GetChannel( item );
-                Profile.AntiSpamIgnored.Add( item );
+                profile.AntiSpamIgnored.Add( item );
                 i++;
             }
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored = Profile.AntiSpamIgnored;
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored = profile.AntiSpamIgnored;
 
             await ctx.RespondAsync(
                 $"Configured anti spam module to ignore the following channels: {string.Join(", ", mentions.Select( x => x.Mention ) ) }."
             );
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "antiSpamResetIgnored" )]
+        [Description( "Resets anti spam module ignored channels" )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task ResetAntiSpamIgnored ( CommandContext ctx, params ulong[] channels )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
+                return;
+            }
+
+            var profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored.Clear();
+
+            await ctx.RespondAsync($"The anti spam module no longer ignores any channels."
+            );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "deleteProfile" )]
@@ -188,6 +209,15 @@ namespace Icarus.Modules.Servers
             if (profile.LogConfig.ChannelUpdated)
                 enabledEvents.Append( "ChannelUpdated." );
 
+            string[] mentions = new string[profile.AntiSpamIgnored.Count];
+
+            int i = 0;
+            foreach (var item in profile.AntiSpamIgnored)
+            {
+                mentions[i] = ctx.Guild.GetChannel( item ).Mention;
+                i++;
+            }
+
             var embed = new DiscordEmbedBuilder
             {
                 Title = $"Server Profile for {ctx.Guild.Name}",
@@ -200,6 +230,8 @@ namespace Icarus.Modules.Servers
                     $"The default containment channel is: {ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}.\n\n" +
                     $"The default containment role is: {ctx.Guild.GetRole(profile.LogConfig.DefaultContainmentRoleId).Mention}.\n\n" +
                     $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
+                    $"Anti spam is configured at {profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit} " +
+                    $"messages per 20 seconds. The following channels are excempt from anti spam module: {string.Join(", ", mentions)}.\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
