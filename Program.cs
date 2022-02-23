@@ -43,7 +43,7 @@ namespace Icarus
 
         private static void Main ( string[] args )
         {
-            Core = new Program();
+            Core = new();
 
             if (GetOperatingSystem() == OSPlatform.Windows)
             {

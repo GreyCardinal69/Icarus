@@ -38,6 +38,27 @@ namespace Icarus.Modules.Other
             }
         }
 
+        [Command( "eraseFromTo" )]
+        [Description( "Deletes all messages from the first to the second specified message." )]
+        [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
+        public async Task EraseFromTo ( CommandContext ctx, ulong from, ulong to, int amount )
+        {
+            await ctx.TriggerTypingAsync();
+            var fromMsg = await ctx.Channel.GetMessageAsync( from );
+            var toMsg = await ctx.Channel.GetMessageAsync( to );
+
+            var messagesBefore = await ctx.Channel.GetMessagesBeforeAsync( to, amount );
+            var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( from, amount );
+
+            var filtered = messagesAfter.Union( messagesBefore ).Distinct().Where(
+                x => ( DateTimeOffset.UtcNow - x.Timestamp ).TotalDays <= 14 &&
+                x.Timestamp <= toMsg.Timestamp && x.Timestamp >= fromMsg.Timestamp
+            );
+
+            await ctx.Channel.DeleteMessagesAsync( filtered );
+            await ctx.RespondAsync( $"Erased: {filtered.Count()} messages, called by {ctx.User.Mention}." );
+        }
+
         [Command( "ban" )]
         [Description( "Bans a user with optional amount of messages to delete." )]
         [RequireUserPermissions( DSharpPlus.Permissions.BanMembers )]
