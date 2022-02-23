@@ -37,8 +37,10 @@ namespace Icarus
 
         public List<ulong> RegisteredServerIds = new();
         public List<ServerProfile> ServerProfiles = new();
+        private List<(ulong, int)> _temporaryMessageCounter = new();
 
         private Timer _entryCheckTimer;
+        private Timer _antiSpamTimer;
         private readonly EventId BotEventId = new( 1488, "Bot-Ex1488" );
 
         private static void Main ( string[] args )
@@ -58,8 +60,23 @@ namespace Icarus
             Core._entryCheckTimer.Start();
             Core._entryCheckTimer.AutoReset = true;
             Core._entryCheckTimer.Enabled = true;
+
+            Core._antiSpamTimer = new( 20000 );
+            Core._antiSpamTimer.Elapsed += async ( sender, e ) => await ResetMessageCache();
+            Core._antiSpamTimer.Start();
+            Core._antiSpamTimer.AutoReset = true;
+            Core._antiSpamTimer.Enabled = true;
+
             Core.BotStartUpStamp = DateTime.Now;
             Core.RunBotAsync().GetAwaiter().GetResult();
+        }
+
+        #pragma warning disable CS1998
+        private static async Task<Task> ResetMessageCache ()
+        #pragma warning restore CS1998
+        {
+            Core._temporaryMessageCounter.Clear();
+            return Task.CompletedTask;
         }
 
         private static async Task<Task> HandleTimer ()
@@ -74,6 +91,7 @@ namespace Icarus
                     }
                 }
             }
+            Core._temporaryMessageCounter.Clear();
             Console.WriteLine( $"Completed 10 minute server entries check [{DateTime.UtcNow}]." );
             return Task.CompletedTask;
         }
@@ -196,6 +214,79 @@ namespace Icarus
                 return;
             }
 
+            if (_temporaryMessageCounter.Count <= 0 )
+            {
+                _temporaryMessageCounter.Add( (e.Author.Id, 1) );
+            }
+
+            bool found = false;
+            for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+            {
+                if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                {
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                _temporaryMessageCounter.Add( (e.Author.Id, 1) );
+            }
+
+            for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+            {
+                if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                {
+                    _temporaryMessageCounter[i] = ( e.Author.Id, _temporaryMessageCounter[i].Item2+1);
+                    if (_temporaryMessageCounter[i].Item2 >= 5)
+                    {
+                        var cmds = Program.Core.Client.GetCommandsNext();
+                        var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                        customArgs = "[]help. Hunting For Pulsars.";
+                        var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                        var profile = ServerProfile.ProfileFromId( guild.Id );
+                        var fakeContext = cmds.CreateFakeContext(
+                                user,
+                                guild.GetChannel( e.Channel.Id ),
+                                "isolate", ">",
+                                cmd,
+                                customArgs
+                        );
+                        if (_temporaryMessageCounter[i].Item2 == 5)
+                        {
+
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} Please stop sending messages so fast." );
+                        }
+                        else if (_temporaryMessageCounter[i].Item2 == 7)
+                        {
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam.." );
+                        }
+                        else if (_temporaryMessageCounter[i].Item2 == 9)
+                        {
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning." );
+                        }
+                        else if (_temporaryMessageCounter[i].Item2 > 12)
+                        {
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
+                            var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
+                            await fakeContext.Channel.DeleteMessagesAsync( messages );
+                            await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
+                            await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs)
+                                .RespondAsync(
+                                $"Isolated user {user.Mention} at {guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
+                                $"The user's actions were considered spam. " +
+                                $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
+                            );
+                            foreach (var role in user.Roles)
+                            {
+                                await user.RevokeRoleAsync( role );
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
             foreach (var link in Database.ScamLinks)
             {
                 if (e.Message.Content.Contains(link))
@@ -206,14 +297,13 @@ namespace Icarus
                     var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
                     var profile = ServerProfile.ProfileFromId( guild.Id );
 
-                    var fakeContext = cmds.CreateFakeContext
-                        (
+                    var fakeContext = cmds.CreateFakeContext(
                             user,
                             guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ),
                             "isolate", ">",
                             cmd,
                             customArgs
-                        );
+                    );
 
                     await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
                     await fakeContext.RespondAsync(

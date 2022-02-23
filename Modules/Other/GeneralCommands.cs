@@ -95,7 +95,7 @@ namespace Icarus.Modules.Other
         {
             if (ctx.User.Id == Program.Core.OwnerId)
             {
-                DiscordActivity activity = new DiscordActivity();
+                DiscordActivity activity = new();
                 DiscordClient discord = ctx.Client;
                 activity.Name = status;
                 // Offline = 0,

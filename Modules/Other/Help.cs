@@ -36,6 +36,7 @@ namespace Icarus.Modules.Other
         [Description( "Responds with information on given command category commands." )]
         public async Task HelpCategory ( CommandContext ctx, string category )
         {
+           // Program.Core.Commands.RegisteredCommands.Values;
             switch (category.ToLower())
             {
                 default:
