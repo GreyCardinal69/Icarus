@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Icarus.Modules.Isolation;
 using Icarus.Modules.Profiles;
 
@@ -15,6 +12,7 @@ namespace Icarus.Modules
         public string Name;
         public ulong ID;
         public LogProfile LogConfig = new();
+        public AntiSpamProfile AntiSpam = new() { CacheResetInterval = 20, FirstWarning = 5, LastWarning = 9, Limit = 12, SecondWarning = 7 };
         public List<IsolationEntry> Entries = new();
         public DateTime ProfileCreationDate { get; init; }
 

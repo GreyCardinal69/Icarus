@@ -47,6 +47,15 @@ namespace Icarus
         {
             Core = new();
 
+            List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
+
+            foreach (var prof in Profiles)
+            {
+                ServerProfile Profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
+                Core.ServerProfiles.Add( Profile );
+                Core.RegisteredServerIds.Add( Profile.ID );
+            }
+
             if (GetOperatingSystem() == OSPlatform.Windows)
             {
 #pragma warning disable CA1416
@@ -112,15 +121,6 @@ namespace Icarus
             Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
 
             Core.OwnerId = Info.OwnerId;
-
-            List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
-
-            foreach (var prof in Profiles)
-            {
-                ServerProfile Profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
-                ServerProfiles.Add( Profile );
-                RegisteredServerIds.Add( Profile.ID );
-            }
 
             var cfg = new DiscordConfiguration
             {
@@ -238,13 +238,13 @@ namespace Icarus
                 if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
                 {
                     _temporaryMessageCounter[i] = ( e.Author.Id, _temporaryMessageCounter[i].Item2+1);
-                    if (_temporaryMessageCounter[i].Item2 >= 5)
+                    var profile = ServerProfile.ProfileFromId( e.Guild.Id );
+                    if (_temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning)
                     {
                         var cmds = Program.Core.Client.GetCommandsNext();
                         var cmd = cmds.FindCommand( "isolate", out var customArgs );
                         customArgs = "[]help. Hunting For Pulsars.";
                         var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
-                        var profile = ServerProfile.ProfileFromId( guild.Id );
                         var fakeContext = cmds.CreateFakeContext(
                                 user,
                                 guild.GetChannel( e.Channel.Id ),
@@ -252,20 +252,19 @@ namespace Icarus
                                 cmd,
                                 customArgs
                         );
-                        if (_temporaryMessageCounter[i].Item2 == 5)
+                        if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning)
                         {
-
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} Please stop sending messages so fast." );
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
                         }
-                        else if (_temporaryMessageCounter[i].Item2 == 7)
+                        else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning)
                         {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam.." );
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
                         }
-                        else if (_temporaryMessageCounter[i].Item2 == 9)
+                        else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning)
                         {
-                            await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning." );
+                            await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
                         }
-                        else if (_temporaryMessageCounter[i].Item2 > 12)
+                        else if (_temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit)
                         {
                             await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
                             var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );

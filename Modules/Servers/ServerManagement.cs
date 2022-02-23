@@ -9,6 +9,7 @@ using System.IO;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
 using System.Text;
+using System.Linq;
 
 namespace Icarus.Modules.Servers
 {
@@ -37,6 +38,37 @@ namespace Icarus.Modules.Servers
 
             File.WriteAllText( $"{ProfilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
+        }
+
+        [Command( "confAntiSpam" )]
+        [Description( "Changes server anti spam module configurations." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task EnableLogging ( CommandContext ctx, int first, int second, int third, int limit )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpam = new()
+            {
+                FirstWarning = first,
+                SecondWarning = second,
+                LastWarning = third,
+                Limit = limit,
+                CacheResetInterval = 20
+            };
+
+            await ctx.RespondAsync(
+                $"Changed anti spam configurations. Message cache is reset every 20 seconds. First warning is issued if a user sends {first} messages " +
+                $"in that interval, second: {second}, last: {third}. At {limit} or more the user is isolated."
+            );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
         [Command( "deleteProfile" )]
