@@ -156,7 +156,7 @@ namespace Icarus.Modules.Servers
         [Command( "profile" )]
         [Description( "Responds with information on the server profile." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
-        public async Task HelpBasic ( CommandContext ctx )
+        public async Task Profile ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
 
@@ -232,6 +232,7 @@ namespace Icarus.Modules.Servers
                     $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
                     $"Anti spam is configured at {profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit} " +
                     $"messages per 20 seconds. The following channels are excempt from anti spam module: {string.Join(", ", mentions)}.\n\n" +
+                    $"The following words are black-listed and users mentioning them will be reported: {string.Join(", ", profile.WordBlackList)}.\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
