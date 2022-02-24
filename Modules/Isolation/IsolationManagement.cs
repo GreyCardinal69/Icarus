@@ -60,6 +60,14 @@ namespace Icarus.Modules.Isolation
                 Reason = reason
             };
 
+            var userP = JsonConvert.DeserializeObject<UserProfile>(
+                File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json" ) );
+
+            userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, reason ) );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json",
+                 JsonConvert.SerializeObject( userP, Formatting.Indented ) );
+
             foreach (var item in user.Roles.ToList())
             {
                 await user.RevokeRoleAsync( item );

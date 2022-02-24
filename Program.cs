@@ -21,6 +21,7 @@ using Icarus.Modules;
 using Icarus.Modules.Logs;
 using Icarus.Modules.Servers;
 using Icarus.Modules.Isolation;
+using Icarus.Modules.Profiles;
 
 namespace Icarus
 {
@@ -124,11 +125,7 @@ namespace Icarus
 
             var cfg = new DiscordConfiguration
             {
-                Intents = DiscordIntents.AllUnprivileged
-                    .AddIntent( DiscordIntents.GuildInvites )
-                    .AddIntent( DiscordIntents.GuildMembers )
-                    .AddIntent( DiscordIntents.AllUnprivileged )
-                    .AddIntent( DiscordIntents.All ),
+                Intents = DiscordIntents.All,
                 Token = Info.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
@@ -186,6 +183,7 @@ namespace Icarus
             Commands.RegisterCommands<LogManagement>();
             Commands.RegisterCommands<ServerManagement>();
             Commands.RegisterCommands<IsolationManagement>();
+            Commands.RegisterCommands<UserLogging>();
 
             await this.Client.ConnectAsync();
             await Task.Delay( -1 );
@@ -298,6 +296,14 @@ namespace Icarus
                                 {
                                     await user.RevokeRoleAsync( role );
                                 }
+
+                                var userP = JsonConvert.DeserializeObject<UserProfile>(
+                                     File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
+
+                                userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, "User's actions were considered spam." ) );
+
+                                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
+                                     JsonConvert.SerializeObject( userP, Formatting.Indented ) );
                             }
                         }
                         break;
@@ -332,6 +338,14 @@ namespace Icarus
                     {
                         await user.RevokeRoleAsync( role );
                     }
+
+                    var userP = JsonConvert.DeserializeObject<UserProfile>(
+                          File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
+
+                    userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, "User posted a scam message." ) );
+
+                    File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
+                         JsonConvert.SerializeObject( userP, Formatting.Indented ) );
 
                     await e.Message.DeleteAsync();
                 }
@@ -904,6 +918,23 @@ namespace Icarus
             {
                 if (e.Guild.Id == ServerProfiles[i].ID)
                 {
+                    if (!File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ))
+                    {
+                        var profile = new UserProfile( e.Member.Id, e.Member.Username )
+                        {
+                            Discriminator = e.Member.Discriminator,
+                            CreationDate = e.Member.CreationTimestamp,
+                            FirstJoinDate = e.Member.JoinedAt,
+                            LocalLanguage = e.Member.Locale
+                        };
+
+                        profile.LastJoinDate = DateTime.UtcNow;
+                        profile.LastUsername = e.Member.Username;
+
+                        File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
+                           JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+                    }
+
                     if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberAdded)
                     {
                         var embed = new DiscordEmbedBuilder
@@ -938,6 +969,16 @@ namespace Icarus
             {
                 if (e.Guild.Id == ServerProfiles[i].ID)
                 {
+                    var user = JsonConvert.DeserializeObject<UserProfile>(
+                        File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) );
+
+                    user.LeaveDate = DateTime.UtcNow;
+                    user.OldUsernames.Add( e.Member.Username );
+                    user.LastUsername = e.Member.Username;
+
+                    File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
+                       JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
                     if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberRemoved)
                     {
                         var embed = new DiscordEmbedBuilder

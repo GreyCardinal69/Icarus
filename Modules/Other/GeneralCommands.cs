@@ -2,8 +2,11 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Icarus.Modules.Profiles;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,8 +68,42 @@ namespace Icarus.Modules.Other
         public async Task Ban ( CommandContext ctx, ulong id, int deleteAmount = 0, string reason = "" )
         {
             await ctx.TriggerTypingAsync();
+
+            var user = JsonConvert.DeserializeObject<UserProfile>(
+                  File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+
+            user.LeaveDate = DateTime.UtcNow;
+            user.OldUsernames.Add( ctx.Guild.GetMemberAsync( id ).Result.Username );
+            user.LastUsername = user.OldUsernames.Last();
+            user.BanEntries.Add( new Tuple<DateTime, string>(DateTime.UtcNow, reason) );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+                 JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
             await ctx.Guild.BanMemberAsync( id, deleteAmount, reason );
             await ctx.RespondAsync( $"Banned {ctx.Guild.GetMemberAsync( id ).Result.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
+        }
+
+        [Command( "kick" )]
+        [Description( "Kicks a user with an optional reason." )]
+        [RequireUserPermissions( DSharpPlus.Permissions.KickMembers )]
+        public async Task Kick ( CommandContext ctx, ulong id, string reason = "" )
+        {
+            await ctx.TriggerTypingAsync();
+
+            var user = JsonConvert.DeserializeObject<UserProfile>(
+                  File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+
+            user.LeaveDate = DateTime.UtcNow;
+            user.OldUsernames.Add( ctx.Guild.GetMemberAsync( id ).Result.Username );
+            user.LastUsername = user.OldUsernames.Last();
+            user.KickEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, reason ) );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+                 JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
+            await ctx.Guild.GetMemberAsync( id ).Result.RemoveAsync();
+            await ctx.RespondAsync( $"Kicked {ctx.Guild.GetMemberAsync( id ).Result.Mention}, with \"{reason}\" as reason." );
         }
 
         [Command( "unban" )]
