@@ -164,8 +164,8 @@ namespace Icarus
             this.Client.UseInteractivity( new InteractivityConfiguration
             {
                 PaginationBehaviour = PaginationBehaviour.Ignore,
-                Timeout = TimeSpan.FromMinutes( 2 )
-            } );
+                Timeout = TimeSpan.FromMinutes( 2 ),
+            });
 
             CommandsNextConfig = new CommandsNextConfiguration
             {
@@ -216,6 +216,20 @@ namespace Icarus
 
             var profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
+            foreach (var word in profile.WordBlackList)
+            {
+                if (e.Message.Content.Contains(word))
+                {
+                    var cmds = Program.Core.Client.GetCommandsNext();
+                    var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                    customArgs = "[]help. Hunting For Pulsars.";
+                    var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                    await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs )
+                        .RespondAsync( $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}." );
+                    break;
+                }
+            }
+
             if (!profile.AntiSpamIgnored.Contains(e.Channel.Id))
             {
                 if (_temporaryMessageCounter.Count <= 0)
@@ -229,6 +243,7 @@ namespace Icarus
                     if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
                     {
                         found = true;
+                        break;
                     }
                 }
 
@@ -488,6 +503,47 @@ namespace Icarus
             {
                 return;
             }
+
+            var profile = ServerProfile.ProfileFromId( e.Guild.Id );
+
+            foreach (var word in profile.WordBlackList)
+            {
+                if (e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId)
+                {
+                    break;
+                }
+
+                var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
+                var perms = user.Permissions;
+
+                if (perms.HasPermission( Permissions.Administrator ) ||
+                     perms.HasPermission( Permissions.BanMembers ) ||
+                     perms.HasPermission( Permissions.KickMembers ) ||
+                     perms.HasPermission( Permissions.ManageChannels ) ||
+                     perms.HasPermission( Permissions.ManageGuild ) ||
+                     perms.HasPermission( Permissions.ManageMessages ) ||
+                     perms.HasPermission( Permissions.ManageRoles ) ||
+                     perms.HasPermission( Permissions.ManageEmojis )
+                     )
+                {
+                    break;
+                }
+
+                if (e.Message.Content.Contains( word ))
+                {
+                    var cmds = Program.Core.Client.GetCommandsNext();
+                    var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                    customArgs = "[]help. Hunting For Pulsars.";
+                    var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                    await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs )
+                        .RespondAsync(
+                        $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}.\n" +
+                        $"The user mentioned the black-listed word after editing a message."
+                    );
+                    break;
+                }
+            }
+
             for (int i = 0; i < ServerProfiles.Count; i++)
             {
                 if (e.Guild.Id == ServerProfiles[i].ID)

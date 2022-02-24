@@ -68,6 +68,63 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
+        [Command( "addWordBlacklist" )]
+        [Description( "Adds words to the word blacklist." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task AddWordBlacklist ( CommandContext ctx, params string[] words )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            foreach (var word in words)
+            {
+                Profile.WordBlackList.Add( word );
+            }
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
+            await ctx.RespondAsync(
+                $"Added the following words to the server's word blacklist, any mentions of those will be reported to the major notifications channel: " +
+                $"{string.Join(", ", words)}."
+            );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
+        [Command( "removeWordBlacklist" )]
+        [Description( "Adds words to the word blacklist." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task RemoveWordBlacklist ( CommandContext ctx, params string[] words )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            foreach (var word in words)
+            {
+                Profile.WordBlackList.Remove( word );
+            }
+
+            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
+            await ctx.RespondAsync(
+                $"Removed the following words to the server's word blacklist: {string.Join( ", ", words )}."
+            );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
         [Command( "setContainmentDefaults" )]
         [Description( "Sets default containment channel and role id-s." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
@@ -126,7 +183,6 @@ namespace Icarus.Modules.Logs
             ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             Profile.LogConfig.LogChannel = channelId;
 
-            Program.Core.ServerProfiles.Add( Profile );
             Profile.LogConfig.ToggleLogging( false );
             await ctx.RespondAsync( $"Disabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId )}" );
 
