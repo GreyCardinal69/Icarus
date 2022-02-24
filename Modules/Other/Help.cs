@@ -118,9 +118,9 @@ namespace Icarus.Modules.Other
                         Description =
                             $"`registerProfile <overWrite>`: Creates a server profile for the server where executed. " +
                             $"if <overWrite> is true replaces the existing profile for the server with a new one.\n\n" +
-                            $"`confAntiSpam <first> <second> <third> <limit>`: Changes server anti spam module configurations." +
-                            $"First waring is given when withing the interval ( 20 seconds ) a user sends <first> amount of messages " +
-                            $"the second when <second> amount of messages, last if <third> amount of messages, " +
+                            $"`confAntiSpam <first> <second> <third> <limit>`: Changes server anti spam module configurations. " +
+                            $"First warning is given when within the interval ( 20 seconds ) a user sends <first> amount of messages, " +
+                            $"the second when <second> amount of messages are sent, last if <third> amount of messages, " +
                             $"on reaching <limit> the user's actions are considered spam and he is isolated at the " +
                             $"default containment channel. A notification is sent to the major notifications channel.\n\n" +
                             $"`antiSpamIgnore <array of channel ids>`: Tells the anti spam module to ignore the specified channels.\n\n" +
