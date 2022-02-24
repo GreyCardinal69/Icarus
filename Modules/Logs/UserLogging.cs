@@ -94,8 +94,5 @@ namespace Icarus.Modules.Logs
 
             await ctx.RespondAsync( embed );
         }
-
-
-
     }
 }

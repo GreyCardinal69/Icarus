@@ -72,7 +72,7 @@ namespace Icarus.Modules.Servers
         }
 
         [Command( "antiSpamIgnore" )]
-        [Description( "Tells the anti spam module to ignore said channels." )]
+        [Description( "Tells the anti spam module to ignore the specified channels." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task EnableLogging ( CommandContext ctx, params ulong[] channels )
         {
@@ -103,10 +103,10 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "antiSpamResetIgnored" )]
+        [Command( "antiSpamRI" )]
         [Description( "Resets anti spam module ignored channels" )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
-        public async Task ResetAntiSpamIgnored ( CommandContext ctx, params ulong[] channels )
+        public async Task ResetAntiSpamIgnored ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
 
@@ -125,7 +125,7 @@ namespace Icarus.Modules.Servers
         }
 
         [Command( "deleteProfile" )]
-        [Description( "Creates a server profile for the server where executed." )]
+        [Description( "Deletes the server profile of the server." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterServer ( CommandContext ctx )
         {

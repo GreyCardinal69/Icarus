@@ -126,7 +126,7 @@ namespace Icarus.Modules.Other
         }
 
         [Command( "setStatus" )]
-        [Description( "Responds with information on serving servers." )]
+        [Description( "Sets the bot's status." )]
         [RequireOwner]
         public async Task SetActivity ( CommandContext ctx, int type, [RemainingText] string status )
         {

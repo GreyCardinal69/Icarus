@@ -90,7 +90,7 @@ namespace Icarus.Modules.Isolation
         [Command( "releaseUser" )]
         [Description( "Releases a user from isolation." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
-        public async Task ReleaseUser ( CommandContext ctx, ulong userID )
+        public async Task ReleaseUser ( CommandContext ctx, ulong userId )
         {
             ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
@@ -99,14 +99,14 @@ namespace Icarus.Modules.Isolation
 
             foreach (var entry in Profile.Entries)
             {
-                if (entry.IsolatedUserId == userID)
+                if (entry.IsolatedUserId == userId)
                 {
                     foundEntry = true;
                     entryInfo = entry;
                 }
             }
 
-            var user = ctx.Guild.GetMemberAsync( userID ).Result;
+            var user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             if (!foundEntry)
             {

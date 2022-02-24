@@ -15,7 +15,7 @@ namespace Icarus.Modules.Logs
     {
         [Command( "enableLogging" )]
         [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task EnableLogging ( CommandContext ctx, ulong channelId )
         {
             await ctx.TriggerTypingAsync();
@@ -68,7 +68,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
-        [Command( "addWordBlacklist" )]
+        [Command( "addWordsBL" )]
         [Description( "Adds words to the word blacklist." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task AddWordBlacklist ( CommandContext ctx, params string[] words )
@@ -97,8 +97,8 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
-        [Command( "removeWordBlacklist" )]
-        [Description( "Adds words to the word blacklist." )]
+        [Command( "removeWordsBL" )]
+        [Description( "Removes the specified words from the server's black-listed words." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task RemoveWordBlacklist ( CommandContext ctx, params string[] words )
         {
@@ -187,6 +187,19 @@ namespace Icarus.Modules.Logs
             await ctx.RespondAsync( $"Disabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId )}" );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+        }
+
+        [Command( "logEvents" )]
+        [Description( "Responds with available log events." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task LogEvents ( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+            await ctx.RespondAsync(
+                $"Listing log events: GuildMemberRemoved GuildMemberAdded GuildBanRemoved GuildBanAdded GuildRoleCreated GuildRoleUpdated" +
+                $" GuildRoleDeleted MessageReactionsCleared MessageReactionRemoved MessageReactionAdded MessagesBulkDeleted MessageDeleted MessageUpdated " +
+                $"InviteDeleted InviteCreated ChannelUpdated ChannelDeleted ChannelCreated"
+            );
         }
 
         [Command( "toggleLogEvents" )]
