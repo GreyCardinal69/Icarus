@@ -83,9 +83,10 @@ namespace Icarus.Modules.Logs
 
             ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach (var word in words)
+            for (int i = 0; i < words.Length; i++)
             {
-                Profile.WordBlackList.Add( word );
+                Profile.WordBlackList.Remove( words[i] );
+                words[i] = $"\"{words[i]}\"";
             }
 
             Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
@@ -112,14 +113,15 @@ namespace Icarus.Modules.Logs
 
             ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach (var word in words)
+            for (int i = 0; i < words.Length; i++)
             {
-                Profile.WordBlackList.Remove( word );
+                Profile.WordBlackList.Remove( words[i] );
+                words[i] = $"\"{words[i]}\"";
             }
 
             Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
             await ctx.RespondAsync(
-                $"Removed the following words to the server's word blacklist: {string.Join( ", ", words )}."
+                $"Removed the following words from the server's word blacklist: {string.Join( ", ", words )}."
             );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
