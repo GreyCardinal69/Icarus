@@ -45,7 +45,7 @@ namespace Icarus.Modules.Other
                         Title = "Isolation Commands",
                         Color = DiscordColor.SpringGreen,
                         Description =
-                        $"`isolate <userId> <channelId> <time> <returnRolesOnRelease> <reason>`: " +
+                        $"`isolate <punishmentRoleId> <userId> <channelId> <time> <returnRolesOnRelease> <reason>`: " +
                         $"Isolates a user at a channel for a given time, with an option to give back revoked " +
                         $"roles on release and a reason. The time can be either (x)d or (x)m, d for " +
                         $"days, m for months. For example 5d or 1.5m.\n\n" +
