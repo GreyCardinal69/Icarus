@@ -102,6 +102,7 @@ namespace Icarus
                 }
             }
             Core._temporaryMessageCounter.Clear();
+            Console.Clear();
             Console.WriteLine( $"Completed 10 minute server entries check [{DateTime.UtcNow}]." );
             return Task.CompletedTask;
         }
@@ -929,7 +930,6 @@ namespace Icarus
                         };
 
                         profile.LastJoinDate = DateTime.UtcNow;
-                        profile.LastUsername = e.Member.Username;
 
                         File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
                            JsonConvert.SerializeObject( profile, Formatting.Indented ) );
@@ -973,8 +973,6 @@ namespace Icarus
                         File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) );
 
                     user.LeaveDate = DateTime.UtcNow;
-                    user.OldUsernames.Add( e.Member.Username );
-                    user.LastUsername = e.Member.Username;
 
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
                        JsonConvert.SerializeObject( user, Formatting.Indented ) );
@@ -1063,6 +1061,7 @@ namespace Icarus
 
         private Task Client_ClientError ( DiscordClient sender, ClientErrorEventArgs e )
         {
+            Console.Clear();
             sender.Logger.LogError( BotEventId, e.Exception, "Exception occured" );
             return Task.CompletedTask;
         }

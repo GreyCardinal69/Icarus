@@ -76,15 +76,14 @@ namespace Icarus.Modules.Logs
 
             var embed = new DiscordEmbedBuilder
             {
-                Title = $"Profile {user.LastUsername}",
+                Title = $"Profile {ctx.Guild.GetMemberAsync(id).Result.Username}",
                 Color = DiscordColor.SpringGreen,
                 Description =
-                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n Last Username: {user.LastUsername}.\n\n" +
+                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n" +
                     $"The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n" +
                     $"The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {string.Join("\n", banEntries)}.\n\n" +
-                    $"The user's logged kcik entries are: {string.Join( "\n", kickEntries )}.\n\n" +
-                    $"The user's logged punishment entries are: \n{string.Join( "\n", punishmentEntries )}.\n\n" +
-                    $"The user's logged old usernames are: {string.Join( ", ", user.OldUsernames )}.",
+                    $"The user's logged kick entries are: {string.Join( "\n", kickEntries )}.\n\n" +
+                    $"The user's logged punishment entries are: \n{string.Join( "\n", punishmentEntries )}.\n\n",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = ctx.Client.CurrentUser.AvatarUrl,

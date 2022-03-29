@@ -23,3 +23,4 @@ C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\ref\Icarus.dll
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.pdb
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.AssemblyReference.cache
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CopyComplete

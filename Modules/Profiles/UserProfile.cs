@@ -8,9 +8,7 @@ namespace Icarus.Modules.Profiles
         public ulong ID { get; set; }
 
         public string Discriminator { get; set; }
-        public string LastUsername { get; set; }
         public string LocalLanguage { get; set; }
-        public List<string> OldUsernames { get; set; }
 
         public List<Tuple<DateTime, string>> PunishmentEntries { get; set; }
         public List<Tuple<DateTime, string>> BanEntries { get; set; }
@@ -23,13 +21,11 @@ namespace Icarus.Modules.Profiles
 
         public UserProfile ( ulong id, string usernameLast )
         {
-            OldUsernames = new();
             PunishmentEntries = new();
             BanEntries = new();
             KickEntries = new();
 
             ID = id;
-            LastUsername = usernameLast;
         }
     }
 }

@@ -73,8 +73,6 @@ namespace Icarus.Modules.Other
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             user.LeaveDate = DateTime.UtcNow;
-            user.OldUsernames.Add( ctx.Guild.GetMemberAsync( id ).Result.Username );
-            user.LastUsername = user.OldUsernames.Last();
             user.BanEntries.Add( new Tuple<DateTime, string>(DateTime.UtcNow, reason) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
@@ -95,8 +93,6 @@ namespace Icarus.Modules.Other
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             user.LeaveDate = DateTime.UtcNow;
-            user.OldUsernames.Add( ctx.Guild.GetMemberAsync( id ).Result.Username );
-            user.LastUsername = user.OldUsernames.Last();
             user.KickEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, reason ) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
