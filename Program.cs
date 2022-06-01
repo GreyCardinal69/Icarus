@@ -13,9 +13,9 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
-
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+
 using Icarus.Modules.Other;
 using Icarus.Modules;
 using Icarus.Modules.Logs;
@@ -52,9 +52,9 @@ namespace Icarus
 
             foreach (var prof in Profiles)
             {
-                ServerProfile Profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
-                Core.ServerProfiles.Add( Profile );
-                Core.RegisteredServerIds.Add( Profile.ID );
+                ServerProfile profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
+                Core.ServerProfiles.Add( profile );
+                Core.RegisteredServerIds.Add( profile.ID );
             }
 
             if (GetOperatingSystem() == OSPlatform.Windows)
@@ -83,11 +83,11 @@ namespace Icarus
 
         #pragma warning disable CS1998
         private static async Task<Task> ResetMessageCache ()
-        #pragma warning restore CS1998
         {
             Core._temporaryMessageCounter.Clear();
             return Task.CompletedTask;
         }
+        #pragma warning restore CS1998
 
         private static async Task<Task> HandleTimer ()
         {
@@ -119,25 +119,25 @@ namespace Icarus
 
         private async Task RunBotAsync ()
         {
-            Config Info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
+            Config info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
 
-            Core.OwnerId = Info.OwnerId;
+            Core.OwnerId = info.OwnerId;
 
             var cfg = new DiscordConfiguration
             {
                 Intents = DiscordIntents.All,
-                Token = Info.Token,
+                Token = info.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
                 MinimumLogLevel = LogLevel.Information
             };
 
-            this.Client = new DiscordClient( cfg );
-            Core.Client = this.Client;
+            Client = new DiscordClient( cfg );
+            Core.Client = Client;
 
-            this.Client.Ready += this.Client_Ready;
-            this.Client.GuildAvailable += this.Client_GuildAvailable;
-            this.Client.ClientErrored += this.Client_ClientError;
+            Client.Ready += Client_Ready;
+            Client.GuildAvailable += Client_GuildAvailable;
+            Client.ClientErrored += Client_ClientError;
             Client.GuildMemberRemoved += Event_GuildMemberRemoved;
             Client.GuildMemberAdded += Event_GuildMemberAdded;
             Client.GuildBanRemoved += Event_GuildBanRemoved;
@@ -148,7 +148,7 @@ namespace Icarus
             Client.MessageReactionsCleared += Event_MessageReactionsCleared;
             Client.MessageReactionRemoved += Event_MessageReactionRemoved;
             Client.MessageReactionAdded += Event_MessageReactionAdded;
-            Client.MessagesBulkDeleted += Event_MessagesBulkDeleted;
+            //Client.MessagesBulkDeleted += Event_MessagesBulkDeleted;
             Client.MessageDeleted += Event_MessageDeleted;
             Client.MessageUpdated += Event_MessageUpdated;
             Client.MessageCreated += Event_MessageCreated;
@@ -158,7 +158,7 @@ namespace Icarus
             Client.ChannelCreated += Event_ChannelCreated;
             Client.ChannelDeleted += Event_ChannelDeleted;
 
-            this.Client.UseInteractivity( new InteractivityConfiguration
+            Client.UseInteractivity( new InteractivityConfiguration
             {
                 PaginationBehaviour = PaginationBehaviour.Ignore,
                 Timeout = TimeSpan.FromMinutes( 2 ),
@@ -167,7 +167,7 @@ namespace Icarus
             CommandsNextConfig = new CommandsNextConfiguration
             {
                 StringPrefixes = new[] {
-                    Info.Prefix
+                    info.Prefix
                 },
                 EnableDms = true,
                 EnableMentionPrefix = true,
@@ -175,7 +175,7 @@ namespace Icarus
                 EnableDefaultHelp = false
             };
 
-            Commands = this.Client.UseCommandsNext( CommandsNextConfig );
+            Commands = Client.UseCommandsNext( CommandsNextConfig );
 
             Commands.RegisterCommands<GeneralCommands>();
             Commands.RegisterCommands<Help>();
@@ -185,7 +185,7 @@ namespace Icarus
             Commands.RegisterCommands<IsolationManagement>();
             Commands.RegisterCommands<UserLogging>();
 
-            await this.Client.ConnectAsync();
+            await Client.ConnectAsync();
             await Task.Delay( -1 );
         }
 
@@ -199,15 +199,14 @@ namespace Icarus
             var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
             var perms = user.Permissions;
 
-            if ( perms.HasPermission(Permissions.Administrator)  ||
-                 perms.HasPermission(Permissions.BanMembers)     ||
-                 perms.HasPermission(Permissions.KickMembers)    ||
-                 perms.HasPermission(Permissions.ManageChannels) ||
-                 perms.HasPermission(Permissions.ManageGuild)    ||
-                 perms.HasPermission(Permissions.ManageMessages) ||
-                 perms.HasPermission(Permissions.ManageRoles)    ||
-                 perms.HasPermission(Permissions.ManageEmojis)
-                 )
+            if ( perms.HasPermission(Permissions.Administrator  ) ||
+                 perms.HasPermission(Permissions.BanMembers     ) ||
+                 perms.HasPermission(Permissions.KickMembers    ) ||
+                 perms.HasPermission(Permissions.ManageChannels ) ||
+                 perms.HasPermission(Permissions.ManageGuild    ) ||
+                 perms.HasPermission(Permissions.ManageMessages ) ||
+                 perms.HasPermission(Permissions.ManageRoles    ) ||
+                 perms.HasPermission(Permissions.ManageEmojis   ))
             {
                 return;
             }
@@ -524,23 +523,22 @@ namespace Icarus
             {
                 if (e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId)
                 {
-                    break;
+                    return;
                 }
 
                 var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
                 var perms = user.Permissions;
 
-                if (perms.HasPermission( Permissions.Administrator ) ||
-                     perms.HasPermission( Permissions.BanMembers ) ||
-                     perms.HasPermission( Permissions.KickMembers ) ||
+                if ( perms.HasPermission( Permissions.Administrator  ) ||
+                     perms.HasPermission( Permissions.BanMembers     ) ||
+                     perms.HasPermission( Permissions.KickMembers    ) ||
                      perms.HasPermission( Permissions.ManageChannels ) ||
-                     perms.HasPermission( Permissions.ManageGuild ) ||
+                     perms.HasPermission( Permissions.ManageGuild    ) ||
                      perms.HasPermission( Permissions.ManageMessages ) ||
-                     perms.HasPermission( Permissions.ManageRoles ) ||
-                     perms.HasPermission( Permissions.ManageEmojis )
-                     )
+                     perms.HasPermission( Permissions.ManageRoles    ) ||
+                     perms.HasPermission( Permissions.ManageEmojis   ))
                 {
-                    break;
+                    return;
                 }
 
                 if (e.Message.Content.Contains( word ))
@@ -554,7 +552,7 @@ namespace Icarus
                         $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}.\n" +
                         $"The user mentioned the black-listed word after editing a message."
                     );
-                    break;
+                    return;
                 }
             }
 
@@ -652,46 +650,6 @@ namespace Icarus
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-            }
-            return;
-        }
-
-        private async Task Event_MessagesBulkDeleted ( DiscordClient sender, MessageBulkDeleteEventArgs e )
-        {
-            for (int i = 0; i < ServerProfiles.Count; i++)
-            {
-                if (e.Guild.Id == ServerProfiles[i].ID)
-                {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessagesBulkDeleted)
-                    {
-                        string TempPath = AppDomain.CurrentDomain.BaseDirectory + "Temp.txt";
-                        await File.WriteAllTextAsync( TempPath, string.Join( "\n", e.Messages.Select( X => X.Content ).Reverse().ToArray() ) );
-                        var embed = new DiscordEmbedBuilder
-                        {
-                            Title = "**Messages Purged**\n\n\n",
-                            Color = DiscordColor.DarkRed,
-                            Author = new DiscordEmbedBuilder.EmbedAuthor
-                            {
-                                IconUrl = e.Guild.IconUrl
-                            },
-                            Description = $"\n {e.Messages.Count} messages were purged.\n\n" +
-                            "The messages were deleted at: " + e.Channel.Mention + "\n\n", //+
-                            //"Providing a file with all the deleted messages below.",
-                            Timestamp = DateTime.Now,
-                        };
-                        await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
-                        //using (var fs = new FileStream( TempPath, FileMode.Open, FileAccess.Read ))
-                       // {
-                          //  await new DiscordMessageBuilder()
-                          //            .WithFile( "Purged_Messages.txt", fs )
-                          //                 .SendAsync( e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ) );
-                        //}
                     }
                     else
                     {
