@@ -1,15 +1,15 @@
-﻿using DSharpPlus;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Icarus.Modules.Profiles;
 
 namespace Icarus.Modules.Other
 {
@@ -73,7 +73,7 @@ namespace Icarus.Modules.Other
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             user.LeaveDate = DateTime.UtcNow;
-            user.BanEntries.Add( new Tuple<DateTime, string>(DateTime.UtcNow, reason) );
+            user.BanEntries.Add( new (DateTime.UtcNow, reason) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );
@@ -93,7 +93,7 @@ namespace Icarus.Modules.Other
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             user.LeaveDate = DateTime.UtcNow;
-            user.KickEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, reason ) );
+            user.KickEntries.Add( new ( DateTime.UtcNow, reason ) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );
@@ -126,23 +126,15 @@ namespace Icarus.Modules.Other
         [RequireOwner]
         public async Task SetActivity ( CommandContext ctx, int type, [RemainingText] string status )
         {
-            if (ctx.User.Id == Program.Core.OwnerId)
-            {
-                DiscordActivity activity = new();
-                DiscordClient discord = ctx.Client;
-                activity.Name = status;
-                // Offline = 0,
-                // Online = 1,
-                // Idle = 2,
-                // DoNotDisturb = 4,
-                // Invisible = 5
-                await discord.UpdateStatusAsync( activity, (UserStatus)type, DateTimeOffset.UtcNow );
-                return;
-            }
-            else
-            {
-                await ctx.RespondAsync("No way this part of code will ever be executed.");
-            }
+            DiscordActivity activity = new();
+            DiscordClient discord = ctx.Client;
+            activity.Name = status;
+            // Offline = 0,
+            // Online = 1,
+            // Idle = 2,
+            // DoNotDisturb = 4,
+            // Invisible = 5
+            await discord.UpdateStatusAsync( activity, ( UserStatus ) type, DateTimeOffset.UtcNow );
         }
     }
 }

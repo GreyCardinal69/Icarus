@@ -2,10 +2,7 @@
 {
     public class LogProfile
     {
-        public void ToggleLogging ( bool Enabled )
-        {
-            this.LoggingEnabled = Enabled;
-        }
+        public void ToggleLogging ( bool enabled ) => LoggingEnabled = enabled;
 
         public static readonly string[] LogEvents = new string[]
         {

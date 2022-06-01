@@ -10,9 +10,9 @@ namespace Icarus.Modules.Profiles
         public string Discriminator { get; set; }
         public string LocalLanguage { get; set; }
 
-        public List<Tuple<DateTime, string>> PunishmentEntries { get; set; }
-        public List<Tuple<DateTime, string>> BanEntries { get; set; }
-        public List<Tuple<DateTime, string>> KickEntries { get; set; }
+        public List<(DateTime, string)> PunishmentEntries { get; set; }
+        public List<(DateTime, string)> BanEntries { get; set; }
+        public List<(DateTime, string)> KickEntries { get; set; }
 
         public DateTimeOffset CreationDate { get; set; }
         public DateTime LastJoinDate { get; set; }

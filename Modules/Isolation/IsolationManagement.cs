@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
+
+using Icarus.Modules.Profiles;
 
 namespace Icarus.Modules.Isolation
 {
@@ -40,7 +38,7 @@ namespace Icarus.Modules.Isolation
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             var user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             IsolationEntry NewEntry = new()
@@ -63,7 +61,7 @@ namespace Icarus.Modules.Isolation
             var userP = JsonConvert.DeserializeObject<UserProfile>(
                 File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json" ) );
 
-            userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, reason ) );
+            userP.PunishmentEntries.Add( ( DateTime.UtcNow, reason ) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json",
                  JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -75,10 +73,10 @@ namespace Icarus.Modules.Isolation
 
             await user.GrantRoleAsync( ctx.Guild.GetRole( punishmentRoleId ) );
 
-            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).Entries.Add( NewEntry );
+            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            profile.Entries.Add( NewEntry );
 
-            File.WriteAllText( $"{ProfilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
 
             var isolationChannel = ctx.Guild.GetChannel( channelId );
 
@@ -92,12 +90,12 @@ namespace Icarus.Modules.Isolation
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
         public async Task ReleaseUser ( CommandContext ctx, ulong userId )
         {
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             bool foundEntry = false;
             IsolationEntry entryInfo = new();
 
-            foreach (var entry in Profile.Entries)
+            foreach (var entry in profile.Entries)
             {
                 if (entry.IsolatedUserId == userId)
                 {
@@ -132,10 +130,10 @@ namespace Icarus.Modules.Isolation
                     $"The user was isolated for `\"{entryInfo.Reason}\"`."
                 );
 
-            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).Entries.Remove(entryInfo);
+            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            profile.Entries.Remove(entryInfo);
 
-            File.WriteAllText( $"{ProfilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         public static async Task ReleaseEntry ( ServerProfile profile, IsolationEntry entry )
@@ -172,10 +170,10 @@ namespace Icarus.Modules.Isolation
                     $"The user was isolated for `\"{entry.Reason}\"`."
                 );
 
-            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
-            Program.Core.ServerProfiles.First( x => x.ID == fakeContext.Guild.Id ).Entries.Remove( entry );
+            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            profile.Entries.Remove( entry );
 
-            File.WriteAllText( $"{ProfilesPath}{fakeContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+            File.WriteAllText( $"{profilesPath}{fakeContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
     }
 }

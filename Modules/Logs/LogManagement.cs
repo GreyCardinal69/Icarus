@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext;
+using Newtonsoft.Json;
 
 using Icarus.Modules.Profiles;
-using Newtonsoft.Json;
-using System.IO;
 
 namespace Icarus.Modules.Logs
 {
@@ -32,18 +32,18 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).LogConfig.LogChannel = channelId;
-            Profile.LogConfig.ToggleLogging( true );
+            profile.LogConfig.LogChannel = channelId;
+            profile.LogConfig.ToggleLogging( true );
             await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId ).Mention}" );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Proprofilefile, Formatting.Indented ) );
         }
 
         [Command( "setMajorLogChannel" )]
         [Description( "Sets the channel for major notifications." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task SetMajorNotificationsChannel ( CommandContext ctx, ulong channelId )
         {
             await ctx.TriggerTypingAsync();
@@ -62,13 +62,13 @@ namespace Icarus.Modules.Logs
 
             ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).LogConfig.MajorNotificationsChannelId = channelId;
+            Profile.LogConfig.MajorNotificationsChannelId = channelId;
             await ctx.RespondAsync( $"Set channel for important notifications of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}" );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
         }
 
-        [Command( "addWordsBL" )]
+        [Command( "addWordsBl" )]
         [Description( "Adds words to the word blacklist." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task AddWordBlacklist ( CommandContext ctx, params string[] words )
@@ -81,21 +81,20 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             for (int i = 0; i < words.Length; i++)
             {
-                Profile.WordBlackList.Remove( words[i] );
+                profile.WordBlackList.Remove( words[i] );
                 words[i] = $"\"{words[i]}\"";
             }
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
             await ctx.RespondAsync(
                 $"Added the following words to the server's word blacklist, any mentions of those will be reported to the major notifications channel: " +
                 $"{string.Join(", ", words)}."
             );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "removeWordsBL" )]
@@ -111,20 +110,19 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             for (int i = 0; i < words.Length; i++)
             {
-                Profile.WordBlackList.Remove( words[i] );
+                profile.WordBlackList.Remove( words[i] );
                 words[i] = $"\"{words[i]}\"";
             }
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).WordBlackList = Profile.WordBlackList;
             await ctx.RespondAsync(
                 $"Removed the following words from the server's word blacklist: {string.Join( ", ", words )}."
             );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "setContainmentDefaults" )]
@@ -152,15 +150,15 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).SetContainmentDefaults( channelId, roleId );
+            profile.SetContainmentDefaults( channelId, roleId );
             await ctx.RespondAsync(
                 $"Set channel for default containment of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}.\n" +
                 $"Default role for containment is set as {ctx.Guild.Roles[roleId].Mention}"
             );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "disableLogging" )]
@@ -182,13 +180,13 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
-            Profile.LogConfig.LogChannel = channelId;
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            profile.LogConfig.LogChannel = channelId;
 
-            Profile.LogConfig.ToggleLogging( false );
+            profile.LogConfig.ToggleLogging( false );
             await ctx.RespondAsync( $"Disabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId )}" );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "logEvents" )]
@@ -207,11 +205,11 @@ namespace Icarus.Modules.Logs
         [Command( "toggleLogEvents" )]
         [Description( "Toggles log events for the server executed in, invalid events will be ignored." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task EnableLogEvents ( CommandContext ctx, params string[] EventTypes )
+        public async Task EnableLogEvents ( CommandContext ctx, params string[] eventTypes )
         {
             await ctx.TriggerTypingAsync();
 
-            if (EventTypes.Length < 1)
+            if (eventTypes.Length < 1)
             {
                 await ctx.RespondAsync( "Specify at least one log event to toggle on/off." );
                 return;
@@ -223,82 +221,80 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach (var Event in EventTypes)
+            foreach (var Event in eventTypes)
             {
                 switch (Event)
                 {
                     case "guildmemberremoved":
-                        Profile.LogConfig.GuildMemberRemoved = !Profile.LogConfig.GuildMemberRemoved;
+                        profile.LogConfig.GuildMemberRemoved = !profile.LogConfig.GuildMemberRemoved;
                         break;
                     case "guildmemberadded":
-                        Profile.LogConfig.GuildMemberAdded = !Profile.LogConfig.GuildMemberAdded;
+                        profile.LogConfig.GuildMemberAdded = !profile.LogConfig.GuildMemberAdded;
                         break;
                     case "guildbanremoved":
-                        Profile.LogConfig.GuildBanRemoved = !Profile.LogConfig.GuildBanRemoved;
+                        profile.LogConfig.GuildBanRemoved = !profile.LogConfig.GuildBanRemoved;
                         break;
                     case "guildbanadded":
-                        Profile.LogConfig.GuildBanAdded = !Profile.LogConfig.GuildBanAdded;
+                        profile.LogConfig.GuildBanAdded = !profile.LogConfig.GuildBanAdded;
                         break;
                     case "guildrolecreated":
-                        Profile.LogConfig.GuildRoleCreated = !Profile.LogConfig.GuildRoleCreated;
+                        profile.LogConfig.GuildRoleCreated = !profile.LogConfig.GuildRoleCreated;
                         break;
                     case "guildroleupdated":
-                        Profile.LogConfig.GuildRoleUpdated = !Profile.LogConfig.GuildRoleUpdated;
+                        profile.LogConfig.GuildRoleUpdated = !profile.LogConfig.GuildRoleUpdated;
                         break;
                     case "guildroledeleted":
-                        Profile.LogConfig.GuildRoleDeleted = !Profile.LogConfig.GuildRoleDeleted;
+                        profile.LogConfig.GuildRoleDeleted = !profile.LogConfig.GuildRoleDeleted;
                         break;
                     case "messagereactionscleared":
-                        Profile.LogConfig.MessageReactionsCleared = !Profile.LogConfig.MessageReactionsCleared;
+                        profile.LogConfig.MessageReactionsCleared = !profile.LogConfig.MessageReactionsCleared;
                         break;
                     case "messagereactionremoved":
-                        Profile.LogConfig.MessageReactionRemoved = !Profile.LogConfig.MessageReactionRemoved;
+                        profile.LogConfig.MessageReactionRemoved = !profile.LogConfig.MessageReactionRemoved;
                         break;
                     case "messagereactionadded":
-                        Profile.LogConfig.MessageReactionAdded = !Profile.LogConfig.MessageReactionAdded;
+                        profile.LogConfig.MessageReactionAdded = !profile.LogConfig.MessageReactionAdded;
                         break;
                     case "messagesbulkdeleted":
-                        Profile.LogConfig.MessagesBulkDeleted = !Profile.LogConfig.MessagesBulkDeleted;
+                        profile.LogConfig.MessagesBulkDeleted = !profile.LogConfig.MessagesBulkDeleted;
                         break;
                     case "messagedeleted":
-                        Profile.LogConfig.MessageDeleted = !Profile.LogConfig.MessageDeleted;
+                        profile.LogConfig.MessageDeleted = !profile.LogConfig.MessageDeleted;
                         break;
                     case "messageupdated":
-                        Profile.LogConfig.MessageUpdated = !Profile.LogConfig.MessageUpdated;
+                        profile.LogConfig.MessageUpdated = !profile.LogConfig.MessageUpdated;
                         break;
                     case "messagecreated":
-                        Profile.LogConfig.MessageCreated = !Profile.LogConfig.MessageCreated;
+                        profile.LogConfig.MessageCreated = !profile.LogConfig.MessageCreated;
                         break;
                     case "invitedeleted":
-                        Profile.LogConfig.InviteDeleted = !Profile.LogConfig.InviteDeleted;
+                        profile.LogConfig.InviteDeleted = !profile.LogConfig.InviteDeleted;
                         break;
                     case "invitecreated":
-                        Profile.LogConfig.InviteCreated = !Profile.LogConfig.InviteCreated;
+                        profile.LogConfig.InviteCreated = !profile.LogConfig.InviteCreated;
                         break;
                     case "channelupdated":
-                        Profile.LogConfig.ChannelUpdated = !Profile.LogConfig.ChannelUpdated;
+                        profile.LogConfig.ChannelUpdated = !profile.LogConfig.ChannelUpdated;
                         break;
                     case "channeldeleted":
-                        Profile.LogConfig.ChannelDeleted = !Profile.LogConfig.ChannelDeleted;
+                        profile.LogConfig.ChannelDeleted = !profile.LogConfig.ChannelDeleted;
                         break;
                     case "channelcreated":
-                        Profile.LogConfig.ChannelCreated = !Profile.LogConfig.ChannelCreated;
+                        profile.LogConfig.ChannelCreated = !profile.LogConfig.ChannelCreated;
                         break;
                 }
             }
 
-            await ctx.RespondAsync( $"Toggled the following log events: {string.Join( ", ", LogProfile.LogEvents.Where( X => EventTypes.Contains( X.ToLower() ) ) )}" );
+            await ctx.RespondAsync( $"Toggled the following log events: {string.Join( ", ", LogProfile.LogEvents.Where( X => eventTypes.Contains( X.ToLower() ) ) )}" );
 
-            Program.Core.ServerProfiles.First( x => x.ID == Profile.ID ).LogConfig = Profile.LogConfig;
-
-            if (!Profile.LogConfig.LoggingEnabled)
+            if (!profile.LogConfig.LoggingEnabled)
             {
                 await ctx.RespondAsync( " Logging is disabled for this server, did you forget to enable it?" );
             }
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
     }
 }

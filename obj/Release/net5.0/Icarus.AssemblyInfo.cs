@@ -11,7 +11,7 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Michael Kananov")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Mikayel Kananov")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("A strictly moderation discord bot made in C#.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]

@@ -1,17 +1,15 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using System;
+using System.Threading.Tasks;
+
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Icarus.Modules.Other
 {
     public class Help : BaseCommandModule
     {
-        [Command( "help" )]
+        [Command( "Help" )]
         [Description( "Responds with information on available command categories." )]
         public async Task HelpBasic ( CommandContext ctx, string category = "")
         {
@@ -124,7 +122,7 @@ namespace Icarus.Modules.Other
                             $"on reaching <limit> the user's actions are considered spam and he is isolated at the " +
                             $"default containment channel. A notification is sent to the major notifications channel.\n\n" +
                             $"`antiSpamIgnore <array of channel ids>`: Tells the anti spam module to ignore the specified channels.\n\n" +
-                            $"`antiSpamRI`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
+                            $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
                             $"`profile`: Responds with information on the server profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor

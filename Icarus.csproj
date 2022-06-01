@@ -5,11 +5,12 @@
     <TargetFramework>net5.0</TargetFramework>
     <NoWin32Manifest>true</NoWin32Manifest>
     <ApplicationIcon>light-tourellesalpha.ico</ApplicationIcon>
-    <Authors>Michael Kananov</Authors>
+    <Authors>Mikayel Kananov</Authors>
     <Description>A strictly moderation discord bot made in C#.</Description>
     <PackageIcon>light-tourellesalpha.png</PackageIcon>
     <PackageIconUrl />
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Company>Mikayel Kananov</Company>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -18,10 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.1.0" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.1.0" />
-    <PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="16.0.0" />
+    <PackageReference Include="DSharpPlus" Version="4.2.0-nightly-01109" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.2.0-nightly-01109" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.2.0-nightly-01109" />
+    <PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="17.1.32210.191" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

@@ -1,14 +1,14 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using Icarus.Modules.Profiles;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using Newtonsoft.Json;
+
+using Icarus.Modules.Profiles;
 
 namespace Icarus.Modules.Logs
 {
@@ -16,7 +16,7 @@ namespace Icarus.Modules.Logs
     {
         [Command( "registerUsers" )]
         [Description( "Creates profiles for all server users." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterUsers ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
@@ -74,6 +74,10 @@ namespace Icarus.Modules.Logs
                 punishmentEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
+            var bans = banEntries.Count == 0 ? "None" : string.Join( "\n", banEntries );
+            var kicks = kickEntries.Count == 0 ? "None" : string.Join( "\n", kickEntries );
+            var strikes = punishmentEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", punishmentEntries )}";
+
             var embed = new DiscordEmbedBuilder
             {
                 Title = $"Profile {ctx.Guild.GetMemberAsync(id).Result.Username}",
@@ -81,9 +85,9 @@ namespace Icarus.Modules.Logs
                 Description =
                     $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n" +
                     $"The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n" +
-                    $"The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {string.Join("\n", banEntries)}.\n\n" +
-                    $"The user's logged kick entries are: {string.Join( "\n", kickEntries )}.\n\n" +
-                    $"The user's logged punishment entries are: \n{string.Join( "\n", punishmentEntries )}.\n\n",
+                    $"The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n" +
+                    $"The user's logged kick entries are: {kicks}.\n\n" +
+                    $"The user's logged punishment entries are: {strikes}.\n\n",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = ctx.Client.CurrentUser.AvatarUrl,

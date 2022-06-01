@@ -102,7 +102,6 @@ namespace Icarus
                 }
             }
             Core._temporaryMessageCounter.Clear();
-            Console.Clear();
             Console.WriteLine( $"Completed 10 minute server entries check [{DateTime.UtcNow}]." );
             return Task.CompletedTask;
         }
@@ -301,7 +300,7 @@ namespace Icarus
                                 var userP = JsonConvert.DeserializeObject<UserProfile>(
                                      File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                                userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, "User's actions were considered spam." ) );
+                                userP.PunishmentEntries.Add( ( DateTime.UtcNow, "User's actions were considered spam." ) );
 
                                 File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                                      JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -343,7 +342,7 @@ namespace Icarus
                     var userP = JsonConvert.DeserializeObject<UserProfile>(
                           File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                    userP.PunishmentEntries.Add( new Tuple<DateTime, string>( DateTime.UtcNow, "User posted a scam message." ) );
+                    userP.PunishmentEntries.Add( ( DateTime.UtcNow, "User posted a scam message." ) );
 
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                          JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -913,7 +912,9 @@ namespace Icarus
         {
             if (e.Guild.Id == 740528944129900565)
             {
-                await e.Member.GrantRoleAsync(e.Guild.GetRole( 740557101843087441 ) );
+                await e.Member.GrantRoleAsync( e.Guild.GetRole( 740557101843087441 ) );
+                var main = e.Guild.GetChannel( 740528944641736756 );
+                await main.SendMessageAsync( e.Member.Mention + " Welcome!" );
             }
             for (int i = 0; i < ServerProfiles.Count; i++)
             {
@@ -1061,7 +1062,7 @@ namespace Icarus
 
         private Task Client_ClientError ( DiscordClient sender, ClientErrorEventArgs e )
         {
-            Console.Clear();
+            //Console.Clear();
             sender.Logger.LogError( BotEventId, e.Exception, "Exception occured" );
             return Task.CompletedTask;
         }

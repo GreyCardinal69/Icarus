@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Text;
+using System.Linq;
+using System.IO;
 
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext;
 
 using Newtonsoft.Json;
-using System.IO;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
-using System.Text;
-using System.Linq;
 
 namespace Icarus.Modules.Servers
 {
@@ -18,12 +18,12 @@ namespace Icarus.Modules.Servers
         [Command( "registerProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task RegisterServer ( CommandContext ctx, bool OverWrite = false )
+        public async Task RegisterServer ( CommandContext ctx, bool overWrite = false )
         {
             await ctx.TriggerTypingAsync();
-            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
 
-            if (File.Exists( $"{ProfilesPath}{ctx.Guild.Id}.json" ) && !OverWrite)
+            if (File.Exists( $"{profilesPath}{ctx.Guild.Id}.json" ) && !overWrite)
             {
                 await ctx.RespondAsync( $"A server profile for this server already exists, do you want to overwrite it ? If yes type `>registerserver true`" );
                 return;
@@ -36,7 +36,7 @@ namespace Icarus.Modules.Servers
                 ProfileCreationDate = DateTime.UtcNow
             };
 
-            File.WriteAllText( $"{ProfilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
         }
 
@@ -53,9 +53,9 @@ namespace Icarus.Modules.Servers
                 return;
             }
 
-            ServerProfile Profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpam = new()
+            profile.AntiSpam = new()
             {
                 FirstWarning = first,
                 SecondWarning = second,
@@ -68,12 +68,12 @@ namespace Icarus.Modules.Servers
                 $"Changed anti spam configurations. Message cache is reset every 20 seconds. First warning is issued if a user sends {first} messages " +
                 $"in that interval, second: {second}, last: {third}. At {limit} or more the user is isolated."
             );
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
         [Command( "antiSpamIgnore" )]
         [Description( "Tells the anti spam module to ignore the specified channels." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task EnableLogging ( CommandContext ctx, params ulong[] channels )
         {
             await ctx.TriggerTypingAsync();
@@ -95,17 +95,15 @@ namespace Icarus.Modules.Servers
                 i++;
             }
 
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored = profile.AntiSpamIgnored;
-
             await ctx.RespondAsync(
                 $"Configured anti spam module to ignore the following channels: {string.Join(", ", mentions.Select( x => x.Mention ) ) }."
             );
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "antiSpamRI" )]
+        [Command( "antiSpamReset" )]
         [Description( "Resets anti spam module ignored channels" )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task ResetAntiSpamIgnored ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
@@ -117,10 +115,9 @@ namespace Icarus.Modules.Servers
             }
 
             var profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
-            Program.Core.ServerProfiles.First( x => x.ID == ctx.Guild.Id ).AntiSpamIgnored.Clear();
+            profile.AntiSpamIgnored.Clear();
 
-            await ctx.RespondAsync($"The anti spam module no longer ignores any channels."
-            );
+            await ctx.RespondAsync($"The anti spam module no longer ignores any channels.");
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
@@ -130,9 +127,9 @@ namespace Icarus.Modules.Servers
         public async Task RegisterServer ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
-            string ProfilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
 
-            await ctx.RespondAsync( " Confirm action by responding with \"yes\" " );
+            await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
 
             var interactivity = ctx.Client.GetInteractivity();
             var msg = await interactivity.WaitForMessageAsync
@@ -144,7 +141,8 @@ namespace Icarus.Modules.Servers
 
             if (!msg.TimedOut)
             {
-                File.Delete( $"{ProfilesPath}{ctx.Guild.Id}.json" );
+                File.Delete( $"{profilesPath}{ctx.Guild.Id}.json" );
+                Program.Core.ServerProfiles.Remove( ServerProfile.ProfileFromId( ctx.Guild.Id ) );
                 await ctx.RespondAsync( $"Deleted the server profile for {ctx.Guild.Name}." );
             }
             else
@@ -155,7 +153,7 @@ namespace Icarus.Modules.Servers
 
         [Command( "profile" )]
         [Description( "Responds with information on the server profile." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task Profile ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
@@ -218,6 +216,7 @@ namespace Icarus.Modules.Servers
                 i++;
             }
 
+            var ignores = string.Join( ", ", mentions );
             var embed = new DiscordEmbedBuilder
             {
                 Title = $"Server Profile for {ctx.Guild.Name}",
@@ -231,7 +230,7 @@ namespace Icarus.Modules.Servers
                     $"The default containment role is: {ctx.Guild.GetRole(profile.LogConfig.DefaultContainmentRoleId).Mention}.\n\n" +
                     $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
                     $"Anti spam is configured at {profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit} " +
-                    $"messages per 20 seconds. The following channels are excempt from anti spam module: {string.Join(", ", mentions)}.\n\n" +
+                    $"messages per 20 seconds. The following channels are excempt from anti spam module: {(ignores.Length == 0 ? "None" : ignores)}.\n\n" +
                     $"The following words are black-listed and users mentioning them will be reported: {string.Join(", ", profile.WordBlackList)}.\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
