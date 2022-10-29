@@ -872,7 +872,7 @@ namespace Icarus
             {
                 await e.Member.GrantRoleAsync( e.Guild.GetRole( 740557101843087441 ) );
                 var main = e.Guild.GetChannel( 740528944641736756 );
-                await main.SendMessageAsync( e.Member.Mention + " Welcome!" );
+                await main.SendMessageAsync( e.Member.Mention + " I am watching you, and welcome." );
             }
             for (int i = 0; i < ServerProfiles.Count; i++)
             {
