@@ -41,6 +41,27 @@ namespace Icarus.Modules.Other
             }
         }
 
+        [Command( "eraseaggressive" )]
+        [Description( "Deletes set amount of messages if possible, can delete messages older than 2 weeeks." )]
+        [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
+        public async Task EraseAggressive( CommandContext ctx, int count )
+        {
+            await ctx.TriggerTypingAsync();
+            try
+            {
+                var messages = await ctx.Channel.GetMessagesAsync( count );
+                foreach ( var item in messages )
+                {
+                    await ctx.Channel.DeleteMessageAsync( item );
+                }
+                await ctx.RespondAsync( $"Erased: {count} messages, called by {ctx.User.Mention}." );
+            }
+            catch ( Exception )
+            {
+                await ctx.RespondAsync( "Failed to erase, are the messages too old?" );
+            }
+        }
+
         [Command( "eraseFromTo" )]
         [Description( "Deletes all messages from the first to the second specified message." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]

@@ -3,7 +3,6 @@ C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.deps.json
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.runtimeconfig.json
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.runtimeconfig.dev.json
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.dll
-C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\ref\Icarus.dll
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Icarus.pdb
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\ConcurrentCollections.dll
 C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\DSharpPlus.dll
@@ -24,3 +23,4 @@ C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.pdb
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.AssemblyReference.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CopyComplete
+C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\refint\Icarus.dll

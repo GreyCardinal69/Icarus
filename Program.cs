@@ -42,7 +42,7 @@ namespace Icarus
 
         private Timer _entryCheckTimer;
         private Timer _antiSpamTimer;
-        private readonly EventId BotEventId = new( 1488, "Bot-Ex1488" );
+        private readonly EventId BotEventId = new( 1458, "Bot-Ex1458" );
 
         private static void Main ( string[] args )
         {

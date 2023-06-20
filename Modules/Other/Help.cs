@@ -92,6 +92,7 @@ namespace Icarus.Modules.Other
                         Description =
                             $"`ping`: Responds with client ping time.\n\n" +
                             $"`erase <count>`: Deletes set amount of messages if possible.\n\n" +
+                            $"`eraseAggressive <count>`: Deletes set amount of messages if possible. Can delete messages older than 2 weeks.\n\n" +
                             $"`eraseFromTo <from> <to> <amount>`: Deletes set amount of messages from the first " +
                             $"to the second specified message.\n\n" +
                             $"`ban <userId> <messageAmount> <reason>`: Bans a user with optional amount of messages to delete, " +

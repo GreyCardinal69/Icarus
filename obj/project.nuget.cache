@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "l50FcusbV8MD6iP8YKOV3m7DP4r5HG9Edpf3K2Xe6vUS+lufx+niRwkDTRyI3POgUhPOxaiwLSi4Ug0/2l9Kvg==",
+  "dgSpecHash": "f6o4Jq09EsaAcTaeSEkUTXkGykuW+mM7g/yFbubq2zWRohiAlA98FlCUeEO9W2L0qn1jiWOL8gAOXHPKE4eDKg==",
   "success": true,
   "projectFilePath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
   "expectedPackageFiles": [
@@ -84,7 +84,10 @@
     "C:\\Users\\thewa\\.nuget\\packages\\system.threading.threadpool\\4.3.0\\system.threading.threadpool.4.3.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\thewa\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
-    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.12\\microsoft.netcore.app.host.win-x64.5.0.12.nupkg.sha512"
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\thewa\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.17\\microsoft.netcore.app.host.win-x64.5.0.17.nupkg.sha512"
   ],
   "logs": []
 }
