@@ -24,3 +24,4 @@ C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.genruntimeconfig
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.AssemblyReference.cache
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\Icarus.csproj.CopyComplete
 C:\Users\thewa\source\repos\C#\Icarus\obj\Release\net5.0\refint\Icarus.dll
+C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Content\ExportChannelFirstHalf.txt

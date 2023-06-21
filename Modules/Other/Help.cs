@@ -94,6 +94,7 @@ namespace Icarus.Modules.Other
                             $"`erase <count>`: Deletes set amount of messages if possible.\n\n" +
                             $"`eraseAggressive <count>`: Deletes set amount of messages if possible. Can delete messages older than 2 weeks.\n\n" +
                             $"`eraseFromTo <from> <to> <amount>`: Deletes set amount of messages from the first " +
+                            $"`archive <channelId`: Exports a discord channel and sends it as a .zip file" +
                             $"to the second specified message.\n\n" +
                             $"`ban <userId> <messageAmount> <reason>`: Bans a user with optional amount of messages to delete, " +
                             $"with a reason for the undertaken action.\n\n" +
