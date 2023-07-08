@@ -358,7 +358,7 @@ namespace Icarus.Modules.Other
                 using var fs = new FileStream( exportPath, FileMode.Open, FileAccess.Read );
 
                 var msg = await new DiscordMessageBuilder()
-                    .WithFiles( new Dictionary<string, Stream>() { { $"{channel.Name}.zip", fs } } )
+                    .AddFile( $"{channel.Name}.zip", fs  )
                     .SendAsync( ctx.Channel );
             }
             catch ( Exception e )

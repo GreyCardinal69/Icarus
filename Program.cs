@@ -521,10 +521,6 @@ namespace Icarus
 
             foreach (var word in profile.WordBlackList)
             {
-                if (e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId)
-                {
-                    return;
-                }
 
                 var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
                 var perms = user.Permissions;
@@ -538,7 +534,7 @@ namespace Icarus
                      perms.HasPermission( Permissions.ManageRoles    ) ||
                      perms.HasPermission( Permissions.ManageEmojis   ))
                 {
-                    return;
+                    break;
                 }
 
                 if (e.Message.Content.Contains( word ))
@@ -552,7 +548,7 @@ namespace Icarus
                         $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}.\n" +
                         $"The user mentioned the black-listed word after editing a message."
                     );
-                    return;
+                    break; ;
                 }
             }
 
@@ -588,7 +584,6 @@ namespace Icarus
                     }
                 }
             }
-            return;
         }
 
         private async Task Event_MessageReactionAdded ( DiscordClient sender, MessageReactionAddEventArgs e )
