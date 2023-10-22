@@ -226,8 +226,12 @@ namespace Icarus
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
                     customArgs = "[]help. Hunting For Pulsars.";
                     var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
-                    await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs )
-                        .RespondAsync( $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}." );
+                    Console.WriteLine( e.Message.JumpLink );
+
+                    var context = cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs );
+
+                    await context.RespondAsync( $"The following user {e.Author.Mention} mentioned \"{word}\" in {e.Channel.Mention}.");
+                    await context.RespondAsync( "Message Jump Link: " + e.Message.JumpLink.ToString() );
                     break;
                 }
             }

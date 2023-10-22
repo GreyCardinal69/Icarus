@@ -122,13 +122,15 @@ namespace Icarus.Modules.Isolation
                 }
             }
 
+          
             await ctx.RespondAsync
                 (
                     $"Released user: {user.Mention} from isolation at channel: {ctx.Guild.GetChannel(entryInfo.IsolationChannelId).Mention}.\n" +
-                    $"The user was isolated for {Convert.ToInt32(Math.Abs((DateTime.UtcNow - entryInfo.EntryDate).TotalDays))} days.\n" +
-                    $"The isolation was called by this message {entryInfo.EntryMessageLink}.\nWere revoked roles returned? {entryInfo.ReturnRoles}.\n" +
-                    $"The user was isolated for `\"{entryInfo.Reason}\"`."
+                    $"The user was isolated for {Convert.ToInt32(Math.Abs((DateTime.UtcNow - entryInfo.EntryDate).TotalDays))} days." +
+                    $"\nWere revoked roles returned? {entryInfo.ReturnRoles}.\n" + $"The user was isolated for `\"{entryInfo.Reason}\"`. " +
+                    $"The isolation was called by this message: " + entryInfo.EntryMessageLink
                 );
+   
 
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
             profile.Entries.Remove(entryInfo);
@@ -165,10 +167,10 @@ namespace Icarus.Modules.Isolation
             await fakeContext.RespondAsync
                 (
                     $"Released user: {user.Mention} from isolation at channel: {fakeContext.Guild.GetChannel( entry.IsolationChannelId ).Mention}.\n" +
-                    $"The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entry.EntryDate ).TotalDays ) )} days.\n" +
-                    $"The isolation was called by this message {entry.EntryMessageLink}.\nWere revoked roles returned? {entry.ReturnRoles}.\n" +
-                    $"The user was isolated for `\"{entry.Reason}\"`."
+                    $"The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entry.EntryDate ).TotalDays ) )} days.\n"
                 );
+            await fakeContext.RespondAsync( "The isolation was called by this message: " + entry.EntryMessageLink.ToString() );
+            await fakeContext.RespondAsync( "Were revoked roles returned? {entry.ReturnRoles}.\n" + $"The user was isolated for `\"{entry.Reason}\"`." );
 
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
             profile.Entries.Remove( entry );

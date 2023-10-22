@@ -12,10 +12,12 @@ namespace Icarus.Modules.Other
         [Command( "Help" )]
         [Description( "Responds with information on available command categories." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
-        public async Task HelpBasic ( CommandContext ctx, string category = "")
+        public async Task HelpBasic ( CommandContext ctx, params string[] text )
         {
             await ctx.TriggerTypingAsync();
             DiscordEmbedBuilder embed;
+
+            var category = string.Join( " ", text );
 
             if (category == "")
             {
@@ -25,7 +27,7 @@ namespace Icarus.Modules.Other
                     Color = DiscordColor.SpringGreen,
                     Description =
                     $"Listing command categories. \n Type `>help <category>` to get more info on the specified category. \n\n **Categories**\n" +
-                    $"Isolation\nLogging\nGeneral\nServer",
+                    $"Isolation\nLogging\nGeneral\nServer\nServer Specific",
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         IconUrl = ctx.Member.AvatarUrl,
@@ -128,6 +130,26 @@ namespace Icarus.Modules.Other
                             $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
                             $"`profile`: Responds with information on the server profile.\n\n",
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            IconUrl = ctx.Member.AvatarUrl,
+                        },
+                        Timestamp = DateTime.Now,
+                    };
+                    await ctx.RespondAsync( embed );
+                    break;
+                case "server specific":
+                    embed = new DiscordEmbedBuilder
+                    {
+                        Title = "Server Specific Commands",
+                        Color = DiscordColor.SpringGreen,
+                        Description =
+                           $"( For Event Horizon Official )\n" +
+                           $"`report <messageId> <channelId> <state> <thresholds> <comment(s)>`: Creates an activity report for the channel. Starting " +
+                           $"from the message with `<messageId>` in the channel with `<channelId>`. The `<state>` describes the state of the channel in the time period. The `<thresholds>` are " +
+                           $"responsible for categorizing user activity and `<comment(s)>` are additional comments to describe events or to take notes. " +
+                           $"Words in the `<state>` must by connected by '-'. Thresholds are connected by '/' and follow this format `name-min:max`. For a new line in comments add `\\n`.\n" +
+                           $"Example usage: `>report 1162845038032723998 294511987684147212 Doing-Fine Dead-0:9/Inactive-10:25/SemiActive-26:35/Active-36:70/VeryActive-70:1000 No comments.`" ,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = ctx.Member.AvatarUrl,
