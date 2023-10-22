@@ -170,7 +170,7 @@ namespace Icarus.Modules.Isolation
                     $"The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entry.EntryDate ).TotalDays ) )} days.\n"
                 );
             await fakeContext.RespondAsync( "The isolation was called by this message: " + entry.EntryMessageLink.ToString() );
-            await fakeContext.RespondAsync( "Were revoked roles returned? {entry.ReturnRoles}.\n" + $"The user was isolated for `\"{entry.Reason}\"`." );
+            await fakeContext.RespondAsync( $"Were revoked roles returned? {entry.ReturnRoles}.\n" + $"The user was isolated for `\"{entry.Reason}\"`." );
 
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
             profile.Entries.Remove( entry );

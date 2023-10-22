@@ -438,7 +438,7 @@ namespace Icarus
                             $"**The channel's new type is** {e.ChannelAfter.Type}\n\n" +
                             $"**The channel's new topic is** {e.ChannelAfter.Topic}\n\n" +
                             $"**The channel's new category is** {e.ChannelAfter.Parent.Name}\n\n" +
-                            "```cs\nThe Channel's ID is: " + e.ChannelAfter.Id + "\n" +
+                            "```\nThe Channel's ID is: " + e.ChannelAfter.Id + "\n" +
                             $"The channel was created at (utc): {e.ChannelBefore.CreationTimestamp.UtcDateTime}```",
                             Timestamp = DateTime.Now,
                         };
@@ -471,7 +471,7 @@ namespace Icarus
                             $"**The channel's type was** {e.Channel.Type}\n\n" +
                             $"**The channel's topic was** {e.Channel.Topic}\n\n" +
                             $"**The channel's category was** {e.Channel.Parent.Name}\n\n" +
-                            "```cs\nThe Channel's ID was: " + e.Channel.Id + "\n" +
+                            "```\nThe Channel's ID was: " + e.Channel.Id + "\n" +
                             $"The channel was created at (utc): {e.Channel.CreationTimestamp.UtcDateTime}```",
                             Timestamp = DateTime.Now,
                         };
@@ -504,7 +504,7 @@ namespace Icarus
                             $"**The channel's type is** {e.Channel.Type}\n\n" +
                             $"**The channel's topic is** {e.Channel.Topic}\n\n" +
                             $"**The channel's category is** {e.Channel.Parent.Name}\n\n" +
-                            "```cs\nThe Channel's ID is: " + e.Channel.Id + "\n" +
+                            "```\nThe Channel's ID is: " + e.Channel.Id + "\n" +
                             $"The channel was created at (utc): {e.Channel.CreationTimestamp.UtcDateTime}```",
                             Timestamp = DateTime.Now,
                         };
@@ -534,19 +534,6 @@ namespace Icarus
             {
 
                 var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
-                var perms = user.Permissions;
-
-                if ( perms.HasPermission( Permissions.Administrator ) ||
-                     perms.HasPermission( Permissions.BanMembers ) ||
-                     perms.HasPermission( Permissions.KickMembers ) ||
-                     perms.HasPermission( Permissions.ManageChannels ) ||
-                     perms.HasPermission( Permissions.ManageGuild ) ||
-                     perms.HasPermission( Permissions.ManageMessages ) ||
-                     perms.HasPermission( Permissions.ManageRoles ) ||
-                     perms.HasPermission( Permissions.ManageEmojis ) )
-                {
-                    break;
-                }
 
                 if ( e.Message.Content.Contains( word ) )
                 {
@@ -582,7 +569,7 @@ namespace Icarus
                             "**The new message is:**\n " + e.Message.Content + "\n\n" +
                             $"**Message updated at:** {e.Channel.Mention} \n\n" +
                             $"[Message's Jump Link]({e.Message.JumpLink})\n\n" +
-                            "```cs\nThe user's ID is: " + e.Message.Author.Id + "\n" +
+                            "```\nThe user's ID is: " + e.Message.Author.Id + "\n" +
                             "The updated message's ID is: " + e.Message.Id + "\n" +
                             "The Channel's ID is: " + e.Channel.Id + "```",
                             Timestamp = DateTime.Now,
@@ -621,7 +608,7 @@ namespace Icarus
                             Description =
                             $"\n\n**The added reaction is:** " + e.Emoji + "\n" +
                             $"\n[The reaction was added to:]({e.Message.JumpLink}) \n\n" +
-                            "```cs\nThe user's ID is: " + e.Message.Author.Id + "\n" +
+                            "```\nThe user's ID is: " + e.Message.Author.Id + "\n" +
                             "The Channel's ID is: " + e.Channel.Id + "```",
                             Timestamp = DateTime.Now,
                         };
@@ -690,7 +677,7 @@ namespace Icarus
                             Description =
                             $"\n\n**The removed reaction is:** " + e.Emoji + "\n" +
                             $"\n[The reaction was removed from:]({e.Message.JumpLink}) \n\n" +
-                            "```cs\nThe user's ID is: " + e.Message.Author.Id + "\n" +
+                            "```\nThe user's ID is: " + e.Message.Author.Id + "\n" +
                             "The Channel's ID is: " + e.Channel.Id + "```",
                             Timestamp = DateTime.Now,
                         };
@@ -722,7 +709,7 @@ namespace Icarus
                             $"**The role's tags were:** {e.Role.Tags}\n\n" +
                             $"**Was the role mentionable?** {e.Role.IsMentionable}\n\n" +
                             $"**The role's color was:** {e.Role.Color}\n\n" +
-                            $"```cs\nThe role's id was: {e.Role.Id}\n" +
+                            $"```\nThe role's id was: {e.Role.Id}\n" +
                             $"The role was created at: {e.Role.CreationTimestamp.UtcDateTime}\n" +
                             $"The role was deleted at: {DateTime.UtcNow}```",
                             Timestamp = DateTime.Now,
@@ -755,7 +742,7 @@ namespace Icarus
                             $"**The role's tags changed from-to:** {e.RoleBefore.Tags} -> {e.RoleAfter.Tags}\n\n" +
                             $"**Is the role mentionable?** {e.RoleAfter.IsMentionable}\n\n" +
                             $"**The role's color changed from-to:** {e.RoleBefore.Color} -> {e.RoleAfter.Color}\n\n" +
-                            $"```cs\nThe role's id is: {e.RoleAfter.Id}\n" +
+                            $"```\nThe role's id is: {e.RoleAfter.Id}\n" +
                             $"The role was created at: {e.RoleAfter.CreationTimestamp.UtcDateTime}```",
                             Timestamp = DateTime.Now,
                         };
@@ -787,7 +774,7 @@ namespace Icarus
                             $"**The role's tags are:** {e.Role.Tags}\n\n" +
                             $"**Is the role mentionable?** {e.Role.IsMentionable}\n\n" +
                             $"**The role's color is:** {e.Role.Color}\n\n" +
-                            $"```cs\nThe role's id is: {e.Role.Id}\n" +
+                            $"```\nThe role's id is: {e.Role.Id}\n" +
                             $"The role was created at: {e.Role.CreationTimestamp.UtcDateTime}```",
                             Timestamp = DateTime.Now,
                         };
@@ -824,7 +811,7 @@ namespace Icarus
                             $"**The user's roles were:** {string.Join( ", ", e.Member.Roles.Select( X => X.Mention ).ToArray() )}" + "\n\n" +
                             $"**The user joined at:** {e.Member.JoinedAt.UtcDateTime}" + "\n\n" +
                             $"**The user's creation date is**: {e.Member.CreationTimestamp.UtcDateTime}" + "\n\n" +
-                            "```cs\nThe user's ID is: " + e.Member.Id + "```",
+                            "```\nThe user's ID is: " + e.Member.Id + "```",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
@@ -858,7 +845,7 @@ namespace Icarus
                             Description =
                             $"**The unbanned user is:** {e.Member.Mention}\n\n" +
                             $"**The user's creation date is**: {e.Member.CreationTimestamp.UtcDateTime}" + "\n\n" +
-                            "```cs\nThe user's ID is: " + e.Member.Id + "```",
+                            "```\nThe user's ID is: " + e.Member.Id + "```",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
@@ -915,7 +902,7 @@ namespace Icarus
                             Description =
                             $"\n **The user joined at:** {e.Member.JoinedAt.UtcDateTime}" + "\n\n" +
                             $"**The user's creation date is**: {e.Member.CreationTimestamp.UtcDateTime}" + "\n\n" +
-                            "```cs\nThe user's ID is: " + e.Member.Id + "```",
+                            "```\nThe user's ID is: " + e.Member.Id + "```",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
@@ -958,7 +945,7 @@ namespace Icarus
                             $"\n **The user joined at:** {e.Member.JoinedAt.UtcDateTime}" + "\n\n" +
                             $"**The user's creation date is**: {e.Member.CreationTimestamp.UtcDateTime}" + "\n\n" +
                             $"**The user's roles were:** {string.Join( ", ", e.Member.Roles.Select( X => X.Mention ).ToArray() )}" + "\n\n" +
-                            "```cs\nThe user's ID is: " + e.Member.Id + "\n",
+                            "```\nThe user's ID is: " + e.Member.Id + "\n```",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
@@ -996,7 +983,7 @@ namespace Icarus
                             Description =
                             $"\n\n**The deleted message was:** " + e.Message.Content + "\n" +
                             $"\n **Message deleted at:** {e.Channel.Mention} \n\n" +
-                            "```cs\nThe user's ID is: " + e.Message.Author.Id + "\n" +
+                            "```\nThe user's ID is: " + e.Message.Author.Id + "\n" +
                             "The deleted message's ID was: " + e.Message.Id + "\n" +
                             "The Channel's ID is: " + e.Channel.Id + "```",
                             Timestamp = DateTime.Now,
