@@ -48,6 +48,8 @@ obj/*
 *.idb
 *.pdb
 
+Modules/ServerSpecific/EventHorizon.cs
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

@@ -15,7 +15,7 @@ namespace Icarus.Modules.Logs
     {
         [Command( "enableLogging" )]
         [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
+        [Require​User​Permissions​( DSharpPlus.Permissions.ManageChannels )]
         public async Task EnableLogging ( CommandContext ctx, ulong channelId )
         {
             await ctx.TriggerTypingAsync();

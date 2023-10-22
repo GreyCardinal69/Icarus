@@ -15,7 +15,7 @@ namespace Icarus.Modules.Isolation
     {
         [Command( "isolate" )]
         [Description( "Isolates a user in a channel with specified parameters." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
+        [Require​User​Permissions​( DSharpPlus.Permissions.ManageRoles )]
         public async Task Isolate ( CommandContext ctx, ulong punishmentRoleId, ulong userId, ulong channelId, string timeLen, bool returnRoles, [RemainingText] string reason)
         {
             await ctx.TriggerTypingAsync();

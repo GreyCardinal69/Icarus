@@ -22,6 +22,7 @@ using Icarus.Modules.Logs;
 using Icarus.Modules.Servers;
 using Icarus.Modules.Isolation;
 using Icarus.Modules.Profiles;
+using Icarus.Modules.ServerSpecific;
 
 namespace Icarus
 {
@@ -44,20 +45,20 @@ namespace Icarus
         private Timer _antiSpamTimer;
         private readonly EventId BotEventId = new( 1458, "Bot-Ex1458" );
 
-        private static void Main ( string[] args )
+        private static void Main( string[] args )
         {
             Core = new();
 
             List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
 
-            foreach (var prof in Profiles)
+            foreach ( var prof in Profiles )
             {
                 ServerProfile profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
                 Core.ServerProfiles.Add( profile );
                 Core.RegisteredServerIds.Add( profile.ID );
             }
 
-            if (GetOperatingSystem() == OSPlatform.Windows)
+            if ( GetOperatingSystem() == OSPlatform.Windows )
             {
 #pragma warning disable CA1416
                 Console.WindowWidth = 140;
@@ -81,21 +82,21 @@ namespace Icarus
             Core.RunBotAsync().GetAwaiter().GetResult();
         }
 
-        #pragma warning disable CS1998
-        private static async Task<Task> ResetMessageCache ()
+#pragma warning disable CS1998
+        private static async Task<Task> ResetMessageCache()
         {
             Core._temporaryMessageCounter.Clear();
             return Task.CompletedTask;
         }
-        #pragma warning restore CS1998
+#pragma warning restore CS1998
 
-        private static async Task<Task> HandleTimer ()
+        private static async Task<Task> HandleTimer()
         {
-            for (int i = 0; i < Core.ServerProfiles.Count; i++)
+            for ( int i = 0; i < Core.ServerProfiles.Count; i++ )
             {
-                for (int w = 0; w < Core.ServerProfiles[i].Entries.Count; w++)
+                for ( int w = 0; w < Core.ServerProfiles[i].Entries.Count; w++ )
                 {
-                    if (DateTime.UtcNow > Core.ServerProfiles[i].Entries[w].ReleaseDate)
+                    if ( DateTime.UtcNow > Core.ServerProfiles[i].Entries[w].ReleaseDate )
                     {
                         await IsolationManagement.ReleaseEntry( Core.ServerProfiles[i], Core.ServerProfiles[i].Entries[w] );
                     }
@@ -106,18 +107,18 @@ namespace Icarus
             return Task.CompletedTask;
         }
 
-        private static OSPlatform GetOperatingSystem ()
+        private static OSPlatform GetOperatingSystem()
         {
-            if (RuntimeInformation.IsOSPlatform( OSPlatform.OSX ))
+            if ( RuntimeInformation.IsOSPlatform( OSPlatform.OSX ) )
                 return OSPlatform.OSX;
-            if (RuntimeInformation.IsOSPlatform( OSPlatform.Linux ))
+            if ( RuntimeInformation.IsOSPlatform( OSPlatform.Linux ) )
                 return OSPlatform.Linux;
-            if (RuntimeInformation.IsOSPlatform( OSPlatform.Windows ))
+            if ( RuntimeInformation.IsOSPlatform( OSPlatform.Windows ) )
                 return OSPlatform.Windows;
             return OSPlatform.Windows;
         }
 
-        private async Task RunBotAsync ()
+        private async Task RunBotAsync()
         {
             Config info = JsonConvert.DeserializeObject<Config>( File.ReadAllText( AppDomain.CurrentDomain.BaseDirectory + @"Config.json" ) );
 
@@ -162,7 +163,7 @@ namespace Icarus
             {
                 PaginationBehaviour = PaginationBehaviour.Ignore,
                 Timeout = TimeSpan.FromMinutes( 2 ),
-            });
+            } );
 
             CommandsNextConfig = new CommandsNextConfiguration
             {
@@ -184,14 +185,15 @@ namespace Icarus
             Commands.RegisterCommands<ServerManagement>();
             Commands.RegisterCommands<IsolationManagement>();
             Commands.RegisterCommands<UserLogging>();
+            Commands.RegisterCommands<EventHorizon>();
 
             await Client.ConnectAsync();
             await Task.Delay( -1 );
         }
 
-        private async Task Event_MessageCreated ( DiscordClient sender, MessageCreateEventArgs e )
+        private async Task Event_MessageCreated( DiscordClient sender, MessageCreateEventArgs e )
         {
-            if (e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId)
+            if ( e.Author.Id == Core.Client.CurrentUser.Id || e.Author.Id == OwnerId )
             {
                 return;
             }
@@ -199,23 +201,23 @@ namespace Icarus
             var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
             var perms = user.Permissions;
 
-            if ( perms.HasPermission(Permissions.Administrator  ) ||
-                 perms.HasPermission(Permissions.BanMembers     ) ||
-                 perms.HasPermission(Permissions.KickMembers    ) ||
-                 perms.HasPermission(Permissions.ManageChannels ) ||
-                 perms.HasPermission(Permissions.ManageGuild    ) ||
-                 perms.HasPermission(Permissions.ManageMessages ) ||
-                 perms.HasPermission(Permissions.ManageRoles    ) ||
-                 perms.HasPermission(Permissions.ManageEmojis   ))
+            if ( perms.HasPermission( Permissions.Administrator ) ||
+                 perms.HasPermission( Permissions.BanMembers ) ||
+                 perms.HasPermission( Permissions.KickMembers ) ||
+                 perms.HasPermission( Permissions.ManageChannels ) ||
+                 perms.HasPermission( Permissions.ManageGuild ) ||
+                 perms.HasPermission( Permissions.ManageMessages ) ||
+                 perms.HasPermission( Permissions.ManageRoles ) ||
+                 perms.HasPermission( Permissions.ManageEmojis ) )
             {
                 return;
             }
 
             var profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
-            foreach (var word in profile.WordBlackList)
+            foreach ( var word in profile.WordBlackList )
             {
-                if (e.Message.Content.Contains(word))
+                if ( e.Message.Content.Contains( word ) )
                 {
                     var cmds = Program.Core.Client.GetCommandsNext();
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
@@ -227,34 +229,34 @@ namespace Icarus
                 }
             }
 
-            if (!profile.AntiSpamIgnored.Contains(e.Channel.Id))
+            if ( !profile.AntiSpamIgnored.Contains( e.Channel.Id ) )
             {
-                if (_temporaryMessageCounter.Count <= 0)
+                if ( _temporaryMessageCounter.Count <= 0 )
                 {
                     _temporaryMessageCounter.Add( (e.Author.Id, 1) );
                 }
 
                 bool found = false;
-                for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
                 {
-                    if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
                     {
                         found = true;
                         break;
                     }
                 }
 
-                if (!found)
+                if ( !found )
                 {
                     _temporaryMessageCounter.Add( (e.Author.Id, 1) );
                 }
 
-                for (int i = 0; i < _temporaryMessageCounter.Count; i++)
+                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
                 {
-                    if (_temporaryMessageCounter[i].Item1 == e.Author.Id)
+                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
                     {
                         _temporaryMessageCounter[i] = (e.Author.Id, _temporaryMessageCounter[i].Item2 + 1);
-                        if (_temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning)
+                        if ( _temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning )
                         {
                             var cmds = Program.Core.Client.GetCommandsNext();
                             var cmd = cmds.FindCommand( "isolate", out var customArgs );
@@ -267,19 +269,19 @@ namespace Icarus
                                     cmd,
                                     customArgs
                             );
-                            if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning)
+                            if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning )
                             {
                                 await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
                             }
-                            else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning)
+                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning )
                             {
                                 await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
                             }
-                            else if (_temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning)
+                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning )
                             {
                                 await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
                             }
-                            else if (_temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit)
+                            else if ( _temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit )
                             {
                                 await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
                                 var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
@@ -291,7 +293,7 @@ namespace Icarus
                                     $"The user's actions were considered spam. " +
                                     $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
                                 );
-                                foreach (var role in user.Roles)
+                                foreach ( var role in user.Roles )
                                 {
                                     await user.RevokeRoleAsync( role );
                                 }
@@ -299,7 +301,7 @@ namespace Icarus
                                 var userP = JsonConvert.DeserializeObject<UserProfile>(
                                      File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                                userP.PunishmentEntries.Add( ( DateTime.UtcNow, "User's actions were considered spam." ) );
+                                userP.PunishmentEntries.Add( (DateTime.UtcNow, "User's actions were considered spam.") );
 
                                 File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                                      JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -310,9 +312,9 @@ namespace Icarus
                 }
             }
 
-            foreach (var link in Database.ScamLinks)
+            foreach ( var link in Database.ScamLinks )
             {
-                if (e.Message.Content.Contains(link))
+                if ( e.Message.Content.Contains( link ) )
                 {
                     var cmds = Program.Core.Client.GetCommandsNext();
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
@@ -328,12 +330,12 @@ namespace Icarus
 
                     await user.GrantRoleAsync( guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
                     await fakeContext.RespondAsync(
-                        $"Isolated user {user.Mention} at {guild.GetChannel(profile.LogConfig.DefaultContainmentChannelId).Mention}. " +
+                        $"Isolated user {user.Mention} at {guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
                         $"The user's message contained a discord scam link, the link was: `{link}`. " +
-                        $"Revoked the following roles from the user: {string.Join(", ", user.Roles.Select( x => x.Mention ).ToArray())}."
+                        $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
                     );
 
-                    foreach (var role in user.Roles)
+                    foreach ( var role in user.Roles )
                     {
                         await user.RevokeRoleAsync( role );
                     }
@@ -341,7 +343,7 @@ namespace Icarus
                     var userP = JsonConvert.DeserializeObject<UserProfile>(
                           File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                    userP.PunishmentEntries.Add( ( DateTime.UtcNow, "User posted a scam message." ) );
+                    userP.PunishmentEntries.Add( (DateTime.UtcNow, "User posted a scam message.") );
 
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                          JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -352,13 +354,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_InviteDeleted ( DiscordClient sender, InviteDeleteEventArgs e )
+        private async Task Event_InviteDeleted( DiscordClient sender, InviteDeleteEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteDeleted)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteDeleted )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -381,13 +383,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_InviteCreated ( DiscordClient sender, InviteCreateEventArgs e )
+        private async Task Event_InviteCreated( DiscordClient sender, InviteCreateEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteCreated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteCreated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -410,13 +412,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_ChannelUpdated ( DiscordClient sender, ChannelUpdateEventArgs e )
+        private async Task Event_ChannelUpdated( DiscordClient sender, ChannelUpdateEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelUpdated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelUpdated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -444,13 +446,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_ChannelDeleted ( DiscordClient sender, ChannelDeleteEventArgs e )
+        private async Task Event_ChannelDeleted( DiscordClient sender, ChannelDeleteEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelDeleted)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelDeleted )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -477,13 +479,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_ChannelCreated ( DiscordClient sender, ChannelCreateEventArgs e )
+        private async Task Event_ChannelCreated( DiscordClient sender, ChannelCreateEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelCreated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelCreated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -510,34 +512,34 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_MessageUpdated ( DiscordClient sender, MessageUpdateEventArgs e )
+        private async Task Event_MessageUpdated( DiscordClient sender, MessageUpdateEventArgs e )
         {
-            if (e.Message.Timestamp < Core.BotStartUpStamp)
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
 
             var profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
-            foreach (var word in profile.WordBlackList)
+            foreach ( var word in profile.WordBlackList )
             {
 
                 var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
                 var perms = user.Permissions;
 
-                if ( perms.HasPermission( Permissions.Administrator  ) ||
-                     perms.HasPermission( Permissions.BanMembers     ) ||
-                     perms.HasPermission( Permissions.KickMembers    ) ||
+                if ( perms.HasPermission( Permissions.Administrator ) ||
+                     perms.HasPermission( Permissions.BanMembers ) ||
+                     perms.HasPermission( Permissions.KickMembers ) ||
                      perms.HasPermission( Permissions.ManageChannels ) ||
-                     perms.HasPermission( Permissions.ManageGuild    ) ||
+                     perms.HasPermission( Permissions.ManageGuild ) ||
                      perms.HasPermission( Permissions.ManageMessages ) ||
-                     perms.HasPermission( Permissions.ManageRoles    ) ||
-                     perms.HasPermission( Permissions.ManageEmojis   ))
+                     perms.HasPermission( Permissions.ManageRoles ) ||
+                     perms.HasPermission( Permissions.ManageEmojis ) )
                 {
                     break;
                 }
 
-                if (e.Message.Content.Contains( word ))
+                if ( e.Message.Content.Contains( word ) )
                 {
                     var cmds = Program.Core.Client.GetCommandsNext();
                     var cmd = cmds.FindCommand( "isolate", out var customArgs );
@@ -552,11 +554,11 @@ namespace Icarus
                 }
             }
 
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageUpdated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageUpdated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -586,17 +588,17 @@ namespace Icarus
             }
         }
 
-        private async Task Event_MessageReactionAdded ( DiscordClient sender, MessageReactionAddEventArgs e )
+        private async Task Event_MessageReactionAdded( DiscordClient sender, MessageReactionAddEventArgs e )
         {
-            if (e.Message.Timestamp < Core.BotStartUpStamp)
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionAdded)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionAdded )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -625,17 +627,17 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_MessageReactionsCleared ( DiscordClient sender, MessageReactionsClearEventArgs e )
+        private async Task Event_MessageReactionsCleared( DiscordClient sender, MessageReactionsClearEventArgs e )
         {
-            if (e.Message.Timestamp < Core.BotStartUpStamp)
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionsCleared)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionsCleared )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -655,17 +657,17 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_MessageReactionRemoved ( DiscordClient sender, MessageReactionRemoveEventArgs e )
+        private async Task Event_MessageReactionRemoved( DiscordClient sender, MessageReactionRemoveEventArgs e )
         {
-            if (e.Message.Timestamp < Core.BotStartUpStamp)
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionRemoved)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionRemoved )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -694,13 +696,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildRoleDeleted ( DiscordClient sender, GuildRoleDeleteEventArgs e )
+        private async Task Event_GuildRoleDeleted( DiscordClient sender, GuildRoleDeleteEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleDeleted)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleDeleted )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -727,13 +729,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildRoleUpdated ( DiscordClient sender, GuildRoleUpdateEventArgs e )
+        private async Task Event_GuildRoleUpdated( DiscordClient sender, GuildRoleUpdateEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleUpdated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleUpdated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -759,13 +761,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildRoleCreated ( DiscordClient sender, GuildRoleCreateEventArgs e )
+        private async Task Event_GuildRoleCreated( DiscordClient sender, GuildRoleCreateEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleCreated)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleCreated )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -791,13 +793,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildBanAdded ( DiscordClient sender, GuildBanAddEventArgs e )
+        private async Task Event_GuildBanAdded( DiscordClient sender, GuildBanAddEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -827,13 +829,13 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildBanRemoved ( DiscordClient sender, GuildBanRemoveEventArgs e )
+        private async Task Event_GuildBanRemoved( DiscordClient sender, GuildBanRemoveEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -861,19 +863,19 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildMemberAdded ( DiscordClient sender, GuildMemberAddEventArgs e )
+        private async Task Event_GuildMemberAdded( DiscordClient sender, GuildMemberAddEventArgs e )
         {
-            if (e.Guild.Id == 740528944129900565)
+            if ( e.Guild.Id == 740528944129900565 )
             {
                 await e.Member.GrantRoleAsync( e.Guild.GetRole( 740557101843087441 ) );
                 var main = e.Guild.GetChannel( 740528944641736756 );
                 await main.SendMessageAsync( e.Member.Mention + " I am watching you, and welcome." );
             }
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (!File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ))
+                    if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) )
                     {
                         var profile = new UserProfile( e.Member.Id, e.Member.Username )
                         {
@@ -889,7 +891,7 @@ namespace Icarus
                            JsonConvert.SerializeObject( profile, Formatting.Indented ) );
                     }
 
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberAdded)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberAdded )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -917,11 +919,11 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_GuildMemberRemoved ( DiscordClient sender, GuildMemberRemoveEventArgs e )
+        private async Task Event_GuildMemberRemoved( DiscordClient sender, GuildMemberRemoveEventArgs e )
         {
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
                     var user = JsonConvert.DeserializeObject<UserProfile>(
                         File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) );
@@ -931,7 +933,7 @@ namespace Icarus
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
                        JsonConvert.SerializeObject( user, Formatting.Indented ) );
 
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberRemoved)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberRemoved )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -960,17 +962,17 @@ namespace Icarus
             return;
         }
 
-        private async Task Event_MessageDeleted ( DiscordClient sender, MessageDeleteEventArgs e )
+        private async Task Event_MessageDeleted( DiscordClient sender, MessageDeleteEventArgs e )
         {
-            if (e.Message.Timestamp < Core.BotStartUpStamp)
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
-            for (int i = 0; i < ServerProfiles.Count; i++)
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
-                if (e.Guild.Id == ServerProfiles[i].ID)
+                if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    if (ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageDeleted)
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageDeleted )
                     {
                         var embed = new DiscordEmbedBuilder
                         {
@@ -1000,20 +1002,20 @@ namespace Icarus
             return;
         }
 
-        private Task Client_Ready ( DiscordClient sender, ReadyEventArgs e )
+        private Task Client_Ready( DiscordClient sender, ReadyEventArgs e )
         {
             Core.Client.UpdateStatusAsync( new DiscordActivity( "You", ActivityType.Watching ), UserStatus.DoNotDisturb, DateTimeOffset.UtcNow );
             sender.Logger.LogInformation( BotEventId, "Client is ready to process events." );
             return Task.CompletedTask;
         }
 
-        private Task Client_GuildAvailable ( DiscordClient sender, GuildCreateEventArgs e )
+        private Task Client_GuildAvailable( DiscordClient sender, GuildCreateEventArgs e )
         {
             sender.Logger.LogInformation( BotEventId, $"Guild available: {e.Guild.Name}" );
             return Task.CompletedTask;
         }
 
-        private Task Client_ClientError ( DiscordClient sender, ClientErrorEventArgs e )
+        private Task Client_ClientError( DiscordClient sender, ClientErrorEventArgs e )
         {
             //Console.Clear();
             sender.Logger.LogError( BotEventId, e.Exception, "Exception occured" );

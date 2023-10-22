@@ -11,11 +11,7 @@ using Newtonsoft.Json;
 
 using Icarus.Modules.Profiles;
 using System.Text;
-using System.Collections.Generic;
-using System.Threading.Channels;
 using System.Net;
-using System.Net.Mail;
-using static System.Net.Mime.MediaTypeNames;
 using System.IO.Compression;
 
 namespace Icarus.Modules.Other
@@ -29,7 +25,7 @@ namespace Icarus.Modules.Other
             using ( WebClient client = new WebClient() ) // WebClient class inherits IDisposable
             {
                 client.DownloadFile( "https://discord.com/channels/740528944129900565/1120263330225999955", @"C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Exports\test.html" );
-                 
+
             }
 
             await ctx.TriggerTypingAsync();
@@ -163,7 +159,7 @@ namespace Icarus.Modules.Other
                         {
                             sb.Append( $@"
                         <div class=""chatlog__content chatlog__markdown"">
-                            <span class=""chatlog__markdown-preserve""><span class=""chatlog__markdown-mention"" title=""{item.MentionedUsers[0].Username}"">{string.Join(' ', item.MentionedUsers.Select( x => x.Username))}</span>{item.Content}</span>
+                            <span class=""chatlog__markdown-preserve""><span class=""chatlog__markdown-mention"" title=""{item.MentionedUsers[0].Username}"">{string.Join( ' ', item.MentionedUsers.Select( x => x.Username ) )}</span>{item.Content}</span>
                         </div>" );
                         }
                         else
@@ -183,10 +179,10 @@ namespace Icarus.Modules.Other
                         </div>" );
                             }
                         }
-                        sb.Append($@"
+                        sb.Append( $@"
                     </div>
                 </div>
-            </div>");
+            </div>" );
                     }
                     // new message, new author, old author message needs to be closed
                     else if ( oldId != item.Author.Id && open )
@@ -270,7 +266,7 @@ namespace Icarus.Modules.Other
                         <img class=""chatlog__avatar"" src=""{exportId}_Images\{item.Author.Username}.jpg"" alt=""Avatar"" loading=""lazy"">
                     </div>" );
                         }
-                    sb.Append(@"<div class=""chatlog__message-primary"">" );
+                        sb.Append( @"<div class=""chatlog__message-primary"">" );
                         if ( item.ReferencedMessage != null )
                         {
                             sb.Append( $@"
@@ -318,9 +314,9 @@ namespace Icarus.Modules.Other
                 sb.Append( $@"</div><div class=""postamble""><div class=""postamble__entry"">Exported {messages.Length} messages(s).</div></div>" );
                 sb.Append( "</body></html>" );
 
-                foreach ( var item in Directory.GetDirectories("Exports\\") )
+                foreach ( var item in Directory.GetDirectories( "Exports\\" ) )
                 {
-                    if ( !item.EndsWith( "Data") )
+                    if ( !item.EndsWith( "Data" ) )
                     {
                         foreach ( var file in Directory.GetFiles( item ) )
                         {
@@ -330,7 +326,7 @@ namespace Icarus.Modules.Other
                     }
                 }
 
-                foreach ( var item in Directory.GetFiles("Exports\\") )
+                foreach ( var item in Directory.GetFiles( "Exports\\" ) )
                 {
                     File.Delete( item );
                 }
@@ -358,7 +354,7 @@ namespace Icarus.Modules.Other
                 using var fs = new FileStream( exportPath, FileMode.Open, FileAccess.Read );
 
                 var msg = await new DiscordMessageBuilder()
-                    .AddFile( $"{channel.Name}.zip", fs  )
+                    .AddFile( $"{channel.Name}.zip", fs )
                     .SendAsync( ctx.Channel );
             }
             catch ( Exception e )
