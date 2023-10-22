@@ -33,8 +33,16 @@ namespace Icarus.Modules.Servers
             {
                 Name = ctx.Guild.Name,
                 ID = ctx.Guild.Id,
-                ProfileCreationDate = DateTime.UtcNow
+                ProfileCreationDate = DateTime.UtcNow,
+                WordBlackList = new(),
+                AntiSpam = new(),
+                AntiSpamIgnored = new(),
+                Entries = new(),
+                LogConfig = new(),
             };
+
+            Program.Core.RegisteredServerIds.Add( ctx.Guild.Id );
+            Program.Core.ServerProfiles.Add( Profile );
 
             File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( Profile, Formatting.Indented ) );
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
@@ -217,20 +225,26 @@ namespace Icarus.Modules.Servers
             }
 
             var ignores = string.Join( ", ", mentions );
+
+            var defChannel = ctx.Guild.GetChannel( profile.LogConfig.LogChannel );
+            var majorNotifChannel = ctx.Guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId );
+            var defaultContainmentChannel = ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId );
+            var containmentRole = ctx.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId );
+
             var embed = new DiscordEmbedBuilder
             {
                 Title = $"Server Profile for {ctx.Guild.Name}",
                 Color = DiscordColor.SpringGreen,
                 Description =
                     $"Logging Enabled?: {profile.LogConfig.LoggingEnabled}.\n\n" +
-                    $"Logging enabled for following events: {enabledEvents}\n\n" +
-                    $"Default notifications are sent to: {ctx.Guild.GetChannel(profile.LogConfig.LogChannel).Mention}.\n\n" +
-                    $"Major notifications are sent to: {ctx.Guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ).Mention}.\n\n" +
-                    $"The default containment channel is: {ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}.\n\n" +
-                    $"The default containment role is: {ctx.Guild.GetRole(profile.LogConfig.DefaultContainmentRoleId).Mention}.\n\n" +
+                    $"Logging enabled for following events: {(enabledEvents.Length == 0 ? "NONE" : enabledEvents)}\n\n" +
+                    $"Default notifications are sent to: {( defChannel == null ? "NONE" : defChannel.Mention)}.\n\n" +
+                    $"Major notifications are sent to: {(majorNotifChannel == null ? "NONE" :majorNotifChannel.Mention)}.\n\n" +
+                    $"The default containment channel is: {( defaultContainmentChannel  == null ? "NONE" : defaultContainmentChannel.Mention)}.\n\n" +
+                    $"The default containment role is: {( containmentRole  == null ? "NONE" : containmentRole.Mention)}.\n\n" +
                     $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
                     $"Anti spam is configured at {profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit} " +
-                    $"messages per 20 seconds. The following channels are excempt from anti spam module: {(ignores.Length == 0 ? "None" : ignores)}.\n\n" +
+                    $"messages per 20 seconds. The following channels are exempt from anti spam module: {(ignores.Length == 0 ? "None" : ignores)}.\n\n" +
                     $"The following words are black-listed and users mentioning them will be reported: {string.Join(", ", profile.WordBlackList)}.\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
