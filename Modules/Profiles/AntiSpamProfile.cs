@@ -4,10 +4,10 @@
     {
         public AntiSpamProfile()
         {
-            FirstWarning = 9;
-            SecondWarning = 15;
-            LastWarning = 19;
-            Limit = 24;
+            FirstWarning = 1000;
+            SecondWarning = 1000;
+            LastWarning = 1000;
+            Limit = 1000;
         }
 
         public int FirstWarning;

@@ -216,6 +216,8 @@ namespace Icarus
 
             var profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
+            if ( profile == null ) return;
+
             foreach ( var word in profile.WordBlackList )
             {
                 if ( e.Message.Content.Contains( word ) )
@@ -521,6 +523,8 @@ namespace Icarus
             }
 
             var profile = ServerProfile.ProfileFromId( e.Guild.Id );
+
+            if ( profile == null ) return;
 
             foreach ( var word in profile.WordBlackList )
             {

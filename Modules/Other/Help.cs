@@ -11,6 +11,7 @@ namespace Icarus.Modules.Other
     {
         [Command( "Help" )]
         [Description( "Responds with information on available command categories." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task HelpBasic ( CommandContext ctx, string category = "")
         {
             await ctx.TriggerTypingAsync();
@@ -23,7 +24,7 @@ namespace Icarus.Modules.Other
                     Title = "Commands:",
                     Color = DiscordColor.SpringGreen,
                     Description =
-                    $"Listing command categories. \n Type `>help <command>` to get more info on the specified command. \n\n **Categories**\n" +
+                    $"Listing command categories. \n Type `>help <category>` to get more info on the specified category. \n\n **Categories**\n" +
                     $"Isolation\nLogging\nGeneral\nServer",
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {

@@ -144,13 +144,14 @@ namespace Icarus.Modules.Servers
             (
                 xm => string.Equals(xm.Content, "yes",
                 StringComparison.InvariantCultureIgnoreCase),
-                TimeSpan.FromSeconds( 60 )
+                TimeSpan.FromSeconds( 15 )
             );
 
-            if (!msg.TimedOut)
+            if (!msg.TimedOut && msg.Result.Author.Id == ctx.User.Id )
             {
                 File.Delete( $"{profilesPath}{ctx.Guild.Id}.json" );
                 Program.Core.ServerProfiles.Remove( ServerProfile.ProfileFromId( ctx.Guild.Id ) );
+                Program.Core.RegisteredServerIds.Remove( ctx.Guild.Id );
                 await ctx.RespondAsync( $"Deleted the server profile for {ctx.Guild.Name}." );
             }
             else
