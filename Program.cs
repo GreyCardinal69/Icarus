@@ -13,6 +13,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -865,6 +866,7 @@ namespace Icarus
 
         private async Task Event_GuildMemberAdded( DiscordClient sender, GuildMemberAddEventArgs e )
         {
+            // this is specific for one server
             if ( e.Guild.Id == 740528944129900565 )
             {
                 await e.Member.GrantRoleAsync( e.Guild.GetRole( 740557101843087441 ) );

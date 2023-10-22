@@ -6,10 +6,10 @@ using System.IO;
 
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext;
-
-using Newtonsoft.Json;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
+
+using Newtonsoft.Json;
 
 namespace Icarus.Modules.Servers
 {

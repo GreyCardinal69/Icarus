@@ -46,7 +46,8 @@ namespace Icarus.Modules.Other
         }
 
         public string Print()
-        {return GetDataInTableFormat( rows );
+        {
+            return GetDataInTableFormat( rows );
         }
 
         private int[] GetMaxCellWidths( List<string[]> table )

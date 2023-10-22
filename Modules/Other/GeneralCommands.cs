@@ -2,17 +2,17 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text;
+using System.Net;
+using System.IO.Compression;
 
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Newtonsoft.Json;
 
+using Newtonsoft.Json;
 using Icarus.Modules.Profiles;
-using System.Text;
-using System.Net;
-using System.IO.Compression;
 
 namespace Icarus.Modules.Other
 {
