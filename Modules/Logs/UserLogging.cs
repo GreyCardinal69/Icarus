@@ -23,21 +23,26 @@ namespace Icarus.Modules.Logs
 
             var users = ctx.Guild.GetAllMembersAsync().Result;
 
+            int i = 0;
             foreach (var user in users)
             {
-                var profile = new UserProfile( user.Id, user.Username )
+                if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json" ) )
                 {
-                    Discriminator = user.Discriminator,
-                    CreationDate = user.CreationTimestamp,
-                    FirstJoinDate = user.JoinedAt,
-                    LocalLanguage = user.Locale
-                };
-                Directory.CreateDirectory( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\" );
-                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json" ,
-                    JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+                    i++;
+                    var profile = new UserProfile( user.Id, user.Username )
+                    {
+                        Discriminator = user.Discriminator,
+                        CreationDate = user.CreationTimestamp,
+                        FirstJoinDate = user.JoinedAt,
+                        LocalLanguage = user.Locale,
+                    };
+                    Directory.CreateDirectory( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\" );
+                    File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json",
+                        JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+                }
             }
 
-            await ctx.RespondAsync( $"Created {users.Count} user profiles." );
+            await ctx.RespondAsync( $"Created {i} user profiles." );
         }
 
         [Command( "userProfile" )]
