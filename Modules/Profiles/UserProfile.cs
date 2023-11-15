@@ -14,6 +14,8 @@ namespace Icarus.Modules.Profiles
         public List<(DateTime, string)> BanEntries { get; set; }
         public List<(DateTime, string)> KickEntries { get; set; }
 
+        public Dictionary<int, string> Notes {  get; set; }
+
         public DateTimeOffset CreationDate { get; set; }
         public DateTime LastJoinDate { get; set; }
         public DateTimeOffset FirstJoinDate { get; set; }
@@ -24,6 +26,7 @@ namespace Icarus.Modules.Profiles
             PunishmentEntries = new();
             BanEntries = new();
             KickEntries = new();
+            Notes = new();
 
             ID = id;
         }

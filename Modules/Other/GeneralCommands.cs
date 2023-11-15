@@ -13,21 +13,48 @@ using DSharpPlus.Entities;
 
 using Newtonsoft.Json;
 using Icarus.Modules.Profiles;
+using DSharpPlus.SlashCommands;
 
 namespace Icarus.Modules.Other
 {
     public class GeneralCommands : BaseCommandModule
     {
-        [Command( "ping" )]
+        [Command( "BotTalk" )]
+        [Description( "Command for talking as the bot." )]
+        [RequireUserPermissions( DSharpPlus.Permissions.Administrator )]
+        public async Task BotTalk( CommandContext ctx, ulong id, ulong id2, ulong id3, bool thread, params string[] rest )
+        {
+            await ctx.TriggerTypingAsync();
+
+            var cmds = Program.Core.Client.GetCommandsNext();
+            var cmd = cmds.FindCommand( "BotTalk", out var customArgs );
+            customArgs = "[]help. Hunting For Pulsars.";
+            var guild = Program.Core.Client.GetGuildAsync( id ).Result;
+            var user = guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
+
+            if ( !thread )
+            {
+                var fakeContext = cmds.CreateFakeContext( user, guild.GetChannel( id2 ), "BotTalk", ">", cmd, customArgs );
+                await fakeContext.RespondAsync( string.Join( " ", rest ) );
+            }
+            else
+            {
+                var channel = guild.GetChannel( id2 );
+                foreach ( var item in channel.Threads )
+                {
+                    if ( item.Id == id3 )
+                    {
+                        var fakeContext = cmds.CreateFakeContext( user, item, "BotTalk", ">", cmd, customArgs );
+                        await fakeContext.RespondAsync( string.Join( " ", rest ) );
+                    }
+                }
+            }
+        }
+
+        [Command("ping")]
         [Description( "Responds with ping time." )]
         public async Task Ping( CommandContext ctx )
         {
-            using ( WebClient client = new WebClient() ) // WebClient class inherits IDisposable
-            {
-                client.DownloadFile( "https://discord.com/channels/740528944129900565/1120263330225999955", @"C:\Users\thewa\source\repos\C#\Icarus\bin\Release\net5.0\Exports\test.html" );
-
-            }
-
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync( $"Ping: {ctx.Client.Ping}ms" );
         }

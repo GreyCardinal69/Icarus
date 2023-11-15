@@ -45,6 +45,66 @@ namespace Icarus.Modules.Logs
             await ctx.RespondAsync( $"Created {i} user profiles." );
         }
 
+        [Command( "addusernote" )]
+        [Description( "Responds with information on a user's profile." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
+        public async Task AddUserNote( CommandContext ctx, ulong id, int index, params string[] note )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( ctx.Guild.GetMemberAsync( id ).Result == null )
+            {
+                await ctx.RespondAsync( "Invalid User Id." );
+                return;
+            }
+
+            var user = JsonConvert.DeserializeObject<UserProfile>( 
+                File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+
+            if ( user.Notes.ContainsKey( index) )
+            {
+                await ctx.RespondAsync( $"A user note with index {index} already exists." );
+                return;
+            }
+
+            user.Notes.Add( index, string.Join(" ", note ) );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+              JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
+            await ctx.RespondAsync( "Note added." );
+        }
+
+        [Command( "removeusernote" )]
+        [Description( "Responds with information on a user's profile." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
+        public async Task RemoveUserNote( CommandContext ctx, ulong id, int index )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( ctx.Guild.GetMemberAsync( id ).Result == null )
+            {
+                await ctx.RespondAsync( "Invalid User Id." );
+                return;
+            }
+
+            var user = JsonConvert.DeserializeObject<UserProfile>(
+                File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+
+            if ( !user.Notes.ContainsKey( index ) )
+            {
+                await ctx.RespondAsync( $"A user note with index {index} doesn't exists." );
+                return;
+            }
+
+            user.Notes.Remove( index );
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+              JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
+            await ctx.RespondAsync( "Note deleted." );
+        }
+
         [Command( "userProfile" )]
         [Description( "Responds with information on a user's profile." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
@@ -79,10 +139,17 @@ namespace Icarus.Modules.Logs
                 punishmentEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
+            List<string> noteEntries = new();
+            foreach ( var item in user.Notes )
+            {
+                noteEntries.Add( $"    {item.Key}  :  {item.Value}" );
+            }
+                
             var bans = banEntries.Count == 0 ? "None" : string.Join( "\n", banEntries );
             var kicks = kickEntries.Count == 0 ? "None" : string.Join( "\n", kickEntries );
             var strikes = punishmentEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", punishmentEntries )}";
-
+            var notes = noteEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", noteEntries )}";
+                
             var embed = new DiscordEmbedBuilder
             {
                 Title = $"Profile {ctx.Guild.GetMemberAsync(id).Result.Username}",
@@ -92,7 +159,8 @@ namespace Icarus.Modules.Logs
                     $"The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n" +
                     $"The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n" +
                     $"The user's logged kick entries are: {kicks}.\n\n" +
-                    $"The user's logged punishment entries are: {strikes}.\n\n",
+                    $"The user's logged punishment entries are: {strikes}.\n\n" +
+                    $"The user has the following notes given by moderators: {notes}",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = ctx.Client.CurrentUser.AvatarUrl,

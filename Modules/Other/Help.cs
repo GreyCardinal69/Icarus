@@ -145,11 +145,12 @@ namespace Icarus.Modules.Other
                         Color = DiscordColor.SpringGreen,
                         Description =
                            $"( For Event Horizon Official )\n" +
-                           $"`report <messageId> <channelId> <state> <thresholds> <comment(s)>`: Creates an activity report for the channel. Starting " +
-                           $"from the message with `<messageId>` in the channel with `<channelId>`. The `<state>` describes the state of the channel in the time period. The `<thresholds>` are " +
-                           $"responsible for categorizing user activity and `<comment(s)>` are additional comments to describe events or to take notes. " +
-                           $"Words in the `<state>` must by connected by '-'. Thresholds are connected by '/' and follow this format `name-min:max`. For a new line in comments add `\\n`.\n" +
-                           $"Example usage: `>report 1162845038032723998 294511987684147212 Doing-Fine Dead-0:9/Inactive-10:25/SemiActive-26:35/Active-36:70/VeryActive-70:1000 No comments.`" ,
+                           $"`report <date> <channelId> <state> <thresholds> <optional_format> <comment(s)>`: Creates an activity report for the channel. Starting " +
+                           $"from the first message after `<date>` in the channel with `<channelId>` ( mention the channel ). The `<state>` describes the state of the channel in the time period. The `<thresholds>` are " +
+                           $"responsible for categorizing user activity, `<optional_format>` is used for user list table format and `<comment(s)>` are additional comments to describe events or to take notes. " +
+                           $"Words in the `<state>` must by connected by '-'. Thresholds are connected by '/' and follow this format `name-min:max`. For a new line in comments add `\\n`. Available table formats are `default` and `md`. If you dont specify a format, it will use the `default` ( dont write `default` ). The `<date>` is given as such `day/month/year` aka `int/first three letters of the month/year`.\n" +
+                           $"Example usage: `>report 28-Oct-23 #ehce Doing-Fine Dead-0:9/Inactive-10:25/SemiActive-26:35/Active-36:70/VeryActive-70:1000 No comments.`\n Or \n" +
+                           $"`>report 28-Oct-23 #ehce Doing-Fine Dead-0:9/Inactive-10:25/SemiActive-26:35/Active-36:70/VeryActive-70:1000 md No comments.`" ,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = ctx.Member.AvatarUrl,

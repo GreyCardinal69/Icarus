@@ -47,15 +47,19 @@
           "dependencies": {
             "DSharpPlus": {
               "target": "Package",
-              "version": "[4.4.2, )"
+              "version": "[4.4.3, )"
             },
             "DSharpPlus.CommandsNext": {
               "target": "Package",
-              "version": "[4.4.2, )"
+              "version": "[4.4.3, )"
             },
             "DSharpPlus.Interactivity": {
               "target": "Package",
-              "version": "[4.4.2, )"
+              "version": "[4.4.3, )"
+            },
+            "DSharpPlus.SlashCommands": {
+              "target": "Package",
+              "version": "[4.4.3, )"
             },
             "Microsoft.VisualStudio.VsixColorCompiler": {
               "target": "Package",

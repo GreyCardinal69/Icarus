@@ -15,7 +15,7 @@
           }
         }
       },
-      "DSharpPlus/4.4.2": {
+      "DSharpPlus/4.4.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
@@ -39,10 +39,10 @@
           }
         }
       },
-      "DSharpPlus.CommandsNext/4.4.2": {
+      "DSharpPlus.CommandsNext/4.4.3": {
         "type": "package",
         "dependencies": {
-          "DSharpPlus": "4.4.2",
+          "DSharpPlus": "4.4.3",
           "Microsoft.Extensions.DependencyInjection": "5.0.1"
         },
         "compile": {
@@ -56,11 +56,11 @@
           }
         }
       },
-      "DSharpPlus.Interactivity/4.4.2": {
+      "DSharpPlus.Interactivity/4.4.3": {
         "type": "package",
         "dependencies": {
           "ConcurrentHashSet": "1.3.0",
-          "DSharpPlus": "4.4.2"
+          "DSharpPlus": "4.4.3"
         },
         "compile": {
           "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {
@@ -69,6 +69,23 @@
         },
         "runtime": {
           "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "DSharpPlus.SlashCommands/4.4.3": {
+        "type": "package",
+        "dependencies": {
+          "DSharpPlus": "4.4.3",
+          "Microsoft.Extensions.DependencyInjection": "5.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/DSharpPlus.SlashCommands.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/DSharpPlus.SlashCommands.dll": {
             "related": ".xml"
           }
         }
@@ -1354,46 +1371,60 @@
         "lib/netstandard2.0/ConcurrentCollections.xml"
       ]
     },
-    "DSharpPlus/4.4.2": {
-      "sha512": "nHp4zUGLryQVhWk2nvfJvHzdv//DKY447gSz2UvMSozMR87MNZBEVOt9NFFEL5lq8OacZS860IDKvSQiRjQyAA==",
+    "DSharpPlus/4.4.3": {
+      "sha512": "dekaxmANgul4AQLbM0m20GWbXuS/N0EtW4u3nJD/9/5o4NXk2c4QBEpApcEzSdOaSsUNoBSatjBkKVuBR9tVzg==",
       "type": "package",
-      "path": "dsharpplus/4.4.2",
+      "path": "dsharpplus/4.4.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.4.4.2.nupkg.sha512",
+        "dsharpplus.4.4.3.nupkg.sha512",
         "dsharpplus.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.dll",
         "lib/netstandard2.0/DSharpPlus.xml"
       ]
     },
-    "DSharpPlus.CommandsNext/4.4.2": {
-      "sha512": "StFRvNYrf7nwnhenR64mh2TsbvQTPMV2dFxWOLBQWjVA7+GDQblUdlkKgQtITnU3r1k00qn5xoTkx8ObrN9wsg==",
+    "DSharpPlus.CommandsNext/4.4.3": {
+      "sha512": "oTIY04IlDX3TcL8SvnhDGf85Fiud2ehp7D9v/t3v2w8iHvecCkzBWuXtA9OJUnrvXR/9orqmwmfqhk2nYk+67Q==",
       "type": "package",
-      "path": "dsharpplus.commandsnext/4.4.2",
+      "path": "dsharpplus.commandsnext/4.4.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.commandsnext.4.4.2.nupkg.sha512",
+        "dsharpplus.commandsnext.4.4.3.nupkg.sha512",
         "dsharpplus.commandsnext.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.CommandsNext.dll",
         "lib/netstandard2.0/DSharpPlus.CommandsNext.xml"
       ]
     },
-    "DSharpPlus.Interactivity/4.4.2": {
-      "sha512": "KTzdJ7mM4Vjua2lPrcwBKmHvH++H5y18P2ywQWvtLXX7yCDEoaXnr7EWolEpgtoF9GfCHIT7iNZKMRUBR7XRTg==",
+    "DSharpPlus.Interactivity/4.4.3": {
+      "sha512": "mga+AvKLb2ZOzps3yGu4cWNcPq5J6R8AVBzE71gCPqq4t7OLs6dXXh57kibpUyJSLalgTOYOtigtnyw62p+6vg==",
       "type": "package",
-      "path": "dsharpplus.interactivity/4.4.2",
+      "path": "dsharpplus.interactivity/4.4.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.interactivity.4.4.2.nupkg.sha512",
+        "dsharpplus.interactivity.4.4.3.nupkg.sha512",
         "dsharpplus.interactivity.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.Interactivity.dll",
         "lib/netstandard2.0/DSharpPlus.Interactivity.xml"
+      ]
+    },
+    "DSharpPlus.SlashCommands/4.4.3": {
+      "sha512": "ri7dV4FsPM0WNGG8N4oIfIky1TCdrckOr0Ozgegt7zPmamXGCwFGG49NrPQLNHfKk56qq6pbyTDeJaejaLiqYA==",
+      "type": "package",
+      "path": "dsharpplus.slashcommands/4.4.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "dsharpplus.png",
+        "dsharpplus.slashcommands.4.4.3.nupkg.sha512",
+        "dsharpplus.slashcommands.nuspec",
+        "lib/netstandard2.0/DSharpPlus.SlashCommands.dll",
+        "lib/netstandard2.0/DSharpPlus.SlashCommands.xml"
       ]
     },
     "Microsoft.Extensions.DependencyInjection/5.0.1": {
@@ -4310,9 +4341,10 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
-      "DSharpPlus >= 4.4.2",
-      "DSharpPlus.CommandsNext >= 4.4.2",
-      "DSharpPlus.Interactivity >= 4.4.2",
+      "DSharpPlus >= 4.4.3",
+      "DSharpPlus.CommandsNext >= 4.4.3",
+      "DSharpPlus.Interactivity >= 4.4.3",
+      "DSharpPlus.SlashCommands >= 4.4.3",
       "Microsoft.VisualStudio.VsixColorCompiler >= 17.5.33428.366",
       "Newtonsoft.Json >= 13.0.3"
     ]
@@ -4364,15 +4396,19 @@
         "dependencies": {
           "DSharpPlus": {
             "target": "Package",
-            "version": "[4.4.2, )"
+            "version": "[4.4.3, )"
           },
           "DSharpPlus.CommandsNext": {
             "target": "Package",
-            "version": "[4.4.2, )"
+            "version": "[4.4.3, )"
           },
           "DSharpPlus.Interactivity": {
             "target": "Package",
-            "version": "[4.4.2, )"
+            "version": "[4.4.3, )"
+          },
+          "DSharpPlus.SlashCommands": {
+            "target": "Package",
+            "version": "[4.4.3, )"
           },
           "Microsoft.VisualStudio.VsixColorCompiler": {
             "target": "Package",
