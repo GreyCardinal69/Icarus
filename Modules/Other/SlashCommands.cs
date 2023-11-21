@@ -4,11 +4,6 @@ using DSharpPlus.SlashCommands;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System;
 
 namespace Icarus.Modules.Other
 {
@@ -17,7 +12,7 @@ namespace Icarus.Modules.Other
         [SlashCommand( "test", "A slash command made to test the DSharpPlus Slash Commands extension!" )]
         public async Task TestCommand( InteractionContext ctx )
         {
-            await ctx.CreateResponseAsync( InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent( "Success!" ) );
+            await ctx.CreateResponseAsync( InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent( "Your home address, coordinates and credit card information has been added to the GreySoc database, we thank you for your obedience." ) );
         }
     }
 }

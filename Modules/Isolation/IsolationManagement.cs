@@ -121,7 +121,6 @@ namespace Icarus.Modules.Isolation
                     await user.GrantRoleAsync( role );
                 }
             }
-
           
             await ctx.RespondAsync
                 (
@@ -131,7 +130,6 @@ namespace Icarus.Modules.Isolation
                     $"The isolation was called by this message: " + entryInfo.EntryMessageLink
                 );
    
-
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
             profile.Entries.Remove(entryInfo);
 
@@ -140,19 +138,9 @@ namespace Icarus.Modules.Isolation
 
         public static async Task ReleaseEntry ( ServerProfile profile, IsolationEntry entry )
         {
-            var cmds = Program.Core.Client.GetCommandsNext();
-            var cmd = cmds.FindCommand( "isolate", out var customArgs );
-            customArgs = "[]help. Hunting For Pulsars.";
-            var guild = Program.Core.Client.GetGuildAsync( profile.ID ).Result;
-            var user = guild.GetMemberAsync( entry.IsolatedUserId ).Result;
-            var fakeContext = cmds.CreateFakeContext
-                (
-                    user,
-                    guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ),
-                    "isolate", ">",
-                    cmd,
-                    customArgs
-                );
+            var fakeContext = Program.Core.CreateCommandContext( profile.ID, profile.LogConfig.MajorNotificationsChannelId );
+            var user = fakeContext.Guild.GetMemberAsync( entry.IsolatedUserId ).Result;
+
 
             if (entry.ReturnRoles)
             {
@@ -162,7 +150,7 @@ namespace Icarus.Modules.Isolation
                 }
             }
 
-            await user.RevokeRoleAsync( guild.GetRole( entry.PunishmentRoleId ) );
+            await user.RevokeRoleAsync( fakeContext.Guild.GetRole( entry.PunishmentRoleId ) );
 
             await fakeContext.RespondAsync
                 (

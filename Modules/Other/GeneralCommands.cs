@@ -25,26 +25,21 @@ namespace Icarus.Modules.Other
         public async Task BotTalk( CommandContext ctx, ulong id, ulong id2, ulong id3, bool thread, params string[] rest )
         {
             await ctx.TriggerTypingAsync();
+            var fakeContext = Program.Core.CreateCommandContext(id, id2);
 
-            var cmds = Program.Core.Client.GetCommandsNext();
-            var cmd = cmds.FindCommand( "BotTalk", out var customArgs );
-            customArgs = "[]help. Hunting For Pulsars.";
-            var guild = Program.Core.Client.GetGuildAsync( id ).Result;
-            var user = guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
+            var user = fakeContext.Guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
 
             if ( !thread )
             {
-                var fakeContext = cmds.CreateFakeContext( user, guild.GetChannel( id2 ), "BotTalk", ">", cmd, customArgs );
                 await fakeContext.RespondAsync( string.Join( " ", rest ) );
             }
             else
             {
-                var channel = guild.GetChannel( id2 );
+                var channel = fakeContext.Guild.GetChannel( id2 );
                 foreach ( var item in channel.Threads )
                 {
                     if ( item.Id == id3 )
                     {
-                        var fakeContext = cmds.CreateFakeContext( user, item, "BotTalk", ">", cmd, customArgs );
                         await fakeContext.RespondAsync( string.Join( " ", rest ) );
                     }
                 }

@@ -527,6 +527,10 @@ namespace Icarus
 
         private async Task Event_MessageUpdated( DiscordClient sender, MessageUpdateEventArgs e )
         {
+            if ( e.Message.Author.Id == this.Client.CurrentUser.Id )
+            {
+                return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
