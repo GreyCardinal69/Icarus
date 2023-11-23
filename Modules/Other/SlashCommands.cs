@@ -85,6 +85,8 @@ namespace Icarus.Modules.Other
                 File.Delete( exportPath );
             }
 
+            await ctx.CreateResponseAsync( "Beginning archival..." );
+
             try
             {
                 StringBuilder sb = new( Constants.ChannelExportFirstHalf.Length );
