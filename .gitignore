@@ -48,6 +48,7 @@ obj/*
 *.idb
 *.pdb
 
+Modules/ServerSpecific/EventHorizonSlash.cs
 Modules/ServerSpecific/EventHorizon.cs
 
 # Kernel Module Compile Results

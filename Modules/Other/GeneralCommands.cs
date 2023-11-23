@@ -51,7 +51,7 @@ namespace Icarus.Modules.Other
         public async Task Ping( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
-            await ctx.RespondAsync( $"Ping: {ctx.Client.Ping}ms" );
+            await ctx.RespondAsync( $"Ping: {ctx.Client.Ping}ms." );
         }
 
         [Command( "erase" )]

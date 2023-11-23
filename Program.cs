@@ -164,6 +164,8 @@ namespace Icarus
 
             var slash = Client.UseSlashCommands();
             slash.RegisterCommands<SlashCommands>();
+            // Server specific class, not included in repository.
+            slash.RegisterCommands<EventHorizonSlash>();
 
             Client.UseInteractivity( new InteractivityConfiguration
             {
@@ -527,7 +529,7 @@ namespace Icarus
 
         private async Task Event_MessageUpdated( DiscordClient sender, MessageUpdateEventArgs e )
         {
-            if ( e.Message.Author.Id == this.Client.CurrentUser.Id )
+            if ( e.Message.Author.IsBot )
             {
                 return;
             }
