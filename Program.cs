@@ -134,6 +134,7 @@ namespace Icarus
                 AutoReconnect = true,
                 MinimumLogLevel = LogLevel.Information,
                 LogUnknownEvents = false,
+                ReconnectIndefinitely = true,
             };
 
             Client = new DiscordClient( cfg );

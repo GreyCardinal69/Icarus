@@ -392,8 +392,8 @@ namespace Icarus.Modules.Other
         public async Task EraseFromTo( CommandContext ctx, ulong from, ulong to, int amount )
         {
             await ctx.TriggerTypingAsync();
-            var fromMsg = await ctx.Channel.GetMessageAsync( from );
-            var toMsg = await ctx.Channel.GetMessageAsync( to );
+            DiscordMessage fromMsg = await ctx.Channel.GetMessageAsync( from );
+            DiscordMessage toMsg = await ctx.Channel.GetMessageAsync( to );
 
             var messagesBefore = await ctx.Channel.GetMessagesBeforeAsync( to, amount );
             var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( from, amount );
@@ -413,6 +413,7 @@ namespace Icarus.Modules.Other
         public async Task Ban( CommandContext ctx, ulong id, int deleteAmount = 0, string reason = "" )
         {
             await ctx.TriggerTypingAsync();
+            DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
 
             var user = JsonConvert.DeserializeObject<UserProfile>(
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
@@ -424,7 +425,7 @@ namespace Icarus.Modules.Other
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );
 
             await ctx.Guild.BanMemberAsync( id, deleteAmount, reason );
-            await ctx.RespondAsync( $"Banned {ctx.Guild.GetMemberAsync( id ).Result.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
+            await ctx.RespondAsync( $"Banned {member.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
         }
 
         [Command( "kick" )]
@@ -443,8 +444,9 @@ namespace Icarus.Modules.Other
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );
 
-            await ctx.Guild.GetMemberAsync( id ).Result.RemoveAsync();
-            await ctx.RespondAsync( $"Kicked {ctx.Guild.GetMemberAsync( id ).Result.Mention}, with \"{reason}\" as reason." );
+            DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
+            await member.RemoveAsync();
+            await ctx.RespondAsync( $"Kicked {member.Mention}, with \"{reason}\" as reason." );
         }
 
         [Command( "unban" )]

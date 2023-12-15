@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using Newtonsoft.Json;
 
 using Icarus.Modules.Profiles;
@@ -16,30 +17,30 @@ namespace Icarus.Modules.Isolation
         [Command( "isolate" )]
         [Description( "Isolates a user in a channel with specified parameters." )]
         [Require​User​Permissions​( DSharpPlus.Permissions.ManageRoles )]
-        public async Task Isolate ( CommandContext ctx, ulong punishmentRoleId, ulong userId, ulong channelId, string timeLen, bool returnRoles, [RemainingText] string reason)
+        public async Task Isolate( CommandContext ctx, ulong punishmentRoleId, ulong userId, ulong channelId, string timeLen, bool returnRoles, [RemainingText] string reason )
         {
             await ctx.TriggerTypingAsync();
 
-            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
             {
                 await ctx.RespondAsync( "Server is not registered, call `>RegisterServer` to proceed." );
                 return;
             }
 
-            if (ctx.Guild.GetMemberAsync( userId ) == null)
+            if ( ctx.Guild.GetMemberAsync( userId ) == null )
             {
                 await ctx.RespondAsync( "Invalid user id." );
                 return;
             }
 
-            if (ctx.Guild.GetRole( punishmentRoleId ) == null)
+            if ( ctx.Guild.GetRole( punishmentRoleId ) == null )
             {
                 await ctx.RespondAsync( "Invalid containment role id." );
                 return;
             }
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
-            var user = ctx.Guild.GetMemberAsync( userId ).Result;
+            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             IsolationEntry NewEntry = new()
             {
@@ -50,8 +51,8 @@ namespace Icarus.Modules.Isolation
                 IsolatedUserId = userId,
                 IsolatedUserName = user.DisplayName,
                 EntryDate = DateTime.UtcNow,
-                ReleaseDate = timeLen.EndsWith('d')
-                        ? DateTime.UtcNow.AddDays( Convert.ToDouble( timeLen[..^1]) )
+                ReleaseDate = timeLen.EndsWith( 'd' )
+                        ? DateTime.UtcNow.AddDays( Convert.ToDouble( timeLen[..^1] ) )
                         : DateTime.UtcNow.AddMonths( Convert.ToInt32( timeLen[..^1] ) ),
                 RemovedRoles = user.Roles.ToList(),
                 ReturnRoles = returnRoles,
@@ -61,12 +62,12 @@ namespace Icarus.Modules.Isolation
             var userP = JsonConvert.DeserializeObject<UserProfile>(
                 File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json" ) );
 
-            userP.PunishmentEntries.Add( ( DateTime.UtcNow, reason ) );
+            userP.PunishmentEntries.Add( (DateTime.UtcNow, reason) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json",
                  JsonConvert.SerializeObject( userP, Formatting.Indented ) );
 
-            foreach (var item in user.Roles.ToList())
+            foreach ( var item in user.Roles.ToList() )
             {
                 await user.RevokeRoleAsync( item );
             }
@@ -81,23 +82,23 @@ namespace Icarus.Modules.Isolation
             var isolationChannel = ctx.Guild.GetChannel( channelId );
 
             await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}" +
-                $", for {Convert.ToInt32(Math.Abs((NewEntry.EntryDate - NewEntry.ReleaseDate).TotalDays))} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )} \n" +
+                $", for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )} \n" +
                 $"User will be released on ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
         }
 
         [Command( "releaseUser" )]
         [Description( "Releases a user from isolation." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
-        public async Task ReleaseUser ( CommandContext ctx, ulong userId )
+        public async Task ReleaseUser( CommandContext ctx, ulong userId )
         {
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             bool foundEntry = false;
             IsolationEntry entryInfo = new();
 
-            foreach (var entry in profile.Entries)
+            foreach ( var entry in profile.Entries )
             {
-                if (entry.IsolatedUserId == userId)
+                if ( entry.IsolatedUserId == userId )
                 {
                     foundEntry = true;
                     entryInfo = entry;
@@ -106,45 +107,45 @@ namespace Icarus.Modules.Isolation
 
             var user = ctx.Guild.GetMemberAsync( userId ).Result;
 
-            if (!foundEntry)
+            if ( !foundEntry )
             {
-                await ctx.RespondAsync($"No entries found for user {user.Mention}.");
+                await ctx.RespondAsync( $"No entries found for user {user.Mention}." );
                 return;
             }
 
             await user.RevokeRoleAsync( ctx.Guild.GetRole( entryInfo.PunishmentRoleId ) );
 
-            if (entryInfo.ReturnRoles)
+            if ( entryInfo.ReturnRoles )
             {
-                foreach (var role in entryInfo.RemovedRoles)
+                foreach ( var role in entryInfo.RemovedRoles )
                 {
                     await user.GrantRoleAsync( role );
                 }
             }
-          
+
             await ctx.RespondAsync
                 (
-                    $"Released user: {user.Mention} from isolation at channel: {ctx.Guild.GetChannel(entryInfo.IsolationChannelId).Mention}.\n" +
-                    $"The user was isolated for {Convert.ToInt32(Math.Abs((DateTime.UtcNow - entryInfo.EntryDate).TotalDays))} days." +
+                    $"Released user: {user.Mention} from isolation at channel: {ctx.Guild.GetChannel( entryInfo.IsolationChannelId ).Mention}.\n" +
+                    $"The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entryInfo.EntryDate ).TotalDays ) )} days." +
                     $"\nWere revoked roles returned? {entryInfo.ReturnRoles}.\n" + $"The user was isolated for `\"{entryInfo.Reason}\"`. " +
                     $"The isolation was called by this message: " + entryInfo.EntryMessageLink
                 );
-   
+
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
-            profile.Entries.Remove(entryInfo);
+            profile.Entries.Remove( entryInfo );
 
             File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        public static async Task ReleaseEntry ( ServerProfile profile, IsolationEntry entry )
+        public static async Task ReleaseEntry( ServerProfile profile, IsolationEntry entry )
         {
             var fakeContext = Program.Core.CreateCommandContext( profile.ID, profile.LogConfig.MajorNotificationsChannelId );
             var user = fakeContext.Guild.GetMemberAsync( entry.IsolatedUserId ).Result;
 
 
-            if (entry.ReturnRoles)
+            if ( entry.ReturnRoles )
             {
-                foreach (var role in entry.RemovedRoles)
+                foreach ( var role in entry.RemovedRoles )
                 {
                     await user.GrantRoleAsync( role );
                 }
