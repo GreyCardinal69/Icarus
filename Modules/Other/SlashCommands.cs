@@ -376,13 +376,10 @@ namespace Icarus.Modules.Other
             var fromMsg = await ctx.Channel.GetMessageAsync( ufrom );
             var toMsg = await ctx.Channel.GetMessageAsync( uto );
 
-            var messagesBefore = await ctx.Channel.GetMessagesBeforeAsync( uto, uamount );
             var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( ufrom, uamount );
 
-            var filtered = messagesAfter.Union( messagesBefore ).Distinct().Where(
-                x => ( DateTimeOffset.UtcNow - x.Timestamp ).TotalDays <= 14 &&
-                x.Timestamp <= toMsg.Timestamp && x.Timestamp >= fromMsg.Timestamp
-            );
+            DiscordMessage[] filtered = messagesAfter.Where( x => x.Timestamp <= toMsg.Timestamp ).ToArray();
+
             await ctx.CreateResponseAsync( $"Erasing: {filtered.Count()} messages, called by {ctx.User.Mention}." );
             await ctx.Channel.DeleteMessagesAsync( filtered );
         }
