@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.IO.Compression;
-using System.Net;
-
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.SlashCommands;
 using DSharpPlus.Entities;
-using DSharpPlus;
+using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
-using DSharpPlus.CommandsNext;
 using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Icarus.Modules.Other
 {

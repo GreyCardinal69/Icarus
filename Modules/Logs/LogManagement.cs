@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using Icarus.Modules.Profiles;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.IO;
-
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.CommandsNext;
-using Newtonsoft.Json;
-
-using Icarus.Modules.Profiles;
 
 namespace Icarus.Modules.Logs
 {

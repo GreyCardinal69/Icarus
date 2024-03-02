@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Icarus.Modules.Isolation;
+﻿using Icarus.Modules.Isolation;
 using Icarus.Modules.Profiles;
+using System;
+using System.Collections.Generic;
 
 namespace Icarus.Modules
 {

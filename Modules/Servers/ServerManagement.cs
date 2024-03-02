@@ -1,15 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Text;
-using System.Linq;
-using System.IO;
-
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Entities;
-
+using DSharpPlus.Interactivity.Extensions;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Icarus.Modules.Servers
 {

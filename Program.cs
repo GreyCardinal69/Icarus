@@ -1,30 +1,27 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Timers;
-
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-
+using Icarus.Modules;
+using Icarus.Modules.Isolation;
+using Icarus.Modules.Logs;
+using Icarus.Modules.Other;
+using Icarus.Modules.Profiles;
+using Icarus.Modules.Servers;
+using Icarus.Modules.ServerSpecific;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-
-using Icarus.Modules.Other;
-using Icarus.Modules;
-using Icarus.Modules.Logs;
-using Icarus.Modules.Servers;
-using Icarus.Modules.Isolation;
-using Icarus.Modules.Profiles;
-using Icarus.Modules.ServerSpecific;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace Icarus
 {
@@ -207,7 +204,8 @@ namespace Icarus
             customArgs = "[]help. Hunting For Pulsars.";
             DiscordGuild guild = Program.Core.Client.GetGuildAsync( guildId ).Result;
 
-            CommandContext context = cmds.CreateFakeContext( Core.Client.CurrentUser, guild.GetChannel( channelId ), "isolate", ">", cmd, customArgs );
+            var channel = guild.GetChannel( channelId ) ?? throw new Exception( "Invalid channel id." );
+            CommandContext context = cmds.CreateFakeContext( Core.Client.CurrentUser, channel, "isolate", ">", cmd, customArgs );
             return context;
         }
 
@@ -257,7 +255,7 @@ namespace Icarus
             {
                 if ( e.Message.Content.Contains( word ) )
                 {
-                    CommandContext context = CreateCommandContext( e.Guild.Id, e.Channel.Id );
+                    CommandContext context = CreateCommandContext( e.Guild.Id, profile.LogConfig.MajorNotificationsChannelId );
 
                     await context.RespondAsync( $"The following user {e.Author.Mention} mentioned \"{word}\" in {e.Channel.Mention}.");
                     await context.RespondAsync( "Message Jump Link: " + e.Message.JumpLink.ToString() );

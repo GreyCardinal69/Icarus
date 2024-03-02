@@ -1,19 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text;
-using System.Net;
-using System.IO.Compression;
-
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-
-using Newtonsoft.Json;
 using Icarus.Modules.Profiles;
-using DSharpPlus.SlashCommands;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Icarus.Modules.Other
 {
@@ -25,9 +22,19 @@ namespace Icarus.Modules.Other
         public async Task BotTalk( CommandContext ctx, ulong id, ulong id2, ulong id3, bool thread, params string[] rest )
         {
             await ctx.TriggerTypingAsync();
-            var fakeContext = Program.Core.CreateCommandContext(id, id2);
+            CommandContext fakeContext = null;
 
-            var user = fakeContext.Guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
+            try
+            {
+                fakeContext = Program.Core.CreateCommandContext( id, id2 );
+            }
+            catch ( Exception ex )
+            {
+                await ctx.RespondAsync( ex.Message );
+                throw;
+            }
+
+            DiscordMember user = fakeContext.Guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
 
             if ( !thread )
             {
@@ -36,6 +43,13 @@ namespace Icarus.Modules.Other
             else
             {
                 var channel = fakeContext.Guild.GetChannel( id2 );
+
+                if ( channel == null )
+                {
+                    await ctx.RespondAsync( "Invalid thread ID." );
+                    return;
+                }
+
                 foreach ( var item in channel.Threads )
                 {
                     if ( item.Id == id3 )

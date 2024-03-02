@@ -1,14 +1,12 @@
-﻿using System;
+﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using Icarus.Modules.Profiles;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using Newtonsoft.Json;
-
-using Icarus.Modules.Profiles;
 
 namespace Icarus.Modules.Isolation
 {
