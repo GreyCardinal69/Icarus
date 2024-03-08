@@ -40,7 +40,7 @@ namespace Icarus.Modules.Isolation
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
 
-            IsolationEntry NewEntry = new()
+            IsolationEntry NewEntry = new IsolationEntry()
             {
                 IsolationChannel = ctx.Guild.GetChannel( channelId ).Mention,
                 IsolationChannelId = channelId,
@@ -57,7 +57,7 @@ namespace Icarus.Modules.Isolation
                 Reason = reason
             };
 
-            var userP = JsonConvert.DeserializeObject<UserProfile>(
+            UserProfile userP = JsonConvert.DeserializeObject<UserProfile>(
                 File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json" ) );
 
             userP.PunishmentEntries.Add( (DateTime.UtcNow, reason) );
@@ -77,11 +77,9 @@ namespace Icarus.Modules.Isolation
 
             File.WriteAllText( $"{profilesPath}{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
 
-            var isolationChannel = ctx.Guild.GetChannel( channelId );
+            DiscordChannel isolationChannel = ctx.Guild.GetChannel( channelId );
 
-            await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}" +
-                $", for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )} \n" +
-                $"User will be released on ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
+            await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}, for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )}. \n The user will be released on ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
         }
 
         [Command( "releaseUser" )]
@@ -89,12 +87,20 @@ namespace Icarus.Modules.Isolation
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
         public async Task ReleaseUser( CommandContext ctx, ulong userId )
         {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, call `>RegisterServer` to proceed." );
+                return;
+            }
+
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             bool foundEntry = false;
-            IsolationEntry entryInfo = new();
+            IsolationEntry entryInfo = new IsolationEntry();
 
-            foreach ( var entry in profile.Entries )
+            foreach ( IsolationEntry entry in profile.Entries )
             {
                 if ( entry.IsolatedUserId == userId )
                 {
@@ -103,7 +109,7 @@ namespace Icarus.Modules.Isolation
                 }
             }
 
-            var user = ctx.Guild.GetMemberAsync( userId ).Result;
+            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             if ( !foundEntry )
             {
@@ -115,7 +121,7 @@ namespace Icarus.Modules.Isolation
 
             if ( entryInfo.ReturnRoles )
             {
-                foreach ( var role in entryInfo.RemovedRoles )
+                foreach ( DiscordRole role in entryInfo.RemovedRoles )
                 {
                     await user.GrantRoleAsync( role );
                 }
@@ -137,13 +143,12 @@ namespace Icarus.Modules.Isolation
 
         public static async Task ReleaseEntry( ServerProfile profile, IsolationEntry entry )
         {
-            var fakeContext = Program.Core.CreateCommandContext( profile.ID, profile.LogConfig.MajorNotificationsChannelId );
-            var user = fakeContext.Guild.GetMemberAsync( entry.IsolatedUserId ).Result;
-
+            CommandContext fakeContext = Program.Core.CreateCommandContext( profile.ID, profile.LogConfig.MajorNotificationsChannelId );
+            DiscordMember user = fakeContext.Guild.GetMemberAsync( entry.IsolatedUserId ).Result;
 
             if ( entry.ReturnRoles )
             {
-                foreach ( var role in entry.RemovedRoles )
+                foreach ( DiscordRole role in entry.RemovedRoles )
                 {
                     await user.GrantRoleAsync( role );
                 }
@@ -153,13 +158,12 @@ namespace Icarus.Modules.Isolation
 
             await fakeContext.RespondAsync
                 (
-                    $"Released user: {user.Mention} from isolation at channel: {fakeContext.Guild.GetChannel( entry.IsolationChannelId ).Mention}.\n" +
-                    $"The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entry.EntryDate ).TotalDays ) )} days.\n"
+                    $"Released user: {user.Mention} from isolation at channel: {fakeContext.Guild.GetChannel( entry.IsolationChannelId ).Mention}.\n The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.UtcNow - entry.EntryDate ).TotalDays ) )} days.\n"
                 );
-            await fakeContext.RespondAsync( "The isolation was called by this message: " + entry.EntryMessageLink.ToString() );
-            await fakeContext.RespondAsync( $"Were revoked roles returned? {entry.ReturnRoles}.\n" + $"The user was isolated for `\"{entry.Reason}\"`." );
+            await fakeContext.RespondAsync( $"The isolation was called by this message: {entry.EntryMessageLink}" );
+            await fakeContext.RespondAsync( $"Were revoked roles returned? {entry.ReturnRoles}.\n The user was isolated for `\"{entry.Reason}\"`." );
 
-            string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
+            string profilesPath = $"{AppDomain.CurrentDomain.BaseDirectory}\\ServerProfiles\\";
             profile.Entries.Remove( entry );
 
             File.WriteAllText( $"{profilesPath}{fakeContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );

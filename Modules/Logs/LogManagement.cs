@@ -221,7 +221,7 @@ namespace Icarus.Modules.Logs
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach (var Event in eventTypes)
+            foreach (string Event in eventTypes)
             {
                 switch (Event)
                 {

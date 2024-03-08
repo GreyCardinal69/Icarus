@@ -19,10 +19,10 @@ namespace Icarus.Modules.Logs
         {
             await ctx.TriggerTypingAsync();
 
-            var users = ctx.Guild.GetAllMembersAsync().Result;
+            IReadOnlyCollection<DiscordMember> users = ctx.Guild.GetAllMembersAsync().Result;
 
             int i = 0;
-            foreach (var user in users)
+            foreach (DiscordMember user in users)
             {
                 if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json" ) )
                 {
@@ -56,7 +56,7 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            var user = JsonConvert.DeserializeObject<UserProfile>( 
+            UserProfile user = JsonConvert.DeserializeObject<UserProfile>( 
                 File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             if ( user.Notes.ContainsKey( index) )
@@ -106,7 +106,7 @@ namespace Icarus.Modules.Logs
         [Command( "userProfile" )]
         [Description( "Responds with information on a user's profile." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
-        public async Task Profile ( CommandContext ctx, ulong id )
+        public async Task UserProfile ( CommandContext ctx, ulong id )
         {
             await ctx.TriggerTypingAsync();
 
@@ -116,49 +116,44 @@ namespace Icarus.Modules.Logs
                 return;
             }
 
-            var user = JsonConvert.DeserializeObject<UserProfile>(
+            UserProfile user = JsonConvert.DeserializeObject<UserProfile>(
                 File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
-            List<string> banEntries = new();
-            foreach (var item in user.BanEntries)
+            List<string> banEntries = new List<string>();
+            foreach ((DateTime, string) item in user.BanEntries)
             {
                 banEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
             List<string> kickEntries = new();
-            foreach (var item in user.KickEntries)
+            foreach ((DateTime, string) item in user.KickEntries)
             {
                 kickEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
             List<string> punishmentEntries = new();
-            foreach (var item in user.PunishmentEntries)
+            foreach ((DateTime, string) item in user.PunishmentEntries)
             {
                 punishmentEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
             List<string> noteEntries = new();
-            foreach ( var item in user.Notes )
+            foreach ( KeyValuePair<int, string> item in user.Notes )
             {
                 noteEntries.Add( $"    {item.Key}  :  {item.Value}" );
             }
                 
-            var bans = banEntries.Count == 0 ? "None" : string.Join( "\n", banEntries );
-            var kicks = kickEntries.Count == 0 ? "None" : string.Join( "\n", kickEntries );
-            var strikes = punishmentEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", punishmentEntries )}";
-            var notes = noteEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", noteEntries )}";
+            string bans = banEntries.Count == 0 ? "None" : string.Join( "\n", banEntries );
+            string kicks = kickEntries.Count == 0 ? "None" : string.Join( "\n", kickEntries );
+            string strikes = punishmentEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", punishmentEntries )}";
+            string notes = noteEntries.Count == 0 ? "None" : $"\n{string.Join( "\n", noteEntries )}";
                 
-            var embed = new DiscordEmbedBuilder
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
             {
                 Title = $"Profile {ctx.Guild.GetMemberAsync(id).Result.Username}",
                 Color = DiscordColor.SpringGreen,
                 Description =
-                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n" +
-                    $"The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n" +
-                    $"The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n" +
-                    $"The user's logged kick entries are: {kicks}.\n\n" +
-                    $"The user's logged punishment entries are: {strikes}.\n\n" +
-                    $"The user has the following notes given by moderators: {notes}",
+                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n The user's logged kick entries are: {kicks}.\n\n The user's logged punishment entries are: {strikes}.\n\n The user has the following notes given by moderators: {notes}",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = ctx.Client.CurrentUser.AvatarUrl,

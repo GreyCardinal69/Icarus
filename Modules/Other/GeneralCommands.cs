@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace Icarus.Modules.Other
             }
             else
             {
-                var channel = fakeContext.Guild.GetChannel( id2 );
+                DiscordChannel channel = fakeContext.Guild.GetChannel( id2 );
 
                 if ( channel == null )
                 {
@@ -76,7 +77,7 @@ namespace Icarus.Modules.Other
             await ctx.TriggerTypingAsync();
             try
             {
-                var messages = await ctx.Channel.GetMessagesAsync( count );
+                IReadOnlyList<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync( count );
                 await ctx.Channel.DeleteMessagesAsync( messages );
                 await ctx.RespondAsync( $"Erased: {count} messages, called by {ctx.User.Mention}." );
             }
@@ -487,7 +488,7 @@ namespace Icarus.Modules.Other
         [RequireOwner]
         public async Task SetActivity( CommandContext ctx, int type, [RemainingText] string status )
         {
-            DiscordActivity activity = new();
+            DiscordActivity activity = new DiscordActivity();
             DiscordClient discord = ctx.Client;
             activity.Name = status;
             // Offline = 0,
