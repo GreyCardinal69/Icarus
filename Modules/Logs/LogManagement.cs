@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Icarus.Modules.Logs
@@ -83,8 +84,10 @@ namespace Icarus.Modules.Logs
 
             for (int i = 0; i < words.Length; i++)
             {
-                profile.WordBlackList.Remove( words[i] );
-                words[i] = $"\"{words[i]}\"";
+                if ( !profile.WordBlackList.Contains( words[i] ) )
+                {
+                    profile.WordBlackList.Add( words[i] );
+                }
             }
 
             await ctx.RespondAsync(
@@ -194,9 +197,9 @@ namespace Icarus.Modules.Logs
         {
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync(
-                $"Listing log events: GuildMemberRemoved GuildMemberAdded GuildBanRemoved GuildBanAdded GuildRoleCreated GuildRoleUpdated" +
-                $" GuildRoleDeleted MessageReactionsCleared MessageReactionRemoved MessageReactionAdded MessagesBulkDeleted MessageDeleted MessageUpdated " +
-                $"InviteDeleted InviteCreated ChannelUpdated ChannelDeleted ChannelCreated"
+                $"Listing log events: GuildMemberRemoved, GuildMemberAdded, GuildBanRemoved, GuildBanAdded, GuildRoleCreated, GuildRoleUpdated," +
+                $" GuildRoleDeleted, MessageReactionsCleared, MessageReactionRemoved, MessageReactionAdded, MessagesBulkDeleted, MessageDeleted, MessageUpdated, MessagesBulkDeleted, " +
+                $"InviteDeleted, InviteCreated, ChannelUpdated, ChannelDeleted, ChannelCreated"
             );
         }
 
@@ -221,9 +224,10 @@ namespace Icarus.Modules.Logs
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach (string Event in eventTypes)
+            foreach ( string Event in eventTypes)
             {
-                switch (Event)
+                var str = Event.ToLower();
+                switch ( str )
                 {
                     case "guildmemberremoved":
                         profile.LogConfig.GuildMemberRemoved = !profile.LogConfig.GuildMemberRemoved;
@@ -285,7 +289,7 @@ namespace Icarus.Modules.Logs
                 }
             }
 
-            await ctx.RespondAsync( $"Toggled the following log events: {string.Join( ", ", LogProfile.LogEvents.Where( X => eventTypes.Contains( X.ToLower() ) ) )}" );
+            await ctx.RespondAsync( $"Toggled the following log events: {string.Join(", ",eventTypes)}" );
 
             if (!profile.LogConfig.LoggingEnabled)
             {

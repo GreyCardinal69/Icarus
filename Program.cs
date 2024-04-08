@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -150,7 +152,7 @@ namespace Icarus
             Client.MessageReactionsCleared += Event_MessageReactionsCleared;
             Client.MessageReactionRemoved += Event_MessageReactionRemoved;
             Client.MessageReactionAdded += Event_MessageReactionAdded;
-            //Client.MessagesBulkDeleted += Event_MessagesBulkDeleted;
+            Client.MessagesBulkDeleted += Event_MessagesBulkDeleted;
             Client.MessageDeleted += Event_MessageDeleted;
             Client.MessageUpdated += Event_MessageUpdated;
             Client.MessageCreated += Event_MessageCreated;
@@ -195,6 +197,44 @@ namespace Icarus
 
             await Client.ConnectAsync();
             await Task.Delay( -1 );
+        }
+
+        private async Task Event_MessagesBulkDeleted( DiscordClient sender, MessageBulkDeleteEventArgs args )
+        {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( args.Guild.Id == ServerProfiles[i].ID )
+                {
+                    DiscordChannel channel = args.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel );
+                    if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessagesBulkDeleted )
+                    {
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                        {
+                            Title = "**Messages Purged!**\n\n\n",
+                            Color = DiscordColor.Red,
+                            Description = 
+                            $"{args.Messages.Count} Messages were deleted in {args.Channel.Mention}.\n\n Attaching purge archive above:",
+                            Timestamp = DateTime.Now,
+                        };
+
+                        StringBuilder sb = new();
+
+                        Helpers.ArchiveInput(CreateCommandContext(args.Guild.Id, args.Channel.Id ), args.Messages, args.Channel );
+
+                        using FileStream fs = new FileStream( $"{AppDomain.CurrentDomain.BaseDirectory}Export.zip", FileMode.Open, FileAccess.Read );
+
+                        DiscordMessage msg = await new DiscordMessageBuilder()
+                            .AddFile( $"{AppDomain.CurrentDomain.BaseDirectory}Export.zip", fs )
+                            .AddEmbed(embed)
+                            .SendAsync( channel );
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+            return;
         }
 
         public CommandContext CreateCommandContext( ulong guildId, ulong channelId )

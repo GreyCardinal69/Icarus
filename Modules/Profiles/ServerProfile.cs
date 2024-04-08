@@ -17,6 +17,7 @@ namespace Icarus.Modules
         public List<ulong> AntiSpamIgnored = new();
         public List<string> WordBlackList = new();
         public DateTime ProfileCreationDate { get; init; }
+        public Dictionary<DateTime, ServerLog> WeeklyLogs = new();
 
         public void SetContainmentDefaults( ulong channelId, ulong roleId )
         {

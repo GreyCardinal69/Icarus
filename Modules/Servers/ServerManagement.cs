@@ -107,6 +107,25 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
+        [Command( "UpdateServerFields" )]
+        [Description( "Adds new and or removes old server profiles data fields." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
+        public async Task UpdateServerFields( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
+
+            var profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            await ctx.RespondAsync( $"Updated server profile fields." );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
         [Command( "antiSpamReset" )]
         [Description( "Resets anti spam module ignored channels" )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]

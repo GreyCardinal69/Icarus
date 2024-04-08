@@ -128,6 +128,7 @@ namespace Icarus.Modules.Other
                             $"`antiSpamIgnore <array of channel ids>`: Tells the anti spam module to ignore the specified channels.\n\n" +
                             $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
+                            $"`UpdateServerFields`: Adds new and or removes old server profile's data fields.\n\n" +
                             $"`profile`: Responds with information on the server profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
