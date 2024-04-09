@@ -129,6 +129,8 @@ namespace Icarus.Modules.Other
                             $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
                             $"`UpdateServerFields`: Adds new and or removes old server profile's data fields.\n\n" +
+                            $"`addtimedreminder` <name> <content> <repeat> <type> <date>: Adds a timed reminder which goes off either at a fixed hour of a day or every x days+hours+minutes. If it is the second option you need write `-r`, if not write `-t` for `<type>`. In <date> for the second option write `0-0-0` where the first number is for days, the second for hours, and the last for minutes. For the first option write `Day-hour`, where hour is from `0-23`, for the day write the first two letters of the target day.\n\n" +
+                            $"`removetimedreminder`: Deletes a registered timed reminder.\n\n" +
                             $"`profile`: Responds with information on the server profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {

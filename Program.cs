@@ -118,8 +118,8 @@ namespace Icarus
                         }
                         else
                         {
-                            await tempContext.RespondAsync( $"Timed Reminder set to repeat, repeating..." );
                             item.UpdateExpDate( now );
+                            await tempContext.RespondAsync( $"Timed Reminder set to repeat, repeating..\n Next time the reminder will go off at <t:{item.ExpDate}>." );
                         }
                     }
                 }

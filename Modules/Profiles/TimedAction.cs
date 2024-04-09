@@ -6,6 +6,7 @@ namespace Icarus.Modules.Profiles
     {
         public bool HasExpired( DateTimeOffset now )
         {
+            var r = DateTimeOffset.FromUnixTimeSeconds( ExpDate );
             return now.ToUnixTimeSeconds() >= ExpDate;
         }
 
@@ -16,7 +17,7 @@ namespace Icarus.Modules.Profiles
             if ( !IsSpecific )
             {
                 times = Date.Split( '-' );
-                ExpDate = new DateTimeOffset(DateTime.UtcNow.AddDays( Convert.ToDouble( times[0] ) ).AddHours( Convert.ToDouble( times[1] ) ).AddMinutes( Convert.ToDouble( times[2] ) ) ).ToUnixTimeSeconds();
+                ExpDate = DateTimeOffset.UtcNow.AddDays( Convert.ToDouble( times[0] ) ).AddHours( Convert.ToDouble( times[1] ) ).AddMinutes( Convert.ToDouble( times[2] ) ).ToUnixTimeSeconds();
                 return;
             }
 
@@ -25,7 +26,8 @@ namespace Icarus.Modules.Profiles
             times = Date.Split( '-' );
             IsSpecific = true;
             DateTime current = DateTime.UtcNow;
-            DateTimeOffset temp = new DateTimeOffset( current.Year, current.Month, current.Day, Convert.ToInt32( times[1] ) - 1, 0, 0, new TimeSpan() );
+
+            DateTimeOffset temp = new DateTimeOffset( current.Year, current.Month, current.Day, Math.Max(0,Convert.ToInt32( times[1] ) - 1), 0, 0, new TimeSpan() );
             int num = 0;
 
             switch ( times[0].ToLower() )
@@ -53,7 +55,14 @@ namespace Icarus.Modules.Profiles
                     break;
             }
 
-            ExpDate = temp.AddDays( num - ( int ) temp.DayOfWeek ).ToUnixTimeSeconds();
+            temp = temp.AddDays( num - ( int ) temp.DayOfWeek );
+
+            if ( DateTimeOffset.UtcNow >= temp )
+            {
+                temp = temp.AddDays( 7 );
+            }
+
+            ExpDate = temp.ToUnixTimeSeconds();
         }
 
         public string ToString()

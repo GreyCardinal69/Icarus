@@ -156,8 +156,10 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            profile.TimedReminders.Add( new TimedReminder( name, content.Replace('_', ' '), repeat, dateType, date ) );
-            await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully added." );
+            var reminder = new TimedReminder( name.Replace( '_', ' ' ), content.Replace( '_', ' ' ), repeat, dateType, date );
+
+            profile.TimedReminders.Add( reminder );
+            await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully added.\nThe reminder will go off at: <t:{reminder.ExpDate}>." );
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
@@ -171,17 +173,19 @@ namespace Icarus.Modules.Servers
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             bool removed = false;
 
+            var clean = name.Replace( '_', ' ' );
+
             for ( int i = 0; i < profile.TimedReminders.Count; i++ )
             {
-                if ( profile.TimedReminders[i].Name == name )
+                if ( profile.TimedReminders[i].Name == clean )
                 {
                     profile.TimedReminders.RemoveAt( i );
-                    await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully removed." );
+                    await ctx.RespondAsync( $"Timed Reminder: `{clean}` successfully removed." );
                     removed = true;
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
                 }
             }
-            if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {name} not found." );
+            if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {clean} not found." );
         }
 
         [Command( "deleteProfile" )]
