@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -61,13 +60,11 @@ namespace Icarus
 
             if ( GetOperatingSystem() == OSPlatform.Windows )
             {
-#pragma warning disable CA1416
                 Console.WindowWidth = 140;
                 Console.WindowHeight = 30;
-#pragma warning restore CA1416
             }
 
-            Core._entryCheckTimer = new( 600000 );
+            Core._entryCheckTimer = new Timer( 60000 );
             Core._entryCheckTimer.Elapsed += async ( sender, e ) => await HandleTimer();
             Core._entryCheckTimer.Start();
             Core._entryCheckTimer.AutoReset = true;
@@ -95,16 +92,41 @@ namespace Icarus
         {
             for ( int i = 0; i < Core.ServerProfiles.Count; i++ )
             {
-                for ( int w = 0; w < Core.ServerProfiles[i].Entries.Count; w++ )
+                ServerProfile profile = Core.ServerProfiles[i];
+                for ( int w = 0; w < profile.Entries.Count; w++ )
                 {
-                    if ( DateTime.UtcNow > Core.ServerProfiles[i].Entries[w].ReleaseDate )
+                    if ( DateTime.Now > profile.Entries[w].ReleaseDate )
                     {
-                        await IsolationManagement.ReleaseEntry( Core.ServerProfiles[i], Core.ServerProfiles[i].Entries[w] );
+                        await IsolationManagement.ReleaseEntry( profile, profile.Entries[w] );
+                    }
+                }
+
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                CommandContext tempContext = Core.CreateCommandContext( profile.ID, profile.LogConfig.MajorNotificationsChannelId );
+
+                for ( int e = 0; e < profile.TimedReminders.Count; e++ )
+                {
+                    var item = profile.TimedReminders[e];
+                    if ( item.HasExpired( now ) )
+                    {
+                        await tempContext.RespondAsync( item.ToString() );
+                        if ( !item.Repeat )
+                        {
+                            profile.TimedReminders.Remove( item );
+                            await tempContext.RespondAsync($"Timed Reminder not set to repeat, removing it from server reminders list.");
+                            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{tempContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+                        }
+                        else
+                        {
+                            await tempContext.RespondAsync( $"Timed Reminder set to repeat, repeating..." );
+                            item.UpdateExpDate( now );
+                        }
                     }
                 }
             }
+
             Core._temporaryMessageCounter.Clear();
-            Console.WriteLine( $"Completed 10 minute server entries check [{DateTime.UtcNow}]." );
+            Console.WriteLine( $"Completed minute server entries check [{DateTime.Now}]." );
             return Task.CompletedTask;
         }
 
@@ -365,7 +387,7 @@ namespace Icarus
                                 var userP = JsonConvert.DeserializeObject<UserProfile>(
                                      File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                                userP.PunishmentEntries.Add( (DateTime.UtcNow, "User's actions were considered spam.") );
+                                userP.PunishmentEntries.Add( (DateTime.Now, "User's actions were considered spam.") );
 
                                 File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                                      JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -397,7 +419,7 @@ namespace Icarus
                     var userP = JsonConvert.DeserializeObject<UserProfile>(
                           File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
-                    userP.PunishmentEntries.Add( (DateTime.UtcNow, "User posted a scam message.") );
+                    userP.PunishmentEntries.Add( (DateTime.Now, "User posted a scam message.") );
 
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
                          JsonConvert.SerializeObject( userP, Formatting.Indented ) );
@@ -762,7 +784,7 @@ namespace Icarus
                             $"**The role's color was:** {e.Role.Color}\n\n" +
                             $"```\nThe role's id was: {e.Role.Id}\n" +
                             $"The role was created at: {e.Role.CreationTimestamp.UtcDateTime}\n" +
-                            $"The role was deleted at: {DateTime.UtcNow}```",
+                            $"The role was deleted at: {DateTime.Now}```",
                             Timestamp = DateTime.Now,
                         };
                         await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
@@ -933,7 +955,7 @@ namespace Icarus
                             LocalLanguage = e.Member.Locale
                         };
 
-                        profile.LastJoinDate = DateTime.UtcNow;
+                        profile.LastJoinDate = DateTime.Now;
 
                         File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
                            JsonConvert.SerializeObject( profile, Formatting.Indented ) );
@@ -976,7 +998,7 @@ namespace Icarus
                     var user = JsonConvert.DeserializeObject<UserProfile>(
                         File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) );
 
-                    user.LeaveDate = DateTime.UtcNow;
+                    user.LeaveDate = DateTime.Now;
 
                     File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json",
                        JsonConvert.SerializeObject( user, Formatting.Indented ) );
@@ -1052,7 +1074,7 @@ namespace Icarus
 
         private Task Client_Ready( DiscordClient sender, ReadyEventArgs e )
         {
-            Core.Client.UpdateStatusAsync( new DiscordActivity( "You", ActivityType.Watching ), UserStatus.DoNotDisturb, DateTimeOffset.UtcNow );
+            Core.Client.UpdateStatusAsync( new DiscordActivity( "You", ActivityType.Watching ), UserStatus.DoNotDisturb, DateTimeOffset.Now );
             sender.Logger.LogInformation( BotEventId, "Client is ready to process events." );
             return Task.CompletedTask;
         }

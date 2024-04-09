@@ -414,7 +414,7 @@ namespace Icarus.Modules.Other
             var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( from, amount );
 
             var filtered = messagesAfter.Union( messagesBefore ).Distinct().Where(
-                x => ( DateTimeOffset.UtcNow - x.Timestamp ).TotalDays <= 14 &&
+                x => ( DateTimeOffset.Now - x.Timestamp ).TotalDays <= 14 &&
                 x.Timestamp <= toMsg.Timestamp && x.Timestamp >= fromMsg.Timestamp
             );
 
@@ -433,8 +433,8 @@ namespace Icarus.Modules.Other
             var user = JsonConvert.DeserializeObject<UserProfile>(
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
-            user.LeaveDate = DateTime.UtcNow;
-            user.BanEntries.Add( new( DateTime.UtcNow, reason ) );
+            user.LeaveDate = DateTime.Now;
+            user.BanEntries.Add( new( DateTime.Now, reason ) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );
@@ -453,8 +453,8 @@ namespace Icarus.Modules.Other
             var user = JsonConvert.DeserializeObject<UserProfile>(
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
-            user.LeaveDate = DateTime.UtcNow;
-            user.KickEntries.Add( new( DateTime.UtcNow, reason ) );
+            user.LeaveDate = DateTime.Now;
+            user.KickEntries.Add( new( DateTime.Now, reason ) );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
                  JsonConvert.SerializeObject( user, Formatting.Indented ) );

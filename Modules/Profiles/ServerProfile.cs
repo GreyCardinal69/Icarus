@@ -11,13 +11,14 @@ namespace Icarus.Modules
 
         public string Name;
         public ulong ID;
-        public LogProfile LogConfig = new();
-        public AntiSpamProfile AntiSpam = new() { CacheResetInterval = 20, FirstWarning = 5, LastWarning = 9, Limit = 12, SecondWarning = 7 };
-        public List<IsolationEntry> Entries = new();
-        public List<ulong> AntiSpamIgnored = new();
-        public List<string> WordBlackList = new();
+        public LogProfile LogConfig = new LogProfile();
+        public AntiSpamProfile AntiSpam = new AntiSpamProfile() { CacheResetInterval = 20, FirstWarning = 5, LastWarning = 9, Limit = 12, SecondWarning = 7 };
+        public List<IsolationEntry> Entries = new List<IsolationEntry>();
+        public List<ulong> AntiSpamIgnored = new List<ulong>();
+        public List<string> WordBlackList = new List<string>();
         public DateTime ProfileCreationDate { get; init; }
-        public Dictionary<DateTime, ServerLog> WeeklyLogs = new();
+        public Dictionary<DateTime, ServerLog> WeeklyLogs = new Dictionary<DateTime, ServerLog>();
+        public List<TimedReminder> TimedReminders = new List<TimedReminder>();
 
         public void SetContainmentDefaults( ulong channelId, ulong roleId )
         {
@@ -27,7 +28,7 @@ namespace Icarus.Modules
 
         public static ServerProfile ProfileFromId ( ulong ID )
         {
-            var ProfileList = Program.Core.ServerProfiles;
+            List<ServerProfile> ProfileList = Program.Core.ServerProfiles;
             foreach (ServerProfile prof in ProfileList)
             {
                 if (prof.ID == ID)

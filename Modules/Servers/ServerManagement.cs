@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
+using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -31,7 +32,7 @@ namespace Icarus.Modules.Servers
             {
                 Name = ctx.Guild.Name,
                 ID = ctx.Guild.Id,
-                ProfileCreationDate = DateTime.UtcNow,
+                ProfileCreationDate = DateTime.Now,
                 WordBlackList = new(),
                 AntiSpam = new(),
                 AntiSpamIgnored = new(),
@@ -144,6 +145,43 @@ namespace Icarus.Modules.Servers
 
             await ctx.RespondAsync($"The anti spam module no longer ignores any channels.");
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "AddTimedReminder" )]
+        [Description( "Adds a timed reminder for the server." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task AddTimedReminder( CommandContext ctx, string name, string content, bool repeat, string dateType, string date )
+        {
+            await ctx.TriggerTypingAsync();
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            profile.TimedReminders.Add( new TimedReminder( name, content.Replace('_', ' '), repeat, dateType, date ) );
+            await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully added." );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "RemoveTimedReminder" )]
+        [Description( "Adds a timed reminder for the server." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task RemoveTimedReminder( CommandContext ctx, string name )
+        {
+            await ctx.TriggerTypingAsync();
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            bool removed = false;
+
+            for ( int i = 0; i < profile.TimedReminders.Count; i++ )
+            {
+                if ( profile.TimedReminders[i].Name == name )
+                {
+                    profile.TimedReminders.RemoveAt( i );
+                    await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully removed." );
+                    removed = true;
+                    File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+                }
+            }
+            if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {name} not found." );
         }
 
         [Command( "deleteProfile" )]
