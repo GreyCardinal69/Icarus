@@ -154,7 +154,22 @@ namespace Icarus.Modules.Servers
         {
             await ctx.TriggerTypingAsync();
 
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
+
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            for ( int i = 0; i < profile.TimedReminders.Count; i++ )
+            {
+                if ( string.Equals(name, profile.TimedReminders[i].Name ) )
+                {
+                    if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {name} already exists." );
+                    return;
+                }
+            }
 
             var reminder = new TimedReminder( name.Replace( '_', ' ' ), content.Replace( '_', ' ' ), repeat, dateType, date );
 
@@ -163,12 +178,52 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
+        [Command( "ListTimedReminders" )]
+        [Description( "Adds a timed reminder for the server." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task ListTimedReminders( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            if ( profile.TimedReminders.Count <= 0 )
+            {
+                await ctx.RespondAsync("No timed reminders registered.");
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder("```");
+
+            int i = 1;
+            foreach ( TimedReminder item in profile.TimedReminders )
+            {
+                sb.Append($"Reminder #{i}:\nName ( ID format ): \t{item.Name.Replace(' ','_')}\nContent: \t{item.Content}\nThe Reminder will go off at: \t<t:{item.ExpDate}>\n\n");
+                i++;
+            }
+            sb.Append( "```" );
+            await ctx.RespondAsync( sb.ToString() );
+        }
+
+
         [Command( "RemoveTimedReminder" )]
         [Description( "Adds a timed reminder for the server." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task RemoveTimedReminder( CommandContext ctx, string name )
         {
             await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             bool removed = false;

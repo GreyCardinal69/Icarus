@@ -118,15 +118,16 @@ namespace Icarus
                         }
                         else
                         {
-                            item.UpdateExpDate( now );
+                            item.UpdateExpDate( );
                             await tempContext.RespondAsync( $"Timed Reminder set to repeat, repeating..\n Next time the reminder will go off at <t:{item.ExpDate}>." );
+                            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{tempContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
                         }
                     }
                 }
             }
 
             Core._temporaryMessageCounter.Clear();
-            Console.WriteLine( $"Completed minute server entries check [{DateTime.Now}]." );
+            Console.WriteLine( $"Completed minute server entries check [{DateTimeOffset.Now}]." );
             return Task.CompletedTask;
         }
 
@@ -590,11 +591,11 @@ namespace Icarus
 
         private async Task Event_MessageUpdated( DiscordClient sender, MessageUpdateEventArgs e )
         {
-            if ( e.Message.Author.IsBot )
+            if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
             }
-            if ( e.Message.Timestamp < Core.BotStartUpStamp )
+            if ( e.Message.Author.IsBot )
             {
                 return;
             }

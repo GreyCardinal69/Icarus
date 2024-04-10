@@ -129,9 +129,10 @@ namespace Icarus.Modules.Other
                             $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
                             $"`UpdateServerFields`: Adds new and or removes old server profile's data fields.\n\n" +
-                            $"`addtimedreminder` <name> <content> <repeat> <type> <date>: Adds a timed reminder which goes off either at a fixed hour of a day or every x days+hours+minutes. If it is the second option you need write `-r`, if not write `-t` for `<type>`. In <date> for the second option write `0-0-0` where the first number is for days, the second for hours, and the last for minutes. For the first option write `Day-hour`, where hour is from `0-23`, for the day write the first two letters of the target day.\n\n" +
-                            $"`removetimedreminder`: Deletes a registered timed reminder.\n\n" +
-                            $"`profile`: Responds with information on the server profile.\n\n",
+                            $"`AddTimedReminder` <name> <content> <repeat> <type> <date>: Adds a timed reminder which goes off either at a certain date with an option to repeat. In the name and content use \"_\" for spaces, there are 3 options for `<date>`, -r, -t and -e. -r Adds day-hour-minute amount of time to the current date, in that order and format with numbers. -t Works with specific day-hour system, hour is 0-23 and for the day insert the first two letters of the day. -e Sets a timer for a very specific date in month-day-hour format. This type of reminder does not repeat even if told to.\n\n" +
+                            $"`RemoveTimedReminder`: Deletes a registered timed reminder.\n\n" +
+                            $"`ListTimedReminders`: Responds in a list of all the registered timed reminders.\n\n" +
+                            $"`Profile`: Responds with information on the server profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = ctx.Member.AvatarUrl,
