@@ -9,7 +9,7 @@ namespace Icarus.Modules.Other
     {
         public static string ToMarkdownTable<T>( this IEnumerable<T> source )
         {
-            var properties = typeof( T ).GetRuntimeProperties();
+            IEnumerable<PropertyInfo> properties = typeof( T ).GetRuntimeProperties();
             var fields = typeof( T )
                 .GetRuntimeFields()
                 .Where( f => f.IsPublic );

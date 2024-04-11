@@ -2,6 +2,8 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System;
@@ -35,8 +37,6 @@ namespace Icarus.Modules.Other
                 throw;
             }
 
-            DiscordMember user = fakeContext.Guild.GetMemberAsync( ctx.Message.Author.Id ).Result;
-
             if ( !thread )
             {
                 await fakeContext.RespondAsync( string.Join( " ", rest ) );
@@ -51,7 +51,7 @@ namespace Icarus.Modules.Other
                     return;
                 }
 
-                foreach ( var item in channel.Threads )
+                foreach ( DiscordThreadChannel item in channel.Threads )
                 {
                     if ( item.Id == id3 )
                     {
@@ -61,7 +61,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command("ping")]
+        [Command( "ping" )]
         [Description( "Responds with ping time." )]
         public async Task Ping( CommandContext ctx )
         {
@@ -95,8 +95,8 @@ namespace Icarus.Modules.Other
             await ctx.TriggerTypingAsync();
             try
             {
-                var messages = await ctx.Channel.GetMessagesAsync( count );
-                foreach ( var item in messages )
+                IReadOnlyList<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync( count );
+                foreach ( DiscordMessage item in messages )
                 {
                     await ctx.Channel.DeleteMessageAsync( item );
                 }
@@ -129,19 +129,19 @@ namespace Icarus.Modules.Other
             await ctx.TriggerTypingAsync();
             try
             {
-                StringBuilder sb = new( Constants.ChannelExportFirstHalf.Length );
+                StringBuilder sb = new StringBuilder( Constants.ChannelExportFirstHalf.Length );
                 DiscordChannel channel = ctx.Guild.GetChannel( id );
 
                 sb.Append( @$"<!DOCTYPE html><html lang=""en""><head><title>{ctx.Guild.Name} {channel.Name}</title>" );
                 sb.Append( Constants.ChannelExportFirstHalf );
 
-                var exportsDir = $"Exports\\";
-                var exportId = $"{ctx.Guild.Name.Replace( " ", "" )}{new Random().Next( 1, int.MaxValue )}";
-                var fileDir = $"{exportsDir}\\{exportId}.html";
-                var imagesDir = $"{exportsDir}{exportId}_Images\\";
+                string exportsDir = $"Exports\\";
+                string exportId = $"{ctx.Guild.Name.Replace( " ", "" )}{new Random().Next( 1, int.MaxValue )}";
+                string fileDir = $"{exportsDir}\\{exportId}.html";
+                string imagesDir = $"{exportsDir}{exportId}_Images\\";
 
                 using var client = new WebClient();
-                var iconPath = $"{imagesDir}\\{ctx.Guild.Name}.jpg";
+                string iconPath = $"{imagesDir}\\{ctx.Guild.Name}.jpg";
 
                 sb.Append( @"<body><div class=""preamble""><div class=""preamble__guild-icon-container""><img class=""preamble__guild-icon"" src=""" );
                 sb.Append( $"{exportId}_Images\\{ctx.Guild.Name}.jpg" );
@@ -153,7 +153,7 @@ namespace Icarus.Modules.Other
                 sb.Append( channel.Topic );
                 sb.Append( @"</div></div></div><div class=""chatlog"">" );
 
-                var messages = channel.GetMessagesAsync( 100000000 ).Result.ToArray();
+                DiscordMessage[] messages = channel.GetMessagesAsync( 100000000 ).Result.ToArray();
                 ulong oldId = 0;
                 bool open = false;
 
@@ -208,7 +208,7 @@ namespace Icarus.Modules.Other
                         }
                         if ( item.Attachments.Count > 0 )
                         {
-                            foreach ( var att in item.Attachments )
+                            foreach ( DiscordAttachment att in item.Attachments )
                             {
                                 sb.Append( $@"
                         <div class=""chatlog__attachment "" onclick="""">
@@ -273,7 +273,7 @@ namespace Icarus.Modules.Other
                         }
                         if ( item.Attachments.Count > 0 )
                         {
-                            foreach ( var att in item.Attachments )
+                            foreach ( DiscordAttachment att in item.Attachments )
                             {
                                 sb.Append( $@"
                         <div class=""chatlog__attachment "" onclick="""">
@@ -333,7 +333,7 @@ namespace Icarus.Modules.Other
                         }
                         if ( item.Attachments.Count > 0 )
                         {
-                            foreach ( var att in item.Attachments )
+                            foreach ( DiscordAttachment att in item.Attachments )
                             {
                                 sb.Append( $@"
                         <div class=""chatlog__attachment "" onclick="""">
@@ -351,11 +351,11 @@ namespace Icarus.Modules.Other
                 sb.Append( $@"</div><div class=""postamble""><div class=""postamble__entry"">Exported {messages.Length} messages(s).</div></div>" );
                 sb.Append( "</body></html>" );
 
-                foreach ( var item in Directory.GetDirectories( "Exports\\" ) )
+                foreach ( string item in Directory.GetDirectories( "Exports\\" ) )
                 {
                     if ( !item.EndsWith( "Data" ) )
                     {
-                        foreach ( var file in Directory.GetFiles( item ) )
+                        foreach ( string file in Directory.GetFiles( item ) )
                         {
                             File.Delete( file );
                         }
@@ -363,7 +363,7 @@ namespace Icarus.Modules.Other
                     }
                 }
 
-                foreach ( var item in Directory.GetFiles( "Exports\\" ) )
+                foreach ( string item in Directory.GetFiles( "Exports\\" ) )
                 {
                     File.Delete( item );
                 }
@@ -384,13 +384,16 @@ namespace Icarus.Modules.Other
                         }
                     }
                     string path2 = $"{imagesDir}{item.Author.Username}.jpg";
-                    client.DownloadFile( item.Author.AvatarUrl, path2 );
+                    if ( !File.Exists( path2 ) )
+                    {
+                        client.DownloadFile( item.Author.AvatarUrl, path2 );
+                    }
                 }
 
                 ZipFile.CreateFromDirectory( @"Exports\\", exportPath );
-                using var fs = new FileStream( exportPath, FileMode.Open, FileAccess.Read );
+                using FileStream fs = new FileStream( exportPath, FileMode.Open, FileAccess.Read );
 
-                var msg = await new DiscordMessageBuilder()
+                DiscordMessage msg = await new DiscordMessageBuilder()
                     .AddFile( $"{channel.Name}.zip", fs )
                     .SendAsync( ctx.Channel );
             }
@@ -410,10 +413,10 @@ namespace Icarus.Modules.Other
             DiscordMessage fromMsg = await ctx.Channel.GetMessageAsync( from );
             DiscordMessage toMsg = await ctx.Channel.GetMessageAsync( to );
 
-            var messagesBefore = await ctx.Channel.GetMessagesBeforeAsync( to, amount );
-            var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( from, amount );
+            IReadOnlyList<DiscordMessage> messagesBefore = await ctx.Channel.GetMessagesBeforeAsync( to, amount );
+            IReadOnlyList<DiscordMessage> messagesAfter = await ctx.Channel.GetMessagesAfterAsync( from, amount );
 
-            var filtered = messagesAfter.Union( messagesBefore ).Distinct().Where(
+            IEnumerable<DiscordMessage> filtered = messagesAfter.Union( messagesBefore ).Distinct().Where(
                 x => ( DateTimeOffset.Now - x.Timestamp ).TotalDays <= 14 &&
                 x.Timestamp <= toMsg.Timestamp && x.Timestamp >= fromMsg.Timestamp
             );
@@ -428,19 +431,37 @@ namespace Icarus.Modules.Other
         public async Task Ban( CommandContext ctx, ulong id, int deleteAmount = 0, string reason = "" )
         {
             await ctx.TriggerTypingAsync();
-            DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
 
-            var user = JsonConvert.DeserializeObject<UserProfile>(
-                  File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+            await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
 
-            user.LeaveDate = DateTime.Now;
-            user.BanEntries.Add( new( DateTime.Now, reason ) );
+            InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+            InteractivityResult<DiscordMessage> msg = await interactivity.WaitForMessageAsync
+            (
+                xm => string.Equals( xm.Content, "yes",
+                StringComparison.InvariantCultureIgnoreCase ),
+                TimeSpan.FromSeconds( 30 )
+            );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
-                 JsonConvert.SerializeObject( user, Formatting.Indented ) );
+            if ( !msg.TimedOut && msg.Result.Author.Id == ctx.User.Id )
+            {
+                DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
 
-            await ctx.Guild.BanMemberAsync( id, deleteAmount, reason );
-            await ctx.RespondAsync( $"Banned {member.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
+                UserProfile user = JsonConvert.DeserializeObject<UserProfile>(
+                      File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+
+                user.LeaveDate = DateTime.Now;
+                user.BanEntries.Add( new( DateTime.Now, reason ) );
+
+                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+                     JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
+                await ctx.Guild.BanMemberAsync( id, deleteAmount, reason );
+                await ctx.RespondAsync( $"Banned {member.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
+            }
+            else
+            {
+                await ctx.RespondAsync( "Confirmation time ran out, aborting." );
+            }
         }
 
         [Command( "kick" )]
@@ -450,18 +471,35 @@ namespace Icarus.Modules.Other
         {
             await ctx.TriggerTypingAsync();
 
-            var user = JsonConvert.DeserializeObject<UserProfile>(
-                  File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
+            await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
 
-            user.LeaveDate = DateTime.Now;
-            user.KickEntries.Add( new( DateTime.Now, reason ) );
+            InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+            InteractivityResult<DiscordMessage> msg = await interactivity.WaitForMessageAsync
+            (
+                xm => string.Equals( xm.Content, "yes",
+                StringComparison.InvariantCultureIgnoreCase ),
+                TimeSpan.FromSeconds( 30 )
+            );
 
-            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
-                 JsonConvert.SerializeObject( user, Formatting.Indented ) );
+            if ( !msg.TimedOut && msg.Result.Author.Id == ctx.User.Id )
+            {
+                UserProfile user = JsonConvert.DeserializeObject<UserProfile>(
+                    File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
-            DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
-            await member.RemoveAsync();
-            await ctx.RespondAsync( $"Kicked {member.Mention}, with \"{reason}\" as reason." );
+                user.LeaveDate = DateTime.Now;
+                user.KickEntries.Add( new( DateTime.Now, reason ) );
+
+                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json",
+                     JsonConvert.SerializeObject( user, Formatting.Indented ) );
+
+                DiscordMember member = ctx.Guild.GetMemberAsync( id ).Result;
+                await member.RemoveAsync();
+                await ctx.RespondAsync( $"Kicked {member.Mention}, with \"{reason}\" as reason." );
+            }
+            else
+            {
+                await ctx.RespondAsync( "Confirmation time ran out, aborting." );
+            }
         }
 
         [Command( "unban" )]
@@ -480,7 +518,7 @@ namespace Icarus.Modules.Other
         public async Task ReportServers( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
-            await ctx.RespondAsync( $"Watching {string.Join( ",\n  \t\t\t\t ", ctx.Client.Guilds.Values.ToList() )}" );
+            await ctx.RespondAsync( $"Watching {string.Join( ",\n  \t\t\t\t ", ctx.Client.Guilds.Values.ToList() )}." );
         }
 
         [Command( "setStatus" )]

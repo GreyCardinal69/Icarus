@@ -38,8 +38,8 @@ namespace Icarus.Modules.Other
 
         public static List<string> GetAllFilesFromFolder( string root, bool searchSubfolders )
         {
-            Queue<string> folders = new();
-            List<string> files = new();
+            Queue<string> folders = new Queue<string>();
+            List<string> files = new List<string>();
             folders.Enqueue( root );
             while ( folders.Count != 0 )
             {
@@ -77,18 +77,18 @@ namespace Icarus.Modules.Other
 
             try
             {
-                StringBuilder sb = new( Constants.ChannelExportFirstHalf.Length );
+                StringBuilder sb = new StringBuilder( Constants.ChannelExportFirstHalf.Length );
 
                 sb.Append( @$"<!DOCTYPE html><html lang=""en""><head><title>{ctx.Guild.Name} {channel.Name}</title>" );
                 sb.Append( Constants.ChannelExportFirstHalf );
 
-                var exportsDir = $"Exports\\";
-                var exportId = $"{ctx.Guild.Name.Replace( " ", "" )}{new Random().Next( 1, int.MaxValue )}";
-                var fileDir = $"{exportsDir}\\{exportId}.html";
-                var imagesDir = $"{exportsDir}{exportId}_Images\\";
+                string exportsDir = $"Exports\\";
+                string exportId = $"{ctx.Guild.Name.Replace( " ", "" )}{new Random().Next( 1, int.MaxValue )}";
+                string fileDir = $"{exportsDir}\\{exportId}.html";
+                string imagesDir = $"{exportsDir}{exportId}_Images\\";
 
-                using var client = new WebClient();
-                var iconPath = $"{imagesDir}\\{ctx.Guild.Name}.jpg";
+                using WebClient client = new WebClient();
+                string iconPath = $"{imagesDir}\\{ctx.Guild.Name}.jpg";
 
                 sb.Append( @"<body><div class=""preamble""><div class=""preamble__guild-icon-container""><img class=""preamble__guild-icon"" src=""" );
                 sb.Append( $"{exportId}_Images\\{ctx.Guild.Name}.jpg" );
@@ -279,7 +279,7 @@ namespace Icarus.Modules.Other
                         }
                         if ( item.Attachments.Count > 0 )
                         {
-                            foreach ( var att in item.Attachments )
+                            foreach ( DiscordAttachment att in item.Attachments )
                             {
                                 sb.Append( $@"
                         <div class=""chatlog__attachment "" onclick="""">
@@ -325,13 +325,13 @@ namespace Icarus.Modules.Other
                     {
                         foreach ( DiscordAttachment att in item.Attachments )
                         {
-                            var path = $"{imagesDir}\\{att.FileName}";
+                            string path = $"{imagesDir}\\{att.FileName}";
                             client.DownloadFile( att.Url, path );
                         }
                     }
-                    if ( item.Author != null )
+                    string path2 = $"{imagesDir}{item.Author.Username}.jpg";
+                    if ( item.Author != null && !File.Exists( path2 ) )
                     {
-                        string path2 = $"{imagesDir}{item.Author.Username}.jpg";
                         client.DownloadFile( item.Author.AvatarUrl, path2 );
                     }
                 }

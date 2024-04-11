@@ -89,7 +89,7 @@ namespace Icarus.Modules.Other
 
             try
             {
-                StringBuilder sb = new( Constants.ChannelExportFirstHalf.Length );
+                StringBuilder sb = new StringBuilder( Constants.ChannelExportFirstHalf.Length );
                 DiscordChannel channel = ctx.Guild.GetChannel( ch.Id );
 
                 sb.Append( @$"<!DOCTYPE html><html lang=""en""><head><title>{ctx.Guild.Name} {channel.Name}</title>" );

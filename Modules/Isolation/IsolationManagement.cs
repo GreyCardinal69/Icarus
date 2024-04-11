@@ -65,7 +65,7 @@ namespace Icarus.Modules.Isolation
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{userId}.json",
                  JsonConvert.SerializeObject( userP, Formatting.Indented ) );
 
-            foreach ( var item in user.Roles.ToList() )
+            foreach ( DiscordRole item in user.Roles.ToList() )
             {
                 await user.RevokeRoleAsync( item );
             }
@@ -79,7 +79,7 @@ namespace Icarus.Modules.Isolation
 
             DiscordChannel isolationChannel = ctx.Guild.GetChannel( channelId );
 
-            await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}, for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )}. \n The user will be released on ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
+            await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}, for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )}. \n The user will be released on: ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
         }
 
         [Command( "releaseUser" )]
@@ -109,13 +109,13 @@ namespace Icarus.Modules.Isolation
                 }
             }
 
-            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
-
             if ( !foundEntry )
             {
                 await ctx.RespondAsync( $"No entries found for user {user.Mention}." );
                 return;
             }
+
+            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             await user.RevokeRoleAsync( ctx.Guild.GetRole( entryInfo.PunishmentRoleId ) );
 

@@ -32,7 +32,7 @@ namespace Icarus.Modules.Logs
 
             profile.LogConfig.LogChannel = channelId;
             profile.LogConfig.ToggleLogging( true );
-            await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId ).Mention}" );
+            await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId ).Mention}." );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
@@ -59,7 +59,7 @@ namespace Icarus.Modules.Logs
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             profile.LogConfig.MajorNotificationsChannelId = channelId;
-            await ctx.RespondAsync( $"Set channel for important notifications of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}" );
+            await ctx.RespondAsync( $"Set channel for important notifications of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}." );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
@@ -153,7 +153,7 @@ namespace Icarus.Modules.Logs
             profile.SetContainmentDefaults( channelId, roleId );
             await ctx.RespondAsync(
                 $"Set channel for default containment of {ctx.Guild.Name} at: {ctx.Guild.GetChannel( channelId ).Mention}.\n" +
-                $"Default role for containment is set as {ctx.Guild.Roles[roleId].Mention}"
+                $"Default role for containment is set as {ctx.Guild.Roles[roleId].Mention}."
             );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
@@ -194,9 +194,9 @@ namespace Icarus.Modules.Logs
         {
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync(
-                $"Listing log events: GuildMemberRemoved, GuildMemberAdded, GuildBanRemoved, GuildBanAdded, GuildRoleCreated, GuildRoleUpdated," +
-                $" GuildRoleDeleted, MessageReactionsCleared, MessageReactionRemoved, MessageReactionAdded, MessagesBulkDeleted, MessageDeleted, MessageUpdated, MessagesBulkDeleted, " +
-                $"InviteDeleted, InviteCreated, ChannelUpdated, ChannelDeleted, ChannelCreated"
+                "Listing log events: GuildMemberRemoved, GuildMemberAdded, GuildBanRemoved, GuildBanAdded, GuildRoleCreated, GuildRoleUpdated, GuildRoleDeleted, " +
+                "MessageReactionsCleared, MessageReactionRemoved, MessageReactionAdded, MessagesBulkDeleted, MessageDeleted, MessageUpdated, MessagesBulkDeleted, " +
+                "InviteDeleted, InviteCreated, ChannelUpdated, ChannelDeleted, ChannelCreated."
             );
         }
 
@@ -223,7 +223,7 @@ namespace Icarus.Modules.Logs
 
             foreach ( string Event in eventTypes)
             {
-                var str = Event.ToLower();
+                string str = Event.ToLower();
                 switch ( str )
                 {
                     case "guildmemberremoved":

@@ -162,11 +162,13 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
+            name = name.Replace( '_', ' ' );
+
             for ( int i = 0; i < profile.TimedReminders.Count; i++ )
             {
                 if ( string.Equals(name, profile.TimedReminders[i].Name ) )
                 {
-                    if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {name} already exists." );
+                    await ctx.RespondAsync( $"Timed reminder with ID: \"{name}\" already exists." );
                     return;
                 }
             }

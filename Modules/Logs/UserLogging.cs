@@ -27,7 +27,7 @@ namespace Icarus.Modules.Logs
                 if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json" ) )
                 {
                     i++;
-                    var profile = new UserProfile( user.Id, user.Username )
+                    UserProfile profile = new UserProfile( user.Id, user.Username )
                     {
                         Discriminator = user.Discriminator,
                         CreationDate = user.CreationTimestamp,
@@ -125,19 +125,19 @@ namespace Icarus.Modules.Logs
                 banEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
-            List<string> kickEntries = new();
+            List<string> kickEntries = new List<string>();
             foreach ((DateTime, string) item in user.KickEntries)
             {
                 kickEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
-            List<string> punishmentEntries = new();
+            List<string> punishmentEntries = new List<string>();
             foreach ((DateTime, string) item in user.PunishmentEntries)
             {
                 punishmentEntries.Add( $"{item.Item1}  :  {item.Item2}" );
             }
 
-            List<string> noteEntries = new();
+            List<string> noteEntries = new List<string>();
             foreach ( KeyValuePair<int, string> item in user.Notes )
             {
                 noteEntries.Add( $"    {item.Key}  :  {item.Value}" );
@@ -153,7 +153,7 @@ namespace Icarus.Modules.Logs
                 Title = $"Profile {ctx.Guild.GetMemberAsync(id).Result.Username}",
                 Color = DiscordColor.SpringGreen,
                 Description =
-                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n The user's logged kick entries are: {kicks}.\n\n The user's logged punishment entries are: {strikes}.\n\n The user has the following notes given by moderators: {notes}",
+                    $"The user's id is: {user.ID}.\n Discriminator: #{user.Discriminator}.\n The account was created at {user.CreationDate}.\n The user first joined at: {user.FirstJoinDate}.\n The user last left the server at {user.LeaveDate}.\n\n The user's logged ban entries are: {bans}.\n\n The user's logged kick entries are: {kicks}.\n\n The user's logged punishment entries are: {strikes}.\n\n The user has the following notes given by moderators: {notes}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = ctx.Client.CurrentUser.AvatarUrl,
