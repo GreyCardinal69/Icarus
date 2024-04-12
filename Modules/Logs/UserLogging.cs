@@ -27,7 +27,7 @@ namespace Icarus.Modules.Logs
                 if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{user.Id}.json" ) )
                 {
                     i++;
-                    UserProfile profile = new UserProfile( user.Id, user.Username )
+                    UserProfile profile = new UserProfile( user.Id )
                     {
                         Discriminator = user.Discriminator,
                         CreationDate = user.CreationTimestamp,

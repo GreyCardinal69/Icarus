@@ -20,6 +20,25 @@ namespace Icarus.Modules
         public Dictionary<DateTime, ServerLog> WeeklyLogs = new Dictionary<DateTime, ServerLog>();
         public List<TimedReminder> TimedReminders = new List<TimedReminder>();
 
+
+        public bool HasCustomWelcome => _hasCustomWelcome;
+        public UserWelcome CustomWelcome => _userWelcome;
+
+        private bool _hasCustomWelcome;
+        private UserWelcome _userWelcome;
+
+        public void SetCustomWelcome( UserWelcome content )
+        {
+            _userWelcome = content;
+            _hasCustomWelcome = true;
+        }
+
+        public void RemoveCustomWelcome()
+        {
+            _hasCustomWelcome = false;
+            _userWelcome = new UserWelcome() { };
+        }
+
         public void SetContainmentDefaults( ulong channelId, ulong roleId )
         {
             LogConfig.DefaultContainmentChannelId = channelId;

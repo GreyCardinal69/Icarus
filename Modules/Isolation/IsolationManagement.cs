@@ -109,13 +109,13 @@ namespace Icarus.Modules.Isolation
                 }
             }
 
+            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
+
             if ( !foundEntry )
             {
                 await ctx.RespondAsync( $"No entries found for user {user.Mention}." );
                 return;
             }
-
-            DiscordMember user = ctx.Guild.GetMemberAsync( userId ).Result;
 
             await user.RevokeRoleAsync( ctx.Guild.GetRole( entryInfo.PunishmentRoleId ) );
 

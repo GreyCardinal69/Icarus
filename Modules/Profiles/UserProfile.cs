@@ -21,12 +21,12 @@ namespace Icarus.Modules.Profiles
         public DateTimeOffset FirstJoinDate { get; set; }
         public DateTime LeaveDate { get; set; }
 
-        public UserProfile ( ulong id, string usernameLast )
+        public UserProfile ( ulong id )
         {
-            PunishmentEntries = new();
-            BanEntries = new();
-            KickEntries = new();
-            Notes = new();
+            PunishmentEntries = new List<(DateTime, string)>();
+            BanEntries = new List<(DateTime, string)>();
+            KickEntries = new List<(DateTime, string)>();
+            Notes = new Dictionary<int, string>();
 
             ID = id;
         }

@@ -37,9 +37,9 @@ namespace Icarus
         public DateTime BotStartUpStamp { get; private set; }
         public ulong OwnerId { get; private set; }
 
-        public List<ulong> RegisteredServerIds = new();
-        public List<ServerProfile> ServerProfiles = new();
-        private List<(ulong, int)> _temporaryMessageCounter = new();
+        public List<ulong> RegisteredServerIds = new List<ulong>();
+        public List<ServerProfile> ServerProfiles = new List<ServerProfile>();
+        private List<(ulong, int)> _temporaryMessageCounter = new List<(ulong, int)>();
 
         private Timer _entryCheckTimer;
         private Timer _antiSpamTimer;
@@ -47,11 +47,11 @@ namespace Icarus
 
         private static void Main( string[] args )
         {
-            Core = new();
+            Core = new Program();
 
             List<string> Profiles = Helpers.GetAllFilesFromFolder( AppDomain.CurrentDomain.BaseDirectory + @"ServerProfiles\", false );
 
-            foreach ( var prof in Profiles )
+            foreach ( string prof in Profiles )
             {
                 ServerProfile profile = JsonConvert.DeserializeObject<ServerProfile>( File.ReadAllText( prof ) );
                 Core.ServerProfiles.Add( profile );
@@ -70,7 +70,7 @@ namespace Icarus
             Core._entryCheckTimer.AutoReset = true;
             Core._entryCheckTimer.Enabled = true;
 
-            Core._antiSpamTimer = new( 20000 );
+            Core._antiSpamTimer = new Timer( 20000 );
             Core._antiSpamTimer.Elapsed += async ( sender, e ) => await ResetMessageCache();
             Core._antiSpamTimer.Start();
             Core._antiSpamTimer.AutoReset = true;
@@ -106,7 +106,7 @@ namespace Icarus
 
                 for ( int e = 0; e < profile.TimedReminders.Count; e++ )
                 {
-                    var item = profile.TimedReminders[e];
+                    TimedReminder item = profile.TimedReminders[e];
                     if ( item.HasExpired( now ) )
                     {
                         await tempContext.RespondAsync( item.ToString() );
@@ -148,7 +148,7 @@ namespace Icarus
 
             Core.OwnerId = info.OwnerId;
 
-            var cfg = new DiscordConfiguration
+            DiscordConfiguration cfg = new DiscordConfiguration
             {
                 Intents = DiscordIntents.All,
                 Token = info.Token,
@@ -185,7 +185,7 @@ namespace Icarus
             Client.ChannelCreated += Event_ChannelCreated;
             Client.ChannelDeleted += Event_ChannelDeleted;
 
-            var slash = Client.UseSlashCommands();
+            SlashCommandsExtension slash = Client.UseSlashCommands();
             slash.RegisterCommands<SlashCommands>();
             // Server specific class, not included in repository.
             slash.RegisterCommands<EventHorizonSlash>();
@@ -240,7 +240,7 @@ namespace Icarus
                             Timestamp = DateTime.Now,
                         };
 
-                        StringBuilder sb = new();
+                        StringBuilder sb = new StringBuilder();
 
                         Helpers.ArchiveInput(CreateCommandContext(args.Guild.Id, args.Channel.Id ), args.Messages, args.Channel );
 
@@ -263,11 +263,11 @@ namespace Icarus
         public CommandContext CreateCommandContext( ulong guildId, ulong channelId )
         {
             CommandsNextExtension cmds = this.Client.GetCommandsNext();
-            Command cmd = cmds.FindCommand( "isolate", out var customArgs );
+            Command cmd = cmds.FindCommand( "isolate", out string? customArgs );
             customArgs = "[]help. Hunting For Pulsars.";
             DiscordGuild guild = Program.Core.Client.GetGuildAsync( guildId ).Result;
 
-            var channel = guild.GetChannel( channelId ) ?? throw new Exception( "Invalid channel id." );
+            DiscordChannel channel = guild.GetChannel( channelId ) ?? throw new Exception( "Invalid channel id." );
             CommandContext context = cmds.CreateFakeContext( Core.Client.CurrentUser, channel, "isolate", ">", cmd, customArgs );
             return context;
         }
@@ -296,7 +296,7 @@ namespace Icarus
                 return;
             }
 
-            var perms = user.Permissions;
+            Permissions perms = user.Permissions;
 
             if ( perms.HasPermission( Permissions.Administrator )    ||
                  perms.HasPermission( Permissions.BanMembers )       ||
@@ -310,11 +310,11 @@ namespace Icarus
                 return;
             }
 
-            var profile = ServerProfile.ProfileFromId( e.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
             if ( profile == null ) return;
 
-            foreach ( var word in profile.WordBlackList )
+            foreach ( string word in profile.WordBlackList )
             {
                 if ( e.Message.Content.Contains( word ) )
                 {
@@ -372,7 +372,7 @@ namespace Icarus
                             else if ( _temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit )
                             {
                                 await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
-                                var messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
+                                IReadOnlyList<DiscordMessage> messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
                                 await fakeContext.Channel.DeleteMessagesAsync( messages );
                                 await user.GrantRoleAsync( e.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
                                 await fakeContext.RespondAsync(
@@ -399,7 +399,7 @@ namespace Icarus
                 }
             }
 
-            foreach ( var link in Database.ScamLinks )
+            foreach ( string link in Database.ScamLinks )
             {
                 if ( e.Message.Content.Contains( link ) )
                 {
@@ -412,12 +412,12 @@ namespace Icarus
                         $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
                     );
 
-                    foreach ( var role in user.Roles )
+                    foreach ( DiscordRole role in user.Roles )
                     {
                         await user.RevokeRoleAsync( role );
                     }
 
-                    var userP = JsonConvert.DeserializeObject<UserProfile>(
+                    UserProfile userP = JsonConvert.DeserializeObject<UserProfile>(
                           File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
 
                     userP.PunishmentEntries.Add( (DateTime.Now, "User posted a scam message.") );
@@ -439,7 +439,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteDeleted )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Invite Deleted**\n\n\n",
                             Color = DiscordColor.IndianRed,
@@ -468,7 +468,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.InviteCreated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Invite Created**\n\n\n",
                             Color = DiscordColor.Wheat,
@@ -497,7 +497,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelUpdated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Channel Updated**",
                             Color = DiscordColor.Wheat,
@@ -531,7 +531,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelDeleted )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Channel Deleted**",
                             Color = DiscordColor.Red,
@@ -564,7 +564,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.ChannelCreated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Channel Created**",
                             Color = DiscordColor.Wheat,
@@ -600,21 +600,21 @@ namespace Icarus
                 return;
             }
 
-            var profile = ServerProfile.ProfileFromId( e.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( e.Guild.Id );
 
             if ( profile == null ) return;
 
-            foreach ( var word in profile.WordBlackList )
+            foreach ( string word in profile.WordBlackList )
             {
 
-                var user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
+                DiscordMember user = e.Guild.GetMemberAsync( e.Message.Author.Id ).Result;
 
                 if ( e.Message.Content.Contains( word ) )
                 {
-                    var cmds = Program.Core.Client.GetCommandsNext();
-                    var cmd = cmds.FindCommand( "isolate", out var customArgs );
+                    CommandsNextExtension cmds = Program.Core.Client.GetCommandsNext();
+                    Command cmd = cmds.FindCommand( "isolate", out var customArgs );
                     customArgs = "[]help. Hunting For Pulsars.";
-                    var guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
+                    DiscordGuild guild = Program.Core.Client.GetGuildAsync( e.Guild.Id ).Result;
                     await cmds.CreateFakeContext( user, guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId ), "isolate", ">", cmd, customArgs )
                         .RespondAsync(
                         $"The following user {e.Author.Mention} mentioned {word} in {e.Channel.Mention}, message link: {e.Message.JumpLink}.\n" +
@@ -630,7 +630,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageUpdated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Message Updated!**\n\n\n",
                             Color = DiscordColor.Gold,
@@ -670,7 +670,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionAdded )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Message Reaction Added**",
                             Color = DiscordColor.Wheat,
@@ -709,7 +709,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionsCleared )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Message Reactions Cleared**",
                             Color = DiscordColor.IndianRed,
@@ -739,7 +739,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageReactionRemoved )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Message Reaction Removed**",
                             Color = DiscordColor.IndianRed,
@@ -774,7 +774,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleDeleted )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Role Deleted**",
                             Color = DiscordColor.Red,
@@ -807,7 +807,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleUpdated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Role Updated**",
                             Color = DiscordColor.Wheat,
@@ -839,7 +839,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildRoleCreated )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Role Created**",
                             Color = DiscordColor.Wheat,
@@ -871,7 +871,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**User Banned**",
                             Color = DiscordColor.Red,
@@ -907,7 +907,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildBanAdded )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**User Unbanned**",
                             Color = DiscordColor.SpringGreen,
@@ -935,12 +935,15 @@ namespace Icarus
 
         private async Task Event_GuildMemberAdded( DiscordClient sender, GuildMemberAddEventArgs e )
         {
-            // this is specific for one server
-            if ( e.Guild.Id == 740528944129900565 )
+            ServerProfile serverProfile = ServerProfile.ProfileFromId( e.Guild.Id );
+            if ( serverProfile.HasCustomWelcome )
             {
-                await e.Member.GrantRoleAsync( e.Guild.GetRole( 740557101843087441 ) );
-                var main = e.Guild.GetChannel( 740528944641736756 );
-                await main.SendMessageAsync( e.Member.Mention + " I am watching you, and welcome." );
+                if ( serverProfile.CustomWelcome.RoleId != 0 )
+                {
+                    await e.Member.GrantRoleAsync( e.Guild.GetRole( serverProfile.CustomWelcome.RoleId ) );
+                }
+                DiscordChannel main = e.Guild.GetChannel( serverProfile.CustomWelcome.ChannelId );
+                await main.SendMessageAsync( serverProfile.CustomWelcome.Message.Replace("MENTION", $"{e.Member.Mention}") );
             }
             for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
@@ -948,7 +951,7 @@ namespace Icarus
                 {
                     if ( !File.Exists( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) )
                     {
-                        var profile = new UserProfile( e.Member.Id, e.Member.Username )
+                        UserProfile profile = new UserProfile( e.Member.Id )
                         {
                             Discriminator = e.Member.Discriminator,
                             CreationDate = e.Member.CreationTimestamp,
@@ -964,7 +967,7 @@ namespace Icarus
 
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberAdded )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**User Joined**",
                             Color = DiscordColor.SpringGreen,

@@ -1,10 +1,13 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
+using Icarus.Modules.Isolation;
 using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,12 +20,12 @@ namespace Icarus.Modules.Servers
         [Command( "registerProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task RegisterServer ( CommandContext ctx, bool overWrite = false )
+        public async Task RegisterServer( CommandContext ctx, bool overWrite = false )
         {
             await ctx.TriggerTypingAsync();
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
 
-            if (File.Exists( $"{profilesPath}{ctx.Guild.Id}.json" ) && !overWrite)
+            if ( File.Exists( $"{profilesPath}{ctx.Guild.Id}.json" ) && !overWrite )
             {
                 await ctx.RespondAsync( $"A server profile for this server already exists, do you want to overwrite it ? If yes type `>registerserver true`" );
                 return;
@@ -33,11 +36,11 @@ namespace Icarus.Modules.Servers
                 Name = ctx.Guild.Name,
                 ID = ctx.Guild.Id,
                 ProfileCreationDate = DateTime.Now,
-                WordBlackList = new(),
-                AntiSpam = new(),
-                AntiSpamIgnored = new(),
-                Entries = new(),
-                LogConfig = new(),
+                WordBlackList = new List<string>(),
+                AntiSpam = new AntiSpamProfile(),
+                AntiSpamIgnored = new List<ulong>(),
+                Entries = new List<IsolationEntry>(),
+                LogConfig = new LogProfile(),
             };
 
             Program.Core.RegisteredServerIds.Add( ctx.Guild.Id );
@@ -50,11 +53,11 @@ namespace Icarus.Modules.Servers
         [Command( "confAntiSpam" )]
         [Description( "Changes server anti spam module configurations." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
-        public async Task EnableLogging ( CommandContext ctx, int first, int second, int third, int limit )
+        public async Task EnableLogging( CommandContext ctx, int first, int second, int third, int limit )
         {
             await ctx.TriggerTypingAsync();
 
-            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
             {
                 await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
                 return;
@@ -62,7 +65,7 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            profile.AntiSpam = new()
+            profile.AntiSpam = new AntiSpamProfile()
             {
                 FirstWarning = first,
                 SecondWarning = second,
@@ -81,11 +84,11 @@ namespace Icarus.Modules.Servers
         [Command( "antiSpamIgnore" )]
         [Description( "Tells the anti spam module to ignore the specified channels." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
-        public async Task EnableLogging ( CommandContext ctx, params ulong[] channels )
+        public async Task EnableLogging( CommandContext ctx, params ulong[] channels )
         {
             await ctx.TriggerTypingAsync();
 
-            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
             {
                 await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
                 return;
@@ -95,7 +98,7 @@ namespace Icarus.Modules.Servers
             DiscordChannel[] mentions = new DiscordChannel[channels.Length];
 
             int i = 0;
-            foreach (var item in channels)
+            foreach ( ulong item in channels )
             {
                 mentions[i] = ctx.Guild.GetChannel( item );
                 profile.AntiSpamIgnored.Add( item );
@@ -103,7 +106,7 @@ namespace Icarus.Modules.Servers
             }
 
             await ctx.RespondAsync(
-                $"Configured anti spam module to ignore the following channels: {string.Join(", ", mentions.Select( x => x.Mention ) ) }."
+                $"Configured anti spam module to ignore the following channels: {string.Join( ", ", mentions.Select( x => x.Mention ) )}."
             );
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
@@ -121,7 +124,7 @@ namespace Icarus.Modules.Servers
                 return;
             }
 
-            var profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
             await ctx.RespondAsync( $"Updated server profile fields." );
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
@@ -130,20 +133,81 @@ namespace Icarus.Modules.Servers
         [Command( "antiSpamReset" )]
         [Description( "Resets anti spam module ignored channels" )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
-        public async Task ResetAntiSpamIgnored ( CommandContext ctx )
+        public async Task ResetAntiSpamIgnored( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
 
-            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
             {
                 await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
                 return;
             }
 
-            var profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
             profile.AntiSpamIgnored.Clear();
 
-            await ctx.RespondAsync($"The anti spam module no longer ignores any channels.");
+            await ctx.RespondAsync( $"The anti spam module no longer ignores any channels." );
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "DisableCustomWelcome" )]
+        [Description( "Disables the custom welcome message for the server." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task DisableCustomWelcome( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            if ( !profile.HasCustomWelcome )
+            {
+                await ctx.RespondAsync("Server does not have a set custom welcome message.");
+                return;
+            }
+
+            await ctx.RespondAsync( "Custom welcome message removed." );
+
+            profile.RemoveCustomWelcome();
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "SetCustomWelcome" )]
+        [Description( "Sets a custom welcome message that the bot will execute for new users." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task SetCustomWelcome( CommandContext ctx, string message, ulong roleId, ulong channelId )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, aborting." );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            if ( message == "" || channelId == 0 )
+            {
+                await ctx.RespondAsync( "Invalid message or channelId." );
+                return;
+            }
+
+            await ctx.RespondAsync( "Custom welcome message set!" );
+
+            profile.SetCustomWelcome( new UserWelcome()
+            {
+                ChannelId = channelId,
+                Message = message,
+                RoleId = roleId,
+            } );
+
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
@@ -173,7 +237,7 @@ namespace Icarus.Modules.Servers
                 }
             }
 
-            var reminder = new TimedReminder( name.Replace( '_', ' ' ), content.Replace( '_', ' ' ), repeat, dateType, date );
+            TimedReminder reminder = new TimedReminder( name.Replace( '_', ' ' ), content.Replace( '_', ' ' ), repeat, dateType, date );
 
             profile.TimedReminders.Add( reminder );
             await ctx.RespondAsync( $"Timed Reminder: `{name}` successfully added.\nThe reminder will go off at: <t:{reminder.ExpDate}>." );
@@ -255,8 +319,8 @@ namespace Icarus.Modules.Servers
 
             await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
 
-            var interactivity = ctx.Client.GetInteractivity();
-            var msg = await interactivity.WaitForMessageAsync
+            InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+            InteractivityResult<DiscordMessage> msg = await interactivity.WaitForMessageAsync
             (
                 xm => string.Equals(xm.Content, "yes",
                 StringComparison.InvariantCultureIgnoreCase),
@@ -341,14 +405,14 @@ namespace Icarus.Modules.Servers
                 i++;
             }
 
-            var ignores = string.Join( ", ", mentions );
+            string ignores = string.Join( ", ", mentions );
 
-            var defChannel = ctx.Guild.GetChannel( profile.LogConfig.LogChannel );
-            var majorNotifChannel = ctx.Guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId );
-            var defaultContainmentChannel = ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId );
-            var containmentRole = ctx.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId );
+            DiscordChannel defChannel = ctx.Guild.GetChannel( profile.LogConfig.LogChannel );
+            DiscordChannel majorNotifChannel = ctx.Guild.GetChannel( profile.LogConfig.MajorNotificationsChannelId );
+            DiscordChannel defaultContainmentChannel = ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId );
+            DiscordRole containmentRole = ctx.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId );
 
-            var embed = new DiscordEmbedBuilder
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
             {
                 Title = $"Server Profile for {ctx.Guild.Name}",
                 Color = DiscordColor.SpringGreen,
