@@ -17,7 +17,7 @@ namespace Icarus.Modules.Servers
 {
     public class ServerManagement : BaseCommandModule
     {
-        [Command( "registerProfile" )]
+        [Command( "RegisterProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterServer( CommandContext ctx, bool overWrite = false )
@@ -50,7 +50,7 @@ namespace Icarus.Modules.Servers
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
         }
 
-        [Command( "confAntiSpam" )]
+        [Command( "ConfAntiSpam" )]
         [Description( "Changes server anti spam module configurations." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task EnableLogging( CommandContext ctx, int first, int second, int third, int limit )
@@ -81,7 +81,7 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "antiSpamIgnore" )]
+        [Command( "AntiSpamIgnore" )]
         [Description( "Tells the anti spam module to ignore the specified channels." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task EnableLogging( CommandContext ctx, params ulong[] channels )
@@ -130,7 +130,7 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "antiSpamReset" )]
+        [Command( "AntiSpamReset" )]
         [Description( "Resets anti spam module ignored channels" )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task ResetAntiSpamIgnored( CommandContext ctx )
@@ -309,7 +309,7 @@ namespace Icarus.Modules.Servers
             if ( !removed ) await ctx.RespondAsync( $"Timed reminder with ID: {clean} not found." );
         }
 
-        [Command( "deleteProfile" )]
+        [Command( "DeleteProfile" )]
         [Description( "Deletes the server profile of the server." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task RegisterServer ( CommandContext ctx )
@@ -340,7 +340,7 @@ namespace Icarus.Modules.Servers
             }
         }
 
-        [Command( "profile" )]
+        [Command( "Profile" )]
         [Description( "Responds with information on the server profile." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task Profile ( CommandContext ctx )
@@ -355,51 +355,51 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            StringBuilder enabledEvents = new();
+            List<string> enabledEvents = new List<string>();
 
             if (profile.LogConfig.GuildMemberRemoved)
-                enabledEvents.Append( "GuildMemberRemoved, " );
+                enabledEvents.Add( "GuildMemberRemoved" );
             if (profile.LogConfig.GuildMemberAdded)
-                enabledEvents.Append( "GuildMemberAdded, " );
+                enabledEvents.Add( "GuildMemberAdded" );
             if (profile.LogConfig.GuildBanRemoved)
-                enabledEvents.Append( "GuildBanRemoved, " );
+                enabledEvents.Add( "GuildBanRemoved" );
             if (profile.LogConfig.GuildBanAdded)
-                enabledEvents.Append( "GuildBanAdded, " );
+                enabledEvents.Add( "GuildBanAdde" );
             if (profile.LogConfig.GuildRoleCreated)
-                enabledEvents.Append( "GuildRoleCreated, " );
+                enabledEvents.Add( "GuildRoleCreate " );
             if (profile.LogConfig.GuildRoleUpdated)
-                enabledEvents.Append( "GuildRoleUpdated, " );
+                enabledEvents.Add( "GuildRoleUpdated" );
             if (profile.LogConfig.GuildRoleDeleted)
-                enabledEvents.Append( "GuildRoleDeleted, " );
+                enabledEvents.Add( "GuildRoleDeleted" );
             if (profile.LogConfig.MessageReactionsCleared)
-                enabledEvents.Append( "MessageReactionsCleared, " );
+                enabledEvents.Add( "MessageReactionsCleared" );
             if (profile.LogConfig.MessageReactionRemoved)
-                enabledEvents.Append( "MessageReactionRemoved, " );
+                enabledEvents.Add( "MessageReactionRemoved" );
             if (profile.LogConfig.MessageReactionAdded)
-                enabledEvents.Append( "MessageReactionAdded, " );
+                enabledEvents.Add( "MessageReactionAdded" );
             if (profile.LogConfig.MessagesBulkDeleted)
-                enabledEvents.Append( "MessagesBulkDeleted, " );
+                enabledEvents.Add( "MessagesBulkDeleted" );
             if (profile.LogConfig.MessageCreated)
-                enabledEvents.Append( "MessageCreated, " );
+                enabledEvents.Add( "MessageCreated" );
             if (profile.LogConfig.MessageDeleted)
-                enabledEvents.Append( "MessageDeleted, " );
+                enabledEvents.Add( "MessageDeleted" );
             if (profile.LogConfig.MessageUpdated)
-                enabledEvents.Append( "MessageUpdated, " );
+                enabledEvents.Add( "MessageUpdated" );
             if (profile.LogConfig.InviteCreated)
-                enabledEvents.Append( "InviteCreated, " );
+                enabledEvents.Add( "InviteCreated" );
             if (profile.LogConfig.InviteDeleted)
-                enabledEvents.Append( "InviteDeleted, " );
+                enabledEvents.Add( "InviteDeleted" );
             if (profile.LogConfig.ChannelCreated)
-                enabledEvents.Append( "ChannelCreated, " );
+                enabledEvents.Add( "ChannelCreated" );
             if (profile.LogConfig.ChannelDeleted)
-                enabledEvents.Append( "ChannelDeleted, " );
+                enabledEvents.Add( "ChannelDeleted" );
             if (profile.LogConfig.ChannelUpdated)
-                enabledEvents.Append( "ChannelUpdated." );
+                enabledEvents.Add( "ChannelUpdated" );
 
             string[] mentions = new string[profile.AntiSpamIgnored.Count];
 
             int i = 0;
-            foreach (var item in profile.AntiSpamIgnored)
+            foreach (ulong item in profile.AntiSpamIgnored)
             {
                 mentions[i] = ctx.Guild.GetChannel( item ).Mention;
                 i++;
@@ -412,21 +412,31 @@ namespace Icarus.Modules.Servers
             DiscordChannel defaultContainmentChannel = ctx.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId );
             DiscordRole containmentRole = ctx.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId );
 
+            StringBuilder timedReminders = new StringBuilder("```");
+
+            foreach ( TimedReminder item in profile.TimedReminders )
+            {
+                timedReminders.Append( $"{item.Name}: Will go off at: {DateTimeOffset.FromUnixTimeSeconds(item.ExpDate)} / <t:{item.ExpDate}> in Unix.\n\n" );
+            }
+            timedReminders.Append( "```" );
+            Console.WriteLine(profile.HasCustomWelcome);
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder
             {
                 Title = $"Server Profile for {ctx.Guild.Name}",
                 Color = DiscordColor.SpringGreen,
                 Description =
-                    $"Logging Enabled?: {profile.LogConfig.LoggingEnabled}.\n\n" +
-                    $"Logging enabled for following events: {(enabledEvents.Length == 0 ? "NONE" : enabledEvents)}\n\n" +
+                    $"Logging Enabled?: `{profile.LogConfig.LoggingEnabled}`.\n\n" +
+                    $"Logging enabled for following events: ```{(enabledEvents.Count == 0 ? "NONE" : string.Join(", ", enabledEvents))}.```\n" +
                     $"Default notifications are sent to: {( defChannel == null ? "NONE" : defChannel.Mention)}.\n\n" +
                     $"Major notifications are sent to: {(majorNotifChannel == null ? "NONE" :majorNotifChannel.Mention)}.\n\n" +
                     $"The default containment channel is: {( defaultContainmentChannel  == null ? "NONE" : defaultContainmentChannel.Mention)}.\n\n" +
                     $"The default containment role is: {( containmentRole  == null ? "NONE" : containmentRole.Mention)}.\n\n" +
-                    $"The server contains {profile.Entries.Count} active isolation entries.\n\n" +
-                    $"Anti spam is configured at {profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit} " +
+                    $"The server contains `{profile.Entries.Count}` active isolation entries.\n\n" +
+                    $"Anti spam is configured at `{profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit}` " +
                     $"messages per 20 seconds. The following channels are exempt from anti spam module: {(ignores.Length == 0 ? "None" : ignores)}.\n\n" +
-                    $"The following words are black-listed and users mentioning them will be reported: {string.Join(", ", profile.WordBlackList)}.\n\n" +
+                    $"The following words are black-listed and users mentioning them will be reported: ```{string.Join(", ", profile.WordBlackList)}.```\n" +
+                    $"The server has the following Timed Reminders queued:\n {(profile.TimedReminders.Count > 0 ? timedReminders : "None")}\n" +
+                    $"The server has the following custom user welcome system set:\n {(profile.HasCustomWelcome ? $"\tMessage: {profile.CustomWelcome.Message}\n \tThe following role will be granted: {(profile.CustomWelcome.RoleId == 0 ? "None" : ctx.Guild.GetRole(profile.CustomWelcome.RoleId).Mention)}.\n\tIn the following channel: {ctx.Guild.GetChannel(profile.CustomWelcome.ChannelId).Mention}." : "`Not Set`.")}\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

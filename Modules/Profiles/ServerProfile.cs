@@ -1,5 +1,6 @@
 ﻿using Icarus.Modules.Isolation;
 using Icarus.Modules.Profiles;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -20,11 +21,13 @@ namespace Icarus.Modules
         public Dictionary<DateTime, ServerLog> WeeklyLogs = new Dictionary<DateTime, ServerLog>();
         public List<TimedReminder> TimedReminders = new List<TimedReminder>();
 
-
+        [JsonIgnore]
         public bool HasCustomWelcome => _hasCustomWelcome;
+        [JsonIgnore]
         public UserWelcome CustomWelcome => _userWelcome;
-
+        [JsonProperty]
         private bool _hasCustomWelcome;
+        [JsonProperty]
         private UserWelcome _userWelcome;
 
         public void SetCustomWelcome( UserWelcome content )
