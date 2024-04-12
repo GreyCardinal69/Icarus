@@ -20,7 +20,7 @@ namespace Icarus.Modules.Servers
         [Command( "RegisterProfile" )]
         [Description( "Creates a server profile for the server where executed." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task RegisterServer( CommandContext ctx, bool overWrite = false )
+        public async Task RegisterProfile( CommandContext ctx, bool overWrite = false )
         {
             await ctx.TriggerTypingAsync();
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
@@ -31,13 +31,12 @@ namespace Icarus.Modules.Servers
                 return;
             }
 
-            ServerProfile Profile = new()
+            ServerProfile Profile = new ServerProfile()
             {
                 Name = ctx.Guild.Name,
                 ID = ctx.Guild.Id,
                 ProfileCreationDate = DateTime.Now,
                 WordBlackList = new List<string>(),
-                AntiSpam = new AntiSpamProfile(),
                 AntiSpamIgnored = new List<ulong>(),
                 Entries = new List<IsolationEntry>(),
                 LogConfig = new LogProfile(),
@@ -50,10 +49,10 @@ namespace Icarus.Modules.Servers
             await ctx.RespondAsync( $"Created a new server profile for {ctx.Guild.Name}." );
         }
 
-        [Command( "ConfAntiSpam" )]
-        [Description( "Changes server anti spam module configurations." )]
+        [Command( "EnableAntiSpam" )]
+        [Description( "Enabled and sets the server anti spam module configurations." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
-        public async Task EnableLogging( CommandContext ctx, int first, int second, int third, int limit )
+        public async Task EnableAntiSpam( CommandContext ctx, int first, int second, int third, int limit )
         {
             await ctx.TriggerTypingAsync();
 
@@ -65,14 +64,7 @@ namespace Icarus.Modules.Servers
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            profile.AntiSpam = new AntiSpamProfile()
-            {
-                FirstWarning = first,
-                SecondWarning = second,
-                LastWarning = third,
-                Limit = limit,
-                CacheResetInterval = 20
-            };
+            profile.EnableAntiSpam( 20, first, second, third, limit );
 
             await ctx.RespondAsync(
                 $"Changed anti spam configurations. Message cache is reset every 20 seconds. First warning is issued if a user sends {first} messages " +
@@ -81,10 +73,29 @@ namespace Icarus.Modules.Servers
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
+        [Command( "DisableAntiSpam" )]
+        [Description( "Enabled and sets the server anti spam module configurations." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task DisableAntiSpam( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, can not change anti spam configurations." );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            profile.DisableAntiSpamModule();
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
         [Command( "AntiSpamIgnore" )]
         [Description( "Tells the anti spam module to ignore the specified channels." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
-        public async Task EnableLogging( CommandContext ctx, params ulong[] channels )
+        public async Task AntiSpamIgnore( CommandContext ctx, params ulong[] channels )
         {
             await ctx.TriggerTypingAsync();
 
@@ -133,7 +144,7 @@ namespace Icarus.Modules.Servers
         [Command( "AntiSpamReset" )]
         [Description( "Resets anti spam module ignored channels" )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
-        public async Task ResetAntiSpamIgnored( CommandContext ctx )
+        public async Task AntiSpamReset( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
 
@@ -312,7 +323,7 @@ namespace Icarus.Modules.Servers
         [Command( "DeleteProfile" )]
         [Description( "Deletes the server profile of the server." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task RegisterServer ( CommandContext ctx )
+        public async Task DeleteProfile( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
             string profilesPath = AppDomain.CurrentDomain.BaseDirectory + @$"\ServerProfiles\";
@@ -342,7 +353,7 @@ namespace Icarus.Modules.Servers
 
         [Command( "Profile" )]
         [Description( "Responds with information on the server profile." )]
-        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task Profile ( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
@@ -432,11 +443,10 @@ namespace Icarus.Modules.Servers
                     $"The default containment channel is: {( defaultContainmentChannel  == null ? "NONE" : defaultContainmentChannel.Mention)}.\n\n" +
                     $"The default containment role is: {( containmentRole  == null ? "NONE" : containmentRole.Mention)}.\n\n" +
                     $"The server contains `{profile.Entries.Count}` active isolation entries.\n\n" +
-                    $"Anti spam is configured at `{profile.AntiSpam.FirstWarning}, {profile.AntiSpam.SecondWarning}, {profile.AntiSpam.LastWarning}, {profile.AntiSpam.Limit}` " +
-                    $"messages per 20 seconds. The following channels are exempt from anti spam module: {(ignores.Length == 0 ? "None" : ignores)}.\n\n" +
+                    $"Anti spam is configured at: {( profile.AntiSpamModuleActive ? ( $"`{profile.AntiSpamProfile.FirstWarning}, {profile.AntiSpamProfile.SecondWarning}, {profile.AntiSpamProfile.LastWarning}, {profile.AntiSpamProfile.Limit}` messages per 20 seconds. The following channels are exempt from anti spam module: {( ignores.Length == 0 ? "None" : ignores )}.\n\n" ) : "Not Set ( Disabled ).\n\n" )}" +
                     $"The following words are black-listed and users mentioning them will be reported: ```{string.Join(", ", profile.WordBlackList)}.```\n" +
                     $"The server has the following Timed Reminders queued:\n {(profile.TimedReminders.Count > 0 ? timedReminders : "None")}\n" +
-                    $"The server has the following custom user welcome system set:\n {(profile.HasCustomWelcome ? $"\tMessage: {profile.CustomWelcome.Message}\n \tThe following role will be granted: {(profile.CustomWelcome.RoleId == 0 ? "None" : ctx.Guild.GetRole(profile.CustomWelcome.RoleId).Mention)}.\n\tIn the following channel: {ctx.Guild.GetChannel(profile.CustomWelcome.ChannelId).Mention}." : "`Not Set`.")}\n\n" +
+                    $"The server has the following custom user welcome system set: {(profile.HasCustomWelcome ? $"\n\tMessage: {profile.CustomWelcome.Message}\n \tThe following role will be granted: {(profile.CustomWelcome.RoleId == 0 ? "None" : ctx.Guild.GetRole(profile.CustomWelcome.RoleId).Mention)}.\n\tIn the following channel: {ctx.Guild.GetChannel(profile.CustomWelcome.ChannelId).Mention}." : "`Not Set`.")}\n\n" +
                     $"Server profile created at: {profile.ProfileCreationDate}.",
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

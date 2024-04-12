@@ -11,7 +11,7 @@ namespace Icarus.Modules.Other
         [Command( "Help" )]
         [Description( "Responds with information on available command categories." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
-        public async Task HelpBasic ( CommandContext ctx, params string[] text )
+        public async Task HelpCommand ( CommandContext ctx, params string[] text )
         {
             await ctx.TriggerTypingAsync();
             DiscordEmbedBuilder embed;
@@ -120,21 +120,22 @@ namespace Icarus.Modules.Other
                         Description =
                             $"`registerProfile <overWrite>`: Creates a server profile for the server where executed. " +
                             $"if <overWrite> is true replaces the existing profile for the server with a new one.\n\n" +
-                            $"`confAntiSpam <first> <second> <third> <limit>`: Changes server anti spam module configurations. " +
+                            $"`EnableAntiSpam <first> <second> <third> <limit>`: Enabled and sets the server anti spam module configurations. " +
                             $"First warning is given when within the interval ( 20 seconds ) a user sends <first> amount of messages, " +
                             $"the second when <second> amount of messages are sent, last if <third> amount of messages, " +
                             $"on reaching <limit> the user's actions are considered spam and he is isolated at the " +
                             $"default containment channel. A notification is sent to the major notifications channel.\n\n" +
+                            $"`disableAntiSpam`: Disables the server's anti spam module.\n\n" +
                             $"`antiSpamIgnore <array of channel ids>`: Tells the anti spam module to ignore the specified channels.\n\n" +
                             $"`antiSpamReset`: Tells the anti spam to no longer ignore any channels in the server.\n\n" +
                             $"`deleteProfile`: Deletes the server profile of the server.\n\n" +
-                            $"`UpdateServerFields`: Adds new and or removes old server profile's data fields.\n\n" +
-                            $"`AddTimedReminder <name> <content> <repeat> <type> <date>`: Adds a timed reminder which goes off either at a certain date with an option to repeat. In the name and content use \"\\_\" for spaces, there are 3 options for `<date>`, -r, -t and -e. -r Adds day-hour-minute amount of time to the current date, in that order and format with numbers. -t Works with specific day-hour system, hour is 0-23 and for the day insert the first two letters of the day. -e Sets a timer for a very specific date in month-day-hour format. This type of reminder does not repeat even if told to.\n\n" +
-                            $"`RemoveTimedReminder`: Deletes a registered timed reminder.\n\n" +
-                            $"`ListTimedReminders`: Responds in a list of all the registered timed reminders.\n\n" +
-                            $"`SetCustomWelcome <welcome_message> <role_id> <channel_id>`: Sets a custom welcome message for the server. The bot will send the given `<welcome_message>` in the channel with id `<channel_id>` and assign the user the role with id `<role_id>`. If you want the bot to mention the user write `MENTION` in the welcome message, the bot will replace it with a user mention. If you don't want the bot to assign a role leave the `<role_id>` as 0.\n\n" +
-                            $"`DisableCustomWelcome`: Removes the custom welcome message for the server if it exists.\n\n" +
-                            $"`Profile`: Responds with information on the server profile.\n\n",
+                            $"`updateServerFields`: Adds new and or removes old server profile's data fields.\n\n" +
+                            $"`addTimedReminder <name> <content> <repeat> <type> <date>`: Adds a timed reminder which goes off either at a certain date with an option to repeat. In the name and content use \"\\_\" for spaces, there are 3 options for `<date>`, -r, -t and -e. -r Adds day-hour-minute amount of time to the current date, in that order and format with numbers. -t Works with specific day-hour system, hour is 0-23 and for the day insert the first two letters of the day. -e Sets a timer for a very specific date in month-day-hour format. This type of reminder does not repeat even if told to.\n\n" +
+                            $"`removeTimedReminder`: Deletes a registered timed reminder.\n\n" +
+                            $"`listTimedReminders`: Responds in a list of all the registered timed reminders.\n\n" +
+                            $"`setCustomWelcome <welcome_message> <role_id> <channel_id>`: Sets a custom welcome message for the server. The bot will send the given `<welcome_message>` in the channel with id `<channel_id>` and assign the user the role with id `<role_id>`. If you want the bot to mention the user write `MENTION` in the welcome message, the bot will replace it with a user mention. If you don't want the bot to assign a role leave the `<role_id>` as 0.\n\n" +
+                            $"`disableCustomWelcome`: Removes the custom welcome message for the server if it exists.\n\n" +
+                            $"`profile`: Responds with information on the server profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             IconUrl = ctx.Member.AvatarUrl,

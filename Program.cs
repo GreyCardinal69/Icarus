@@ -326,79 +326,6 @@ namespace Icarus
                 }
             }
 
-            if ( !profile.AntiSpamIgnored.Contains( e.Channel.Id ) )
-            {
-                if ( _temporaryMessageCounter.Count <= 0 )
-                {
-                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
-                }
-
-                bool found = false;
-                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
-                {
-                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if ( !found )
-                {
-                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
-                }
-
-                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
-                {
-                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
-                    {
-                        _temporaryMessageCounter[i] = (e.Author.Id, _temporaryMessageCounter[i].Item2 + 1);
-                        if ( _temporaryMessageCounter[i].Item2 >= profile.AntiSpam.FirstWarning )
-                        {
-                            CommandContext fakeContext = CreateCommandContext( e.Guild.Id, e.Channel.Id );
-
-                            if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.FirstWarning )
-                            {
-                                await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
-                            }
-                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.SecondWarning )
-                            {
-                                await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
-                            }
-                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpam.LastWarning )
-                            {
-                                await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
-                            }
-                            else if ( _temporaryMessageCounter[i].Item2 > profile.AntiSpam.Limit )
-                            {
-                                await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
-                                IReadOnlyList<DiscordMessage> messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
-                                await fakeContext.Channel.DeleteMessagesAsync( messages );
-                                await user.GrantRoleAsync( e.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
-                                await fakeContext.RespondAsync(
-                                    $"Isolated user {user.Mention} at {e.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
-                                    $"The user's actions were considered spam. " +
-                                    $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
-                                );
-                                foreach ( var role in user.Roles )
-                                {
-                                    await user.RevokeRoleAsync( role );
-                                }
-
-                                var userP = JsonConvert.DeserializeObject<UserProfile>(
-                                     File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
-
-                                userP.PunishmentEntries.Add( (DateTime.Now, "User's actions were considered spam.") );
-
-                                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
-                                     JsonConvert.SerializeObject( userP, Formatting.Indented ) );
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-
             foreach ( string link in Database.ScamLinks )
             {
                 if ( e.Message.Content.Contains( link ) )
@@ -426,6 +353,81 @@ namespace Icarus
                          JsonConvert.SerializeObject( userP, Formatting.Indented ) );
 
                     await e.Message.DeleteAsync();
+                }
+            }
+
+            if ( !profile.AntiSpamModuleActive ) return;
+
+            if ( !profile.AntiSpamIgnored.Contains( e.Channel.Id ) )
+            {
+                if ( _temporaryMessageCounter.Count <= 0 )
+                {
+                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
+                }
+
+                bool found = false;
+                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
+                {
+                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if ( !found )
+                {
+                    _temporaryMessageCounter.Add( (e.Author.Id, 1) );
+                }
+
+                for ( int i = 0; i < _temporaryMessageCounter.Count; i++ )
+                {
+                    if ( _temporaryMessageCounter[i].Item1 == e.Author.Id )
+                    {
+                        _temporaryMessageCounter[i] = (e.Author.Id, _temporaryMessageCounter[i].Item2 + 1);
+                        if ( _temporaryMessageCounter[i].Item2 >= profile.AntiSpamProfile.FirstWarning )
+                        {
+                            CommandContext fakeContext = CreateCommandContext( e.Guild.Id, e.Channel.Id );
+
+                            if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpamProfile.FirstWarning )
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} Stop sending messages so quickly." );
+                            }
+                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpamProfile.SecondWarning )
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} Your actions are considered spam." );
+                            }
+                            else if ( _temporaryMessageCounter[i].Item2 == profile.AntiSpamProfile.LastWarning )
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} This is your final warning, calm down." );
+                            }
+                            else if ( _temporaryMessageCounter[i].Item2 > profile.AntiSpamProfile.Limit )
+                            {
+                                await fakeContext.RespondAsync( $"{e.Author.Mention} You will be isolated now." );
+                                IReadOnlyList<DiscordMessage> messages = await fakeContext.Channel.GetMessagesAsync( _temporaryMessageCounter[i].Item2 + 4 );
+                                await fakeContext.Channel.DeleteMessagesAsync( messages );
+                                await user.GrantRoleAsync( e.Guild.GetRole( profile.LogConfig.DefaultContainmentRoleId ) );
+                                await fakeContext.RespondAsync(
+                                    $"Isolated user {user.Mention} at {e.Guild.GetChannel( profile.LogConfig.DefaultContainmentChannelId ).Mention}. " +
+                                    $"The user's actions were considered spam. " +
+                                    $"Revoked the following roles from the user: {string.Join( ", ", user.Roles.Select( x => x.Mention ).ToArray() )}."
+                                );
+                                foreach ( var role in user.Roles )
+                                {
+                                    await user.RevokeRoleAsync( role );
+                                }
+
+                                var userP = JsonConvert.DeserializeObject<UserProfile>(
+                                     File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json" ) );
+
+                                userP.PunishmentEntries.Add( (DateTime.Now, "User's actions were considered spam.") );
+
+                                File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Author.Id}.json",
+                                     JsonConvert.SerializeObject( userP, Formatting.Indented ) );
+                            }
+                        }
+                        break;
+                    }
                 }
             }
             return;
@@ -999,7 +1001,7 @@ namespace Icarus
             {
                 if ( e.Guild.Id == ServerProfiles[i].ID )
                 {
-                    var user = JsonConvert.DeserializeObject<UserProfile>(
+                    UserProfile user = JsonConvert.DeserializeObject<UserProfile>(
                         File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{e.Guild.Id}UserProfiles\{e.Member.Id}.json" ) );
 
                     user.LeaveDate = DateTime.Now;
@@ -1009,7 +1011,7 @@ namespace Icarus
 
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.GuildMemberRemoved )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**User Removed**",
                             Color = DiscordColor.Red,
@@ -1048,7 +1050,7 @@ namespace Icarus
                 {
                     if ( ServerProfiles[i].LogConfig.LoggingEnabled && ServerProfiles[i].LogConfig.MessageDeleted )
                     {
-                        var embed = new DiscordEmbedBuilder
+                        DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                         {
                             Title = "**Message Deleted**",
                             Color = DiscordColor.Red,
@@ -1091,7 +1093,6 @@ namespace Icarus
 
         private Task Client_ClientError( DiscordClient sender, ClientErrorEventArgs e )
         {
-            //Console.Clear();
             sender.Logger.LogError( BotEventId, e.Exception, "Exception occured" );
             return Task.CompletedTask;
         }

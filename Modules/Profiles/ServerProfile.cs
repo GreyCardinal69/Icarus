@@ -13,7 +13,6 @@ namespace Icarus.Modules
         public string Name;
         public ulong ID;
         public LogProfile LogConfig = new LogProfile();
-        public AntiSpamProfile AntiSpam = new AntiSpamProfile() { CacheResetInterval = 20, FirstWarning = 5, LastWarning = 9, Limit = 12, SecondWarning = 7 };
         public List<IsolationEntry> Entries = new List<IsolationEntry>();
         public List<ulong> AntiSpamIgnored = new List<ulong>();
         public List<string> WordBlackList = new List<string>();
@@ -21,14 +20,27 @@ namespace Icarus.Modules
         public Dictionary<DateTime, ServerLog> WeeklyLogs = new Dictionary<DateTime, ServerLog>();
         public List<TimedReminder> TimedReminders = new List<TimedReminder>();
 
-        [JsonIgnore]
-        public bool HasCustomWelcome => _hasCustomWelcome;
-        [JsonIgnore]
-        public UserWelcome CustomWelcome => _userWelcome;
-        [JsonProperty]
-        private bool _hasCustomWelcome;
-        [JsonProperty]
-        private UserWelcome _userWelcome;
+        [JsonIgnore] public AntiSpamProfile AntiSpamProfile => _antiSpamProfile;
+        [JsonIgnore] public bool AntiSpamModuleActive => _antiSpamModuleActive;
+        [JsonIgnore] public bool HasCustomWelcome => _hasCustomWelcome;
+        [JsonIgnore] public UserWelcome CustomWelcome => _userWelcome;
+
+        [JsonProperty] private bool _hasCustomWelcome;
+        [JsonProperty] private UserWelcome _userWelcome;
+        [JsonProperty] private bool _antiSpamModuleActive;
+        [JsonProperty] private AntiSpamProfile _antiSpamProfile;
+
+        public void EnableAntiSpam( int interval, int first, int second, int last, int limit )
+        {
+            _antiSpamProfile = new AntiSpamProfile() { CacheResetInterval = interval, FirstWarning = first, LastWarning = last, Limit = limit, SecondWarning = second };
+            _antiSpamModuleActive = true;
+        }
+
+        public void DisableAntiSpamModule()
+        {
+            _antiSpamModuleActive = false;
+            _antiSpamProfile = new AntiSpamProfile();
+        }
 
         public void SetCustomWelcome( UserWelcome content )
         {

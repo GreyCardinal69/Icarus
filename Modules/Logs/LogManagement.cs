@@ -195,7 +195,7 @@ namespace Icarus.Modules.Logs
             await ctx.TriggerTypingAsync();
             await ctx.RespondAsync(
                 "Listing log events: GuildMemberRemoved, GuildMemberAdded, GuildBanRemoved, GuildBanAdded, GuildRoleCreated, GuildRoleUpdated, GuildRoleDeleted, " +
-                "MessageReactionsCleared, MessageReactionRemoved, MessageReactionAdded, MessagesBulkDeleted, MessageDeleted, MessageUpdated, MessagesBulkDeleted, " +
+                "MessageReactionsCleared, MessageReactionRemoved, MessageReactionAdded, MessagesBulkDeleted, MessageDeleted, MessageUpdated, " +
                 "InviteDeleted, InviteCreated, ChannelUpdated, ChannelDeleted, ChannelCreated."
             );
         }
