@@ -113,12 +113,12 @@ namespace Icarus
                         if ( !item.Repeat )
                         {
                             profile.TimedReminders.Remove( item );
-                            await tempContext.RespondAsync($"Timed Reminder not set to repeat, removing it from server reminders list.");
+                            await tempContext.RespondAsync( $"Timed Reminder not set to repeat, removing it from server reminders list." );
                             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{tempContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
                         }
                         else
                         {
-                            item.UpdateExpDate( );
+                            item.UpdateExpDate();
                             await tempContext.RespondAsync( $"Timed Reminder set to repeat, repeating..\n Next time the reminder will go off at <t:{item.ExpDate}>." );
                             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{tempContext.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
                         }
@@ -216,6 +216,7 @@ namespace Icarus
             Commands.RegisterCommands<ServerManagement>();
             Commands.RegisterCommands<IsolationManagement>();
             Commands.RegisterCommands<UserLogging>();
+            // Server specific class, not included in repository.
             Commands.RegisterCommands<EventHorizon>();
 
             await Client.ConnectAsync();
@@ -235,20 +236,20 @@ namespace Icarus
                         {
                             Title = "**Messages Purged!**\n\n\n",
                             Color = DiscordColor.Red,
-                            Description = 
+                            Description =
                             $"{args.Messages.Count} Messages were deleted in {args.Channel.Mention}.\n\n Attaching purge archive above:",
                             Timestamp = DateTime.Now,
                         };
 
                         StringBuilder sb = new StringBuilder();
 
-                        Helpers.ArchiveInput(CreateCommandContext(args.Guild.Id, args.Channel.Id ), args.Messages, args.Channel );
+                        Helpers.ArchiveInput( CreateCommandContext( args.Guild.Id, args.Channel.Id ), args.Messages, args.Channel );
 
                         using FileStream fs = new FileStream( $"{AppDomain.CurrentDomain.BaseDirectory}Export.zip", FileMode.Open, FileAccess.Read );
 
                         DiscordMessage msg = await new DiscordMessageBuilder()
                             .AddFile( $"{AppDomain.CurrentDomain.BaseDirectory}Export.zip", fs )
-                            .AddEmbed(embed)
+                            .AddEmbed( embed )
                             .SendAsync( channel );
                     }
                     else
@@ -298,13 +299,13 @@ namespace Icarus
 
             Permissions perms = user.Permissions;
 
-            if ( perms.HasPermission( Permissions.Administrator )    ||
-                 perms.HasPermission( Permissions.BanMembers )       ||
-                 perms.HasPermission( Permissions.KickMembers )      ||
-                 perms.HasPermission( Permissions.ManageChannels )   ||
-                 perms.HasPermission( Permissions.ManageGuild )      ||
-                 perms.HasPermission( Permissions.ManageMessages )   ||
-                 perms.HasPermission( Permissions.ManageRoles )      ||
+            if ( perms.HasPermission( Permissions.Administrator ) ||
+                 perms.HasPermission( Permissions.BanMembers ) ||
+                 perms.HasPermission( Permissions.KickMembers ) ||
+                 perms.HasPermission( Permissions.ManageChannels ) ||
+                 perms.HasPermission( Permissions.ManageGuild ) ||
+                 perms.HasPermission( Permissions.ManageMessages ) ||
+                 perms.HasPermission( Permissions.ManageRoles ) ||
                  perms.HasPermission( Permissions.ManageEmojis ) )
             {
                 return;
@@ -320,7 +321,7 @@ namespace Icarus
                 {
                     CommandContext context = CreateCommandContext( e.Guild.Id, profile.LogConfig.MajorNotificationsChannelId );
 
-                    await context.RespondAsync( $"The following user {e.Author.Mention} mentioned \"{word}\" in {e.Channel.Mention}.");
+                    await context.RespondAsync( $"The following user {e.Author.Mention} mentioned \"{word}\" in {e.Channel.Mention}." );
                     await context.RespondAsync( "Message Jump Link: " + e.Message.JumpLink.ToString() );
                     break;
                 }
@@ -945,7 +946,7 @@ namespace Icarus
                     await e.Member.GrantRoleAsync( e.Guild.GetRole( serverProfile.CustomWelcome.RoleId ) );
                 }
                 DiscordChannel main = e.Guild.GetChannel( serverProfile.CustomWelcome.ChannelId );
-                await main.SendMessageAsync( serverProfile.CustomWelcome.Message.Replace("MENTION", $"{e.Member.Mention}") );
+                await main.SendMessageAsync( serverProfile.CustomWelcome.Message.Replace( "MENTION", $"{e.Member.Mention}" ) );
             }
             for ( int i = 0; i < ServerProfiles.Count; i++ )
             {

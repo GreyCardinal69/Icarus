@@ -61,7 +61,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "ping" )]
+        [Command( "Ping" )]
         [Description( "Responds with ping time." )]
         public async Task Ping( CommandContext ctx )
         {
@@ -69,7 +69,7 @@ namespace Icarus.Modules.Other
             await ctx.RespondAsync( $"Ping: {ctx.Client.Ping}ms." );
         }
 
-        [Command( "erase" )]
+        [Command( "Erase" )]
         [Description( "Deletes set amount of messages if possible." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task Erase( CommandContext ctx, int count )
@@ -87,7 +87,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "eraseaggressive" )]
+        [Command( "EraseAggressive" )]
         [Description( "Deletes set amount of messages if possible, can delete messages older than 2 weeeks." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task EraseAggressive( CommandContext ctx, int count )
@@ -108,7 +108,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "archive" )]
+        [Command( "Archive" )]
         [Description( "Exports a discord channel and sends it as a .zip file." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task Archive( CommandContext ctx, ulong id )
@@ -404,7 +404,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "eraseFromTo" )]
+        [Command( "EraseFromTo" )]
         [Description( "Deletes all messages from the first to the second specified message." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task EraseFromTo( CommandContext ctx, ulong from, ulong to, int amount )
@@ -425,14 +425,14 @@ namespace Icarus.Modules.Other
             await ctx.RespondAsync( $"Erased: {filtered.Count()} messages, called by {ctx.User.Mention}." );
         }
 
-        [Command( "ban" )]
+        [Command( "Ban" )]
         [Description( "Bans a user with optional amount of messages to delete." )]
         [RequireUserPermissions( DSharpPlus.Permissions.BanMembers )]
         public async Task Ban( CommandContext ctx, ulong id, int deleteAmount = 0, string reason = "" )
         {
             await ctx.TriggerTypingAsync();
 
-            await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
+            await ctx.RespondAsync( "Confirm action by responding with \"yes\"." );
 
             InteractivityExtension interactivity = ctx.Client.GetInteractivity();
             InteractivityResult<DiscordMessage> msg = await interactivity.WaitForMessageAsync
@@ -464,14 +464,14 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "kick" )]
+        [Command( "Kick" )]
         [Description( "Kicks a user with an optional reason." )]
         [RequireUserPermissions( DSharpPlus.Permissions.KickMembers )]
         public async Task Kick( CommandContext ctx, ulong id, string reason = "" )
         {
             await ctx.TriggerTypingAsync();
 
-            await ctx.RespondAsync( "Confirm action by responding with \"yes\" " );
+            await ctx.RespondAsync( "Confirm action by responding with \"yes\"." );
 
             InteractivityExtension interactivity = ctx.Client.GetInteractivity();
             InteractivityResult<DiscordMessage> msg = await interactivity.WaitForMessageAsync
@@ -502,7 +502,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [Command( "unban" )]
+        [Command( "Unban" )]
         [Description( "Unbans a user." )]
         [RequireUserPermissions( DSharpPlus.Permissions.BanMembers )]
         public async Task Unban( CommandContext ctx, ulong id )
@@ -512,7 +512,7 @@ namespace Icarus.Modules.Other
             await ctx.RespondAsync( $"Unbanned {ctx.Guild.GetMemberAsync( id ).Result.Mention}." );
         }
 
-        [Command( "reportServers" )]
+        [Command( "ReportServers" )]
         [Description( "Responds with information on serving servers." )]
         [RequireOwner]
         public async Task ReportServers( CommandContext ctx )
@@ -521,7 +521,7 @@ namespace Icarus.Modules.Other
             await ctx.RespondAsync( $"Watching {string.Join( ",\n  \t\t\t\t ", ctx.Client.Guilds.Values.ToList() )}." );
         }
 
-        [Command( "setStatus" )]
+        [Command( "SetStatus" )]
         [Description( "Sets the bot's status." )]
         [RequireOwner]
         public async Task SetActivity( CommandContext ctx, int type, [RemainingText] string status )

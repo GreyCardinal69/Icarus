@@ -17,18 +17,19 @@ namespace Icarus.Modules
         public List<ulong> AntiSpamIgnored = new List<ulong>();
         public List<string> WordBlackList = new List<string>();
         public DateTime ProfileCreationDate { get; init; }
-        public Dictionary<DateTime, ServerLog> WeeklyLogs = new Dictionary<DateTime, ServerLog>();
         public List<TimedReminder> TimedReminders = new List<TimedReminder>();
 
         [JsonIgnore] public AntiSpamProfile AntiSpamProfile => _antiSpamProfile;
         [JsonIgnore] public bool AntiSpamModuleActive => _antiSpamModuleActive;
         [JsonIgnore] public bool HasCustomWelcome => _hasCustomWelcome;
         [JsonIgnore] public UserWelcome CustomWelcome => _userWelcome;
+        [JsonIgnore] public ServerLog CurrentWeeklyLog => _currentWeeklyLog;
 
         [JsonProperty] private bool _hasCustomWelcome;
         [JsonProperty] private UserWelcome _userWelcome;
         [JsonProperty] private bool _antiSpamModuleActive;
         [JsonProperty] private AntiSpamProfile _antiSpamProfile;
+        [JsonProperty] private ServerLog _currentWeeklyLog;
 
         public void EnableAntiSpam( int interval, int first, int second, int last, int limit )
         {

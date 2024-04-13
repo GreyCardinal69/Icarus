@@ -9,7 +9,7 @@ namespace Icarus.Modules.Logs
 {
     public class LogManagement : BaseCommandModule
     {
-        [Command( "enableLogging" )]
+        [Command( "EnableLogging" )]
         [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
         [Require​User​Permissions​( DSharpPlus.Permissions.ManageChannels )]
         public async Task EnableLogging ( CommandContext ctx, ulong channelId )
@@ -37,7 +37,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "setMajorLogChannel" )]
+        [Command( "SetMajorLogChannel" )]
         [Description( "Sets the channel for major notifications." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageChannels )]
         public async Task SetMajorNotificationsChannel ( CommandContext ctx, ulong channelId )
@@ -64,7 +64,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "addWordsBl" )]
+        [Command( "AddWordsBl" )]
         [Description( "Adds words to the word blacklist." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task AddWordBlacklist ( CommandContext ctx, params string[] words )
@@ -95,7 +95,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "removeWordsBL" )]
+        [Command( "RemoveWordsBL" )]
         [Description( "Removes the specified words from the server's black-listed words." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task RemoveWordBlacklist ( CommandContext ctx, params string[] words )
@@ -123,7 +123,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "setContainmentDefaults" )]
+        [Command( "SetContainmentDefaults" )]
         [Description( "Sets default containment channel and role id-s." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task SetDefaultContainmentIds ( CommandContext ctx, ulong channelId, ulong roleId )
@@ -159,7 +159,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "disableLogging" )]
+        [Command( "DisableLogging" )]
         [Description( "Disables logging for the server executed in, logs go into the specified channel." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
         public async Task DisableLogging ( CommandContext ctx, ulong channelId )
@@ -187,7 +187,7 @@ namespace Icarus.Modules.Logs
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
         }
 
-        [Command( "logEvents" )]
+        [Command( "LogEvents" )]
         [Description( "Responds with available log events." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
         public async Task LogEvents ( CommandContext ctx )
@@ -200,10 +200,10 @@ namespace Icarus.Modules.Logs
             );
         }
 
-        [Command( "toggleLogEvents" )]
+        [Command( "ToggleLogEvents" )]
         [Description( "Toggles log events for the server executed in, invalid events will be ignored." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.Administrator )]
-        public async Task EnableLogEvents ( CommandContext ctx, params string[] eventTypes )
+        public async Task ToggleLogEvents( CommandContext ctx, params string[] eventTypes )
         {
             await ctx.TriggerTypingAsync();
 
@@ -221,7 +221,7 @@ namespace Icarus.Modules.Logs
 
             ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
 
-            foreach ( string Event in eventTypes)
+            foreach ( string Event in eventTypes )
             {
                 string str = Event.ToLower();
                 switch ( str )

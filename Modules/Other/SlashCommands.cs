@@ -1,11 +1,11 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext.Attributes;
+﻿using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
 using Icarus.Modules.Profiles;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -17,27 +17,21 @@ namespace Icarus.Modules.Other
 {
     public class SlashCommands : ApplicationCommandModule
     {
-        [SlashCommand( "GiveIn", "Willfully report your personal information to GreySoc." )]
-        public async Task TestCommand( InteractionContext ctx )
-        {
-            await ctx.CreateResponseAsync( InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent( "Your home address, coordinates and credit card information has been added to the GreySoc database, we thank you for your obedience." ) );
-        }
-
-        [SlashCommand( "ping", "Command for bot latency time." )]
+        [SlashCommand( "Ping", "Command for bot latency time." )]
         [Description( "Responds with ping time." )]
         public async Task Ping( InteractionContext ctx )
         {
             await ctx.CreateResponseAsync( $"Ping: {ctx.Client.Ping}ms." );
         }
 
-        [SlashCommand( "erase", $"Deletes N amount of messages if possible." )]
+        [SlashCommand( "Erase", $"Deletes N amount of messages if possible." )]
         [Description( "Deletes set amount of messages if possible." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task Erase( InteractionContext ctx, [Option( "Count", "The amount of messages to delete." )] long n )
         {
             try
             {
-                var messages = await ctx.Channel.GetMessagesAsync( Convert.ToInt32( n ) );
+                IReadOnlyList<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync( Convert.ToInt32( n ) );
                 await ctx.Channel.DeleteMessagesAsync( messages );
                 await ctx.CreateResponseAsync( $"Erased: {n} messages, called by {ctx.User.Mention}." );
             }
@@ -47,15 +41,15 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [SlashCommand( "eraseAggressive", "Deletes N amount of messages, can delete messages older than 2 weeeks." )]
+        [SlashCommand( "EraseAggressive", "Deletes N amount of messages, can delete messages older than 2 weeeks." )]
         [Description( "Deletes set amount of messages if possible, can delete messages older than 2 weeeks." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task EraseAggressive( InteractionContext ctx, [Option( "Count", "The amount of messages to delete." )] long N )
         {
             try
             {
-                var messages = await ctx.Channel.GetMessagesAsync( ( int ) N );
-                foreach ( var item in messages )
+                IReadOnlyList<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync( ( int ) N );
+                foreach ( DiscordMessage item in messages )
                 {
                     await ctx.Channel.DeleteMessageAsync( item );
                 }
@@ -67,7 +61,7 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [SlashCommand( "archive", "Exports a discord channel and sends it as a .zip file." )]
+        [SlashCommand( "Archive", "Exports a discord channel and sends it as a .zip file." )]
         [Description( "Exports a discord channel and sends it as a .zip file." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.ManageMessages )]
         public async Task Archive( InteractionContext ctx, [Option( "Channel", "The channel to export." )] DiscordChannel ch )
@@ -361,19 +355,19 @@ namespace Icarus.Modules.Other
             }
         }
 
-        [SlashCommand( "eraseFromTo", "Deletes all messages from the first to the second specified message." )]
+        [SlashCommand( "EraseFromTo", "Deletes all messages from the first to the second specified message." )]
         [Description( "Deletes all messages from the first to the second specified message." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.ManageMessages )]
-        public async Task EraseFromTo( InteractionContext ctx, [Option( "From", "The message to delete from." )] string from, [Option( "To", "The message to delete towards." )] string to, [Option( "Amount", "The amount of messages to delete." )] long amount )
+        public async Task EraseFromTo( InteractionContext ctx, [Option( "From", "The message to delete from ( ID )." )] string from, [Option( "To", "The message to delete towards ( ID )." )] string to, [Option( "Amount", "The amount of messages to delete." )] long amount )
         {
             ulong ufrom = Convert.ToUInt64( from );
             ulong uto = Convert.ToUInt64( to );
             int uamount = Convert.ToInt32 ( amount );
 
-            var fromMsg = await ctx.Channel.GetMessageAsync( ufrom );
-            var toMsg = await ctx.Channel.GetMessageAsync( uto );
+            DiscordMessage fromMsg = await ctx.Channel.GetMessageAsync( ufrom );
+            DiscordMessage toMsg = await ctx.Channel.GetMessageAsync( uto );
 
-            var messagesAfter = await ctx.Channel.GetMessagesAfterAsync( ufrom, uamount );
+            IReadOnlyList<DiscordMessage> messagesAfter = await ctx.Channel.GetMessagesAfterAsync( ufrom, uamount );
 
             DiscordMessage[] filtered = messagesAfter.Where( x => x.Timestamp <= toMsg.Timestamp ).ToArray();
 
@@ -381,16 +375,16 @@ namespace Icarus.Modules.Other
             await ctx.Channel.DeleteMessagesAsync( filtered );
         }
 
-        [SlashCommand( "ban", "Bans a user with optional amount of messages to delete." )]
+        [SlashCommand( "Ban", "Bans a user with optional amount of messages to delete." )]
         [Description( "Bans a user with optional amount of messages to delete." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.BanMembers )]
-        public async Task Ban( InteractionContext ctx, [Option( "Id", "The id of the user to ban." )] string id, [Option( "Amount", "The amount of messages to delete." )] long deleteAmount = 0, [Option( "Reason", "The reasoning for the ban." )] string reason = "" )
+        public async Task Ban( InteractionContext ctx, [Option( "Id", "The ID of the user to ban." )] string id, [Option( "Amount", "The amount of messages to delete." )] long deleteAmount = 0, [Option( "Reason", "The reasoning for the ban." )] string reason = "" )
         {
             ulong uId = Convert.ToUInt64( id );
-            var member = ctx.Guild.GetMemberAsync( uId ).Result;
+            DiscordMember member = ctx.Guild.GetMemberAsync( uId ).Result;
 
             await ctx.CreateResponseAsync( $"Banned {member.Mention}, deleted last {deleteAmount} messages with \"{reason}\" as reason." );
-            var user = JsonConvert.DeserializeObject<UserProfile>(
+            UserProfile user = JsonConvert.DeserializeObject<UserProfile>(
                   File.ReadAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}UserProfiles\{id}.json" ) );
 
             user.LeaveDate = DateTime.Now;
@@ -402,7 +396,7 @@ namespace Icarus.Modules.Other
             await ctx.Guild.BanMemberAsync( member, Convert.ToInt32( deleteAmount ), reason );
         }
         
-        [SlashCommand( "kick", "Kicks a user with an optional reason." )]
+        [SlashCommand( "Kick", "Kicks a user with an optional reason." )]
         [Description( "Kicks a user with an optional reasoning." )]
         [SlashRequirePermissions( DSharpPlus.Permissions.KickMembers )]
         public async Task Kick( InteractionContext ctx, [Option( "ID", "The ID of the user to kick." )] string id, [Option( "Reason", "The reasoning for the kick." )] string reason = "" )

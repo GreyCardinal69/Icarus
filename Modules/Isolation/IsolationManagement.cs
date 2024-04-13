@@ -12,7 +12,7 @@ namespace Icarus.Modules.Isolation
 {
     public class IsolationManagement : BaseCommandModule
     {
-        [Command( "isolate" )]
+        [Command( "Isolate" )]
         [Description( "Isolates a user in a channel with specified parameters." )]
         [Require​User​Permissions​( DSharpPlus.Permissions.ManageRoles )]
         public async Task Isolate( CommandContext ctx, ulong punishmentRoleId, ulong userId, ulong channelId, string timeLen, bool returnRoles, [RemainingText] string reason )
@@ -82,7 +82,7 @@ namespace Icarus.Modules.Isolation
             await ctx.RespondAsync( $"Isolated {user.Mention} at channel: {isolationChannel.Mention}, for {Convert.ToInt32( Math.Abs( ( NewEntry.EntryDate - NewEntry.ReleaseDate ).TotalDays ) )} days. Removed the following roles: {string.Join( ", ", NewEntry.RemovedRoles.Select( X => X.Mention ) )}. \n The user will be released on: ({NewEntry.ReleaseDate}) +- 1-10 minutes. Will the revoked roles be given back on release? {returnRoles}." );
         }
 
-        [Command( "releaseUser" )]
+        [Command( "ReleaseUser" )]
         [Description( "Releases a user from isolation." )]
         [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageRoles )]
         public async Task ReleaseUser( CommandContext ctx, ulong userId )
@@ -160,6 +160,7 @@ namespace Icarus.Modules.Isolation
                 (
                     $"Released user: {user.Mention} from isolation at channel: {fakeContext.Guild.GetChannel( entry.IsolationChannelId ).Mention}.\n The user was isolated for {Convert.ToInt32( Math.Abs( ( DateTime.Now - entry.EntryDate ).TotalDays ) )} days.\n"
                 );
+
             await fakeContext.RespondAsync( $"The isolation was called by this message: {entry.EntryMessageLink}" );
             await fakeContext.RespondAsync( $"Were revoked roles returned? {entry.ReturnRoles}.\n The user was isolated for `\"{entry.Reason}\"`." );
 
