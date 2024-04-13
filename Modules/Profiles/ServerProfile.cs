@@ -23,13 +23,11 @@ namespace Icarus.Modules
         [JsonIgnore] public bool AntiSpamModuleActive => _antiSpamModuleActive;
         [JsonIgnore] public bool HasCustomWelcome => _hasCustomWelcome;
         [JsonIgnore] public UserWelcome CustomWelcome => _userWelcome;
-        [JsonIgnore] public ServerLog CurrentWeeklyLog => _currentWeeklyLog;
 
         [JsonProperty] private bool _hasCustomWelcome;
         [JsonProperty] private UserWelcome _userWelcome;
         [JsonProperty] private bool _antiSpamModuleActive;
         [JsonProperty] private AntiSpamProfile _antiSpamProfile;
-        [JsonProperty] private ServerLog _currentWeeklyLog;
 
         public void EnableAntiSpam( int interval, int first, int second, int last, int limit )
         {
