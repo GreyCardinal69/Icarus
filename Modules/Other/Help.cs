@@ -77,6 +77,8 @@ namespace Icarus.Modules.Other
                             $"`logEvents`: Lists available log events.\n\n" +
                             $"`registerUsers`: Creates profiles for all server users. Must be called when setting up " +
                             $"the bot for the server.\n\n" +
+                            $"`AddLogExclusion <channelId>`: Disables logging in a specific channel.\n\n" +
+                            $"`RemoveLogExclusion <channelId>`: Enables logging in a specific channel after it has been excluded from logging.\n\n" +
                             $"`userProfile <userId>`: Responds with information on a registered user's profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {

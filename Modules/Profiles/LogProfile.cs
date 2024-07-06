@@ -1,4 +1,6 @@
-﻿namespace Icarus.Modules.Profiles
+﻿using System.Collections.Generic;
+
+namespace Icarus.Modules.Profiles
 {
     public class LogProfile
     {
@@ -26,6 +28,7 @@
             "ChannelCreated"
         };
 
+        public List<ulong> ExcludedChannels {  get; set; }
         public bool LoggingEnabled { get; set; }
         public bool GuildMemberRemoved { get; set; }
         public bool GuildMemberAdded { get; set; }

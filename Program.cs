@@ -227,6 +227,11 @@ namespace Icarus
         {
             for ( int i = 0; i < ServerProfiles.Count; i++ )
             {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( args.Channel.Id ) )
+                    return;
+            }
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
                 if ( args.Guild.Id == ServerProfiles[i].ID )
                 {
                     DiscordChannel channel = args.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel );
@@ -275,6 +280,12 @@ namespace Icarus
 
         private async Task Event_MessageCreated( DiscordClient sender, MessageCreateEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
+
             if ( e.Message.Content.Contains( Core.Client.CurrentUser.Mention ) )
             {
                 CommandContext context = CreateCommandContext( e.Guild.Id, e.Channel.Id );
@@ -594,6 +605,11 @@ namespace Icarus
 
         private async Task Event_MessageUpdated( DiscordClient sender, MessageUpdateEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
@@ -663,6 +679,11 @@ namespace Icarus
 
         private async Task Event_MessageReactionAdded( DiscordClient sender, MessageReactionAddEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
@@ -702,6 +723,11 @@ namespace Icarus
 
         private async Task Event_MessageReactionsCleared( DiscordClient sender, MessageReactionsClearEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
@@ -732,6 +758,11 @@ namespace Icarus
 
         private async Task Event_MessageReactionRemoved( DiscordClient sender, MessageReactionRemoveEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;
@@ -1041,6 +1072,11 @@ namespace Icarus
 
         private async Task Event_MessageDeleted( DiscordClient sender, MessageDeleteEventArgs e )
         {
+            for ( int i = 0; i < ServerProfiles.Count; i++ )
+            {
+                if ( ServerProfiles[i].LogConfig.ExcludedChannels.Contains( e.Channel.Id ) )
+                    return;
+            }
             if ( e.Message.Timestamp < Core.BotStartUpStamp )
             {
                 return;

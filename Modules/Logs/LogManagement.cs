@@ -12,17 +12,17 @@ namespace Icarus.Modules.Logs
         [Command( "EnableLogging" )]
         [Description( "Enables logging for the server executed in, logs go into the specified channel." )]
         [Require​User​Permissions​( DSharpPlus.Permissions.ManageChannels )]
-        public async Task EnableLogging ( CommandContext ctx, ulong channelId )
+        public async Task EnableLogging( CommandContext ctx, ulong channelId )
         {
             await ctx.TriggerTypingAsync();
 
-            if (!Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ))
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
             {
                 await ctx.RespondAsync( "Server is not registered, can not enable logging." );
                 return;
             }
 
-            if (!ctx.Guild.Channels.ContainsKey( channelId ))
+            if ( !ctx.Guild.Channels.ContainsKey( channelId ) )
             {
                 await ctx.RespondAsync( $"Invalid channel Id: {channelId}" );
                 return;
@@ -35,6 +35,78 @@ namespace Icarus.Modules.Logs
             await ctx.RespondAsync( $"Enabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId ).Mention}." );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "RemoveLogExclusion" )]
+        [Description( "Enables logging for a specific channel." )]
+        [Require​User​Permissions​( DSharpPlus.Permissions.ManageChannels )]
+        public async Task RemoveLogExclusion( CommandContext ctx, ulong channelId )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            if ( !ctx.Guild.Channels.ContainsKey( channelId ) )
+            {
+                await ctx.RespondAsync( $"Invalid channel Id: {channelId}" );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            if ( profile.LogConfig.ExcludedChannels.Contains( channelId ) )
+            {
+                profile.LogConfig.ExcludedChannels.Remove( channelId );
+            }
+            else
+            {
+                await ctx.RespondAsync( $"Channel not excluded." );
+                return;
+            }
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+
+            await ctx.RespondAsync( $"The channel is now logged." );
+        }
+
+        [Command( "AddLogExclusion" )]
+        [Description( "Disables logging for a specific channel." )]
+        [Require​User​Permissions​( DSharpPlus.Permissions.ManageChannels )]
+        public async Task AddLogExclusion( CommandContext ctx, ulong channelId )
+        {
+            await ctx.TriggerTypingAsync();
+
+            if ( !Program.Core.RegisteredServerIds.Contains( ctx.Guild.Id ) )
+            {
+                await ctx.RespondAsync( "Server is not registered, can not enable logging." );
+                return;
+            }
+
+            if ( !ctx.Guild.Channels.ContainsKey( channelId ) )
+            {
+                await ctx.RespondAsync( $"Invalid channel Id: {channelId}" );
+                return;
+            }
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            if ( !profile.LogConfig.ExcludedChannels.Contains( channelId ) )
+            {
+                profile.LogConfig.ExcludedChannels.Add( channelId );
+            }
+            else
+            {
+                await ctx.RespondAsync( $"Channel already excluded." );
+                return;
+            }
+
+            File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+
+            await ctx.RespondAsync( $"The channel is now excluded from logging." );
         }
 
         [Command( "SetMajorLogChannel" )]
