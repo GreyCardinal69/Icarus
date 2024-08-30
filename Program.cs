@@ -19,8 +19,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -1097,14 +1099,53 @@ namespace Icarus
                                 IconUrl = e.Message.Author.AvatarUrl
                             },
                             Description =
-                            $"\n\n**The deleted message was:** " + e.Message.Content + "\n" +
+                            $"\n\n**The deleted message was:** " + $"{(e.Message.Content == "" ? "None, see attachment(s) below." : e.Message.Content)} " + "\n" +
                             $"\n **Message deleted at:** {e.Channel.Mention} \n\n" +
                             "```\nThe user's ID is: " + e.Message.Author.Id + "\n" +
                             "The deleted message's ID was: " + e.Message.Id + "\n" +
                             "The Channel's ID is: " + e.Channel.Id + "```",
                             Timestamp = DateTime.Now,
                         };
-                        await e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel ).SendMessageAsync( embed );
+
+                        int z = 0;
+                        if ( e.Message.Attachments != null )
+                        {
+                            foreach ( var item in e.Message.Attachments )
+                            {
+                                await Console.Out.WriteLineAsync(item.Url);
+                                string savePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\Temp\\image{z}.{GetUrlType(item.Url)}";
+
+                                try
+                                {
+                                    using ( HttpClient client = new HttpClient() )
+                                    {
+                                        byte[] imageBytes = await client.GetByteArrayAsync( item.Url );
+                                        await File.WriteAllBytesAsync( savePath, imageBytes );
+                                        Console.WriteLine( "Image downloaded successfully." );
+                                    }
+                                }
+                                catch ( Exception ex )
+                                {
+                                    Console.WriteLine( $"Error downloading image: {ex.Message}" );
+                                }
+                                z++;
+                            }
+                        }
+
+                        var channel = e.Guild.GetChannel( ServerProfiles[i].LogConfig.LogChannel );
+                        await channel.SendMessageAsync( embed );
+
+                        var saved = Helpers.GetAllFilesFromFolder( @$"{AppDomain.CurrentDomain.BaseDirectory}\Temp\", false );
+
+                        foreach ( var item in saved )
+                        {
+                            using var fs = new FileStream( item, FileMode.Open, FileAccess.Read );
+                            var msg = await new DiscordMessageBuilder().AddFile( item, fs ).SendAsync( channel );
+                        }
+                        foreach ( var item in saved )
+                        {
+                            File.Delete( item );
+                        }
                     }
                     else
                     {
@@ -1113,6 +1154,17 @@ namespace Icarus
                 }
             }
             return;
+        }
+
+        private string GetUrlType ( string url )
+        {
+            if ( url.Contains( ".jpg" ) || url.Contains( ".jpeg" ) ) return ".jpg";
+            if ( url.Contains( ".mp4" ) ) return ".mp4";
+            if ( url.Contains( ".mp3" ) ) return ".mp3";
+            if ( url.Contains( ".png" ) ) return ".png";
+            if ( url.Contains( ".gif" ) ) return ".gif";
+
+            return ".jpg";
         }
 
         private Task Client_Ready( DiscordClient sender, ReadyEventArgs e )
