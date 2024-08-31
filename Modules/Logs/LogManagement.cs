@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Icarus.Modules.Logs
@@ -257,6 +258,26 @@ namespace Icarus.Modules.Logs
             await ctx.RespondAsync( $"Disabled logging for {ctx.Guild.Name} in: {ctx.Guild.GetChannel( channelId )}" );
 
             File.WriteAllText( $@"{AppDomain.CurrentDomain.BaseDirectory}ServerProfiles\{ctx.Guild.Id}.json", JsonConvert.SerializeObject( profile, Formatting.Indented ) );
+        }
+
+        [Command( "ListLogExclusions" )]
+        [Description( "Responds with channels not logged." )]
+        [Require​User​Permissions​Attribute( DSharpPlus.Permissions.ManageMessages )]
+        public async Task ListLogExclusions( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+
+            ServerProfile profile = ServerProfile.ProfileFromId( ctx.Guild.Id );
+
+            StringBuilder str = new();
+
+            foreach ( var item in profile.LogConfig.ExcludedChannels )
+            {
+                var channel = ctx.Guild.GetChannel( item );
+                str.Append( $"{channel.Name}: {channel.Id}.\n" );
+            }
+
+            await ctx.RespondAsync( str.ToString() );
         }
 
         [Command( "LogEvents" )]

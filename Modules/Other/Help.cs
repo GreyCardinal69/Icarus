@@ -79,6 +79,7 @@ namespace Icarus.Modules.Other
                             $"the bot for the server.\n\n" +
                             $"`AddLogExclusion <channelId>`: Disables logging in a specific channel.\n\n" +
                             $"`RemoveLogExclusion <channelId>`: Enables logging in a specific channel after it has been excluded from logging.\n\n" +
+                            $"`ListLogExclusions`: Replies with channels not logged.\n\n" +
                             $"`userProfile <userId>`: Responds with information on a registered user's profile.\n\n",
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
