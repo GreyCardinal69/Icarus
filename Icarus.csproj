@@ -29,12 +29,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.4.3" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.4.3" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.4.3" />
-    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.3" />
+    <PackageReference Include="DSharpPlus" Version="4.5.0" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.5.0" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.5.0" />
+    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.5.0" />
     <PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="17.5.33428.366" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="runtime.native.System.Net.Security" Version="4.3.1" />
   </ItemGroup>
 
 </Project>

@@ -80,7 +80,7 @@ namespace Icarus.Modules.Profiles
 
         public string ToString()
         {
-            return $"Timed Reminder: `{Name}` \nContent: {Content}.\n`{DateTime.Now}`.";
+            return $"Timed Reminder: `{Name}` \nContent: {Content} \n`{DateTime.Now}`";
         }
 
         public TimedReminder( string name, string content, bool repeat, string dateFormat, string date, long expdate = 0 )

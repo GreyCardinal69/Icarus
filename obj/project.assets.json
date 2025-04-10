@@ -15,7 +15,7 @@
           }
         }
       },
-      "DSharpPlus/4.4.3": {
+      "DSharpPlus/4.5.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
@@ -39,10 +39,10 @@
           }
         }
       },
-      "DSharpPlus.CommandsNext/4.4.3": {
+      "DSharpPlus.CommandsNext/4.5.0": {
         "type": "package",
         "dependencies": {
-          "DSharpPlus": "4.4.3",
+          "DSharpPlus": "4.5.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1"
         },
         "compile": {
@@ -56,11 +56,11 @@
           }
         }
       },
-      "DSharpPlus.Interactivity/4.4.3": {
+      "DSharpPlus.Interactivity/4.5.0": {
         "type": "package",
         "dependencies": {
           "ConcurrentHashSet": "1.3.0",
-          "DSharpPlus": "4.4.3"
+          "DSharpPlus": "4.5.0"
         },
         "compile": {
           "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {
@@ -73,10 +73,10 @@
           }
         }
       },
-      "DSharpPlus.SlashCommands/4.4.3": {
+      "DSharpPlus.SlashCommands/4.5.0": {
         "type": "package",
         "dependencies": {
-          "DSharpPlus": "4.4.3",
+          "DSharpPlus": "4.5.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1"
         },
         "compile": {
@@ -141,7 +141,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -235,11 +235,11 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "runtime.native.System.Net.Security/4.3.0": {
+      "runtime.native.System.Net.Security/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0"
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3"
         },
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -1371,57 +1371,57 @@
         "lib/netstandard2.0/ConcurrentCollections.xml"
       ]
     },
-    "DSharpPlus/4.4.3": {
-      "sha512": "dekaxmANgul4AQLbM0m20GWbXuS/N0EtW4u3nJD/9/5o4NXk2c4QBEpApcEzSdOaSsUNoBSatjBkKVuBR9tVzg==",
+    "DSharpPlus/4.5.0": {
+      "sha512": "DilQxEBSQ+826t17QsOertkpDleUNKDk7pTr3eEmmm3eGOW3ipQW4eVASVBB0YIciFjV/qGbkzTp0+qcCdm9YA==",
       "type": "package",
-      "path": "dsharpplus/4.4.3",
+      "path": "dsharpplus/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.4.4.3.nupkg.sha512",
+        "dsharpplus.4.5.0.nupkg.sha512",
         "dsharpplus.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.dll",
         "lib/netstandard2.0/DSharpPlus.xml"
       ]
     },
-    "DSharpPlus.CommandsNext/4.4.3": {
-      "sha512": "oTIY04IlDX3TcL8SvnhDGf85Fiud2ehp7D9v/t3v2w8iHvecCkzBWuXtA9OJUnrvXR/9orqmwmfqhk2nYk+67Q==",
+    "DSharpPlus.CommandsNext/4.5.0": {
+      "sha512": "CeHQGhQuUkujgKPMBqxnykSg8zaPW3MSou7iRL+vRdFqh1iIACjkQXiKhvp/YmawqxZs1YYsvcc2X9L5IKBahw==",
       "type": "package",
-      "path": "dsharpplus.commandsnext/4.4.3",
+      "path": "dsharpplus.commandsnext/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.commandsnext.4.4.3.nupkg.sha512",
+        "dsharpplus.commandsnext.4.5.0.nupkg.sha512",
         "dsharpplus.commandsnext.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.CommandsNext.dll",
         "lib/netstandard2.0/DSharpPlus.CommandsNext.xml"
       ]
     },
-    "DSharpPlus.Interactivity/4.4.3": {
-      "sha512": "mga+AvKLb2ZOzps3yGu4cWNcPq5J6R8AVBzE71gCPqq4t7OLs6dXXh57kibpUyJSLalgTOYOtigtnyw62p+6vg==",
+    "DSharpPlus.Interactivity/4.5.0": {
+      "sha512": "zZcxwkpOSkpK+Tj0c3OgRf4CxCM/N+uqeYi9nV+zb2WYtEy23+slIzqlKVqhBs2rKGkbXwOxDCaMwha+ih3YjA==",
       "type": "package",
-      "path": "dsharpplus.interactivity/4.4.3",
+      "path": "dsharpplus.interactivity/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dsharpplus.interactivity.4.4.3.nupkg.sha512",
+        "dsharpplus.interactivity.4.5.0.nupkg.sha512",
         "dsharpplus.interactivity.nuspec",
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.Interactivity.dll",
         "lib/netstandard2.0/DSharpPlus.Interactivity.xml"
       ]
     },
-    "DSharpPlus.SlashCommands/4.4.3": {
-      "sha512": "ri7dV4FsPM0WNGG8N4oIfIky1TCdrckOr0Ozgegt7zPmamXGCwFGG49NrPQLNHfKk56qq6pbyTDeJaejaLiqYA==",
+    "DSharpPlus.SlashCommands/4.5.0": {
+      "sha512": "6ngr6EqPPfCibHnrga+8nwqsFJHM00JgiqwynKW/zY3fZnU35TUdbGiOL/RhMgx0bH/UnW6kB7YiF8dalG7mFA==",
       "type": "package",
-      "path": "dsharpplus.slashcommands/4.4.3",
+      "path": "dsharpplus.slashcommands/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "dsharpplus.png",
-        "dsharpplus.slashcommands.4.4.3.nupkg.sha512",
+        "dsharpplus.slashcommands.4.5.0.nupkg.sha512",
         "dsharpplus.slashcommands.nuspec",
         "lib/netstandard2.0/DSharpPlus.SlashCommands.dll",
         "lib/netstandard2.0/DSharpPlus.SlashCommands.xml"
@@ -1506,17 +1506,17 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.Targets/1.1.0": {
-      "sha512": "aOZA3BWfz9RXjpzt0sRJJMjAscAUm3Hoa4UWAfceV9UTYxgwZ1lZt5nO2myFf+/jetYQo4uTP7zS8sJY67BBxg==",
+    "Microsoft.NETCore.Targets/1.1.3": {
+      "sha512": "3Wrmi0kJDzClwAC+iBdUBpEKmEle8FQNsCs77fkiOIw/9oYA07bL1EZNX0kQ2OMN3xpwvl0vAtOCYY3ndDNlhQ==",
       "type": "package",
-      "path": "microsoft.netcore.targets/1.1.0",
+      "path": "microsoft.netcore.targets/1.1.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.targets.1.1.0.nupkg.sha512",
+        "microsoft.netcore.targets.1.1.3.nupkg.sha512",
         "microsoft.netcore.targets.nuspec",
         "runtime.json"
       ]
@@ -1674,17 +1674,17 @@
         "runtime.native.system.net.http.nuspec"
       ]
     },
-    "runtime.native.System.Net.Security/4.3.0": {
-      "sha512": "M2nN92ePS8BgQ2oi6Jj3PlTUzadYSIWLdZrHY1n1ZcW9o4wAQQ6W+aQ2lfq1ysZQfVCgDwY58alUdowrzezztg==",
+    "runtime.native.System.Net.Security/4.3.1": {
+      "sha512": "7pPnb9XRVrUKSzd6OPtpO737FSJcQjECYwW8KxRVT7mKuAHcZJ30ZFtvt451fqa0DX/IGyeuB+Nx3tNmDZY8Ew==",
       "type": "package",
-      "path": "runtime.native.system.net.security/4.3.0",
+      "path": "runtime.native.system.net.security/4.3.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
-        "runtime.native.system.net.security.4.3.0.nupkg.sha512",
+        "runtime.native.system.net.security.4.3.1.nupkg.sha512",
         "runtime.native.system.net.security.nuspec"
       ]
     },
@@ -4341,32 +4341,33 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "DSharpPlus >= 4.4.3",
-      "DSharpPlus.CommandsNext >= 4.4.3",
-      "DSharpPlus.Interactivity >= 4.4.3",
-      "DSharpPlus.SlashCommands >= 4.4.3",
+      "DSharpPlus >= 4.5.0",
+      "DSharpPlus.CommandsNext >= 4.5.0",
+      "DSharpPlus.Interactivity >= 4.5.0",
+      "DSharpPlus.SlashCommands >= 4.5.0",
       "Microsoft.VisualStudio.VsixColorCompiler >= 17.5.33428.366",
-      "Newtonsoft.Json >= 13.0.3"
+      "Newtonsoft.Json >= 13.0.3",
+      "runtime.native.System.Net.Security >= 4.3.1"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\thewa\\.nuget\\packages\\": {},
+    "C:\\Users\\zalgo\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
+      "projectUniqueName": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj",
       "projectName": "Icarus",
-      "projectPath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
-      "packagesPath": "C:\\Users\\thewa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\obj\\",
+      "projectPath": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj",
+      "packagesPath": "C:\\Users\\zalgo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\thewa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\zalgo\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4391,8 +4392,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -4400,19 +4402,19 @@
         "dependencies": {
           "DSharpPlus": {
             "target": "Package",
-            "version": "[4.4.3, )"
+            "version": "[4.5.0, )"
           },
           "DSharpPlus.CommandsNext": {
             "target": "Package",
-            "version": "[4.4.3, )"
+            "version": "[4.5.0, )"
           },
           "DSharpPlus.Interactivity": {
             "target": "Package",
-            "version": "[4.4.3, )"
+            "version": "[4.5.0, )"
           },
           "DSharpPlus.SlashCommands": {
             "target": "Package",
-            "version": "[4.4.3, )"
+            "version": "[4.5.0, )"
           },
           "Microsoft.VisualStudio.VsixColorCompiler": {
             "target": "Package",
@@ -4421,6 +4423,10 @@
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.3, )"
+          },
+          "runtime.native.System.Net.Security": {
+            "target": "Package",
+            "version": "[4.3.1, )"
           }
         },
         "imports": [
@@ -4439,8 +4445,50 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Net.Security' 4.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-6xh7-4v2w-36q6",
+      "libraryId": "System.Net.Security",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Net.Security' 4.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-ch6p-4jcm-h8vh",
+      "libraryId": "System.Net.Security",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Net.Security' 4.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-j8f4-2w4p-mhjc",
+      "libraryId": "System.Net.Security",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Net.Security' 4.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qhqf-ghgh-x2m4",
+      "libraryId": "System.Net.Security",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

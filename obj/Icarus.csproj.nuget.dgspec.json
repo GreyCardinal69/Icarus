@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj": {}
+    "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj": {}
   },
   "projects": {
-    "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj": {
+    "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
+        "projectUniqueName": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj",
         "projectName": "Icarus",
-        "projectPath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\Icarus.csproj",
-        "packagesPath": "C:\\Users\\thewa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\thewa\\source\\repos\\C#\\Icarus\\obj\\",
+        "projectPath": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\Icarus.csproj",
+        "packagesPath": "C:\\Users\\zalgo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\zalgo\\source\\repos\\C#\\Icarus\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\thewa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\zalgo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -42,8 +42,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
-        }
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -51,19 +52,19 @@
           "dependencies": {
             "DSharpPlus": {
               "target": "Package",
-              "version": "[4.4.3, )"
+              "version": "[4.5.0, )"
             },
             "DSharpPlus.CommandsNext": {
               "target": "Package",
-              "version": "[4.4.3, )"
+              "version": "[4.5.0, )"
             },
             "DSharpPlus.Interactivity": {
               "target": "Package",
-              "version": "[4.4.3, )"
+              "version": "[4.5.0, )"
             },
             "DSharpPlus.SlashCommands": {
               "target": "Package",
-              "version": "[4.4.3, )"
+              "version": "[4.5.0, )"
             },
             "Microsoft.VisualStudio.VsixColorCompiler": {
               "target": "Package",
@@ -72,6 +73,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "runtime.native.System.Net.Security": {
+              "target": "Package",
+              "version": "[4.3.1, )"
             }
           },
           "imports": [
@@ -90,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
