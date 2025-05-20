@@ -74,7 +74,8 @@ namespace Icarus.Modules.Other
         public async Task UpTime( CommandContext ctx )
         {
             await ctx.TriggerTypingAsync();
-            await ctx.RespondAsync( $"Uptime: {DateTime.Now - Program.Core.BotStartUpStamp}." );
+            var uptime = (DateTime.Now - Program.Core.BotStartUpStamp);
+            await ctx.RespondAsync( $"Uptime: {Math.Abs(uptime.Days)} Day(s), {Math.Abs(uptime.Hours)} hour(s), {Math.Abs(uptime.Minutes)} minute(s)." );
         }
 
         [Command( "Erase" )]
