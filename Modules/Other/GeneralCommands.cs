@@ -69,6 +69,14 @@ namespace Icarus.Modules.Other
             await ctx.RespondAsync( $"Ping: {ctx.Client.Ping}ms." );
         }
 
+        [Command( "UpTime" )]
+        [Description( "Responds with current instance up time." )]
+        public async Task UpTime( CommandContext ctx )
+        {
+            await ctx.TriggerTypingAsync();
+            await ctx.RespondAsync( $"Uptime: {DateTime.Now - Program.Core.BotStartUpStamp}." );
+        }
+
         [Command( "Erase" )]
         [Description( "Deletes set amount of messages if possible." )]
         [RequireUserPermissions( DSharpPlus.Permissions.ManageMessages )]
